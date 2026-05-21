@@ -14,4 +14,5 @@ export {
 } from './dropdown-menu';
 export { Avatar, AvatarImage, AvatarFallback } from './avatar';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
+export { DataTable } from './data-table';
 export { Spinner, Skeleton, EmptyState } from '../Spinner';
