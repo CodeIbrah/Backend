@@ -13,10 +13,15 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { initOpenTelemetry } from './telemetry/otel';
 
 async function bootstrap() {
-  initOpenTelemetry();
+  try {
+    initOpenTelemetry();
+  } catch {
+    console.warn('OpenTelemetry not available, skipping initialization');
+  }
 
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
+    abortOnError: false,
   });
 
   const configService = app.get(ConfigService);
@@ -88,8 +93,13 @@ async function bootstrap() {
   const port = configService.get<number>('PORT', 3000);
   const httpServer = app.getHttpServer();
 
-  await app.listen(port);
-  logger.log(`Application is running on port ${port}`, 'Bootstrap');
+  try {
+    await app.listen(port);
+    logger.log(`Application is running on port ${port}`, 'Bootstrap');
+  } catch (err) {
+    logger.error(`Failed to start on port ${port}: ${err.message}`, 'Bootstrap');
+    process.exit(1);
+  }
 
   const signals = ['SIGINT', 'SIGTERM'] as const;
   signals.forEach((signal) => {

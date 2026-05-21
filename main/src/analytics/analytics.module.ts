@@ -1,4 +1,4 @@
-import { Module, OnModuleDestroy, Provider, Inject } from '@nestjs/common';
+import { Module, OnModuleDestroy, Provider, Inject, Optional } from '@nestjs/common';
 import { Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -10,12 +10,23 @@ import { AnalyticsProcessor } from './analytics.processor';
 const redisProvider: Provider = {
   provide: 'ANALYTICS_REDIS',
   useFactory: (configService: ConfigService) => {
-    return new Redis({
+    const redis = new Redis({
       host: configService.get<string>('REDIS_HOST', 'localhost'),
       port: parseInt(configService.get<string>('REDIS_PORT', '6379'), 10),
       password: configService.get<string>('REDIS_PASSWORD') || undefined,
       maxRetriesPerRequest: null,
+      lazyConnect: true,
+      retryStrategy: (times) => {
+        if (times > 3) return null;
+        return Math.min(times * 200, 2000);
+      },
     });
+
+    redis.on('error', () => {
+      // Silently handle Redis errors in dev mode
+    });
+
+    return redis;
   },
   inject: [ConfigService],
 };
@@ -23,7 +34,13 @@ const redisProvider: Provider = {
 const queueProvider: Provider = {
   provide: 'ANALYTICS_QUEUE',
   useFactory: (redis: Redis) => {
-    return new Queue('analytics-events', { connection: redis });
+    return new Queue('analytics-events', {
+      connection: redis,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 1000 },
+      },
+    });
   },
   inject: ['ANALYTICS_REDIS'],
 };
@@ -31,17 +48,13 @@ const queueProvider: Provider = {
 const workerProvider: Provider = {
   provide: 'ANALYTICS_WORKER',
   useFactory: (redis: Redis, processor: AnalyticsProcessor) => {
-    const worker = new Worker(
-      'analytics-events',
-      (job) => processor.process(job),
-      {
-        connection: redis,
-        concurrency: 5,
-      },
-    );
+    const worker = new Worker('analytics-events', (job) => processor.process(job), {
+      connection: redis,
+      concurrency: 5,
+    });
 
-    worker.on('error', (err) => {
-      console.error('Analytics worker error:', err);
+    worker.on('error', () => {
+      // Silently handle worker errors in dev mode
     });
 
     return worker;
@@ -57,14 +70,18 @@ const workerProvider: Provider = {
 })
 export class AnalyticsModule implements OnModuleDestroy {
   constructor(
-    @Inject('ANALYTICS_WORKER') private readonly analyticsWorker: Worker,
-    @Inject('ANALYTICS_QUEUE') private readonly analyticsQueue: Queue,
-    @Inject('ANALYTICS_REDIS') private readonly redis: Redis,
+    @Optional() @Inject('ANALYTICS_WORKER') private readonly analyticsWorker?: Worker,
+    @Optional() @Inject('ANALYTICS_QUEUE') private readonly analyticsQueue?: Queue,
+    @Optional() @Inject('ANALYTICS_REDIS') private readonly redis?: Redis,
   ) {}
 
   async onModuleDestroy() {
-    await this.analyticsWorker.close();
-    await this.analyticsQueue.close();
-    await this.redis.quit();
+    await this.analyticsWorker?.close().catch(() => {});
+    await this.analyticsQueue?.close().catch(() => {});
+    try {
+      await this.redis?.quit();
+    } catch {
+      // Ignore quit errors
+    }
   }
 }
