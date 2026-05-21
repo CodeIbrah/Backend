@@ -1,0 +1,16 @@
+{
+  "name": "@backend/shared-ai",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "@anthropic-ai/sdk": "^0.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

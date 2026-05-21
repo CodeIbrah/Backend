@@ -1,0 +1,9 @@
+{
+  "name": "@backend/shared-analytics",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@backend/shared-types": "1.0.0",
+    "@backend/shared-logger": "1.0.0"
+  }
+}

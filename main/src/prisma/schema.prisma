@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  CLOSED
+}
+
+enum AnalyticsEventType {
+  LOGIN
+  REGISTER
+  FAILED_AUTH
+  ENDPOINT_CALL
+  USER_ACTIVITY
+  API_LATENCY
+  ERROR
+  SERVICE_CALL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  analyticsEvents AnalyticsEvent[]
+  incidents       Incident[]
+  auditLogs       AuditLog[]
+  activityLogs    ActivityLog[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model AnalyticsEvent {
+  id        String             @id @default(uuid())
+  type      AnalyticsEventType
+  userId    String?
+  user      User?              @relation(fields: [userId], references: [id])
+  metadata  Json?
+  timestamp DateTime           @default(now())
+  traceId   String?
+  service   String?
+
+  @@index([type])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([service])
+  @@map("analytics_events")
+}
+
+model Incident {
+  id            String          @id @default(uuid())
+  severity      IncidentSeverity
+  title         String
+  description   String
+  rootCause     String?
+  suggestedFix  String?
+  status        IncidentStatus  @default(OPEN)
+  userId        String?
+  user          User?           @relation(fields: [userId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  resolvedAt    DateTime?
+
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("incidents")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  resource  String
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  LOGIN_FAILED
+  PAYMENT_CREATED
+  PAYMENT_COMPLETED
+  PAYMENT_FAILED
+  PAYMENT_REFUNDED
+  INVOICE_GENERATED
+  INVOICE_DOWNLOADED
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  ROLE_CHANGED
+  PASSWORD_CHANGED
+  SETTINGS_UPDATED
+  DATA_EXPORTED
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+  API_KEY_CREATED
+  API_KEY_REVOKED
+  CONFIG_CHANGED
+  SYSTEM_ALERT
+}
+
+enum ActivitySeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+model ActivityLog {
+  id          String           @id @default(uuid())
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id])
+  type        ActivityType
+  severity    ActivitySeverity @default(INFO)
+  action      String
+  resource    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  traceId     String?
+  createdAt   DateTime         @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt])
+  @@index([action])
+  @@map("activity_logs")
+}
+
+model ErrorLog {
+  id        String   @id @default(uuid())
+  message   String
+  stack     String?
+  level     String
+  service   String
+  traceId   String?
+  context   Json?
+  createdAt DateTime @default(now())
+
+  @@index([level])
+  @@index([service])
+  @@index([createdAt])
+  @@index([traceId])
+  @@map("error_logs")
+}

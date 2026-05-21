@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "commonjs",
+    "lib": ["ES2021"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@shared-types": ["../packages/shared-types/src"],
+      "@shared-utils": ["../packages/shared-utils/src"],
+      "@shared-logger": ["../packages/shared-logger/src"],
+      "@shared-telemetry": ["../packages/shared-telemetry/src"],
+      "@shared-analytics": ["../packages/shared-analytics/src"],
+      "@shared-ai": ["../packages/shared-ai/src"],
+      "@shared-reports": ["../packages/shared-reports/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "test"]
+}

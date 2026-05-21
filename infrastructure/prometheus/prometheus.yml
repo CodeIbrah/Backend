@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - recording_rules.yml
+  - alert_rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'main'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['main:3000']
+        labels:
+          service: 'main'
+
+  - job_name: 'auth-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['auth-service:3001']
+        labels:
+          service: 'auth-service'
+
+  - job_name: 'users-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['users-service:3002']
+        labels:
+          service: 'users-service'
+
+  - job_name: 'notifications-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['notifications-service:3003']
+        labels:
+          service: 'notifications-service'

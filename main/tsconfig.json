@@ -1,0 +1,33 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@shared-types": ["../../packages/shared-types/src"],
+      "@shared-utils": ["../../packages/shared-utils/src"],
+      "@shared-logger": ["../../packages/shared-logger/src"],
+      "@shared-telemetry": ["../../packages/shared-telemetry/src"],
+      "@shared-analytics": ["../../packages/shared-analytics/src"],
+      "@shared-ai": ["../../packages/shared-ai/src"],
+      "@shared-reports": ["../../packages/shared-reports/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
+}

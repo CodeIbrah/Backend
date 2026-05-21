@@ -1,0 +1,11 @@
+{
+  "name": "@backend/shared-utils",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "dependencies": {
+    "bcrypt": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2"
+  }
+}

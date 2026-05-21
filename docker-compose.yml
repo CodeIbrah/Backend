@@ -1,0 +1,225 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - main
+    networks:
+      - backend
+    restart: unless-stopped
+
+  main:
+    build:
+      context: .
+      dockerfile: main/Dockerfile
+    ports:
+      - "3010:3000"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backend
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: microservices/auth-service/Dockerfile
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  users-service:
+    build:
+      context: .
+      dockerfile: microservices/users-service/Dockerfile
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: microservices/payment-service/Dockerfile
+    ports:
+      - "3004:3000"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  notifications-service:
+    build:
+      context: .
+      dockerfile: microservices/notifications-service/Dockerfile
+    ports:
+      - "3003:3000"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: backend_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infrastructure/grafana:/etc/grafana/provisioning
+    networks:
+      - backend
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    networks:
+      - backend
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./infrastructure/loki:/etc/loki
+      - loki-data:/loki
+    networks:
+      - backend
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./infrastructure/promtail:/etc/promtail
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+    networks:
+      - backend
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+      - "4317:4317"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # Sentry (self-hosted)
+  # To set up Sentry self-hosted:
+  # 1. Clone the sentry self-hosted repository: git clone https://github.com/getsentry/self-hosted.git
+  # 2. Navigate to the directory: cd self-hosted
+  # 3. Run the installer: ./install.sh
+  # 4. Start Sentry: docker compose up -d
+  # 5. Access Sentry at http://localhost:9000
+  # Note: Sentry requires significant resources (minimum 8GB RAM recommended)
+  # Consider running it as a separate compose project to avoid conflicts
+
+  nginx:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - main
+      - auth-service
+      - users-service
+      - notifications-service
+      - payment-service
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  grafana-data:
+  prometheus-data:
+  loki-data:

@@ -1,0 +1,13 @@
+query:
+  base-path: /
+
+collector:
+  zipkin:
+    host-port: 9411
+
+sampling:
+  strategies_file: /etc/jaeger/sampling_strategies.json
+  refresh_interval: 1m
+
+storage:
+  type: memory

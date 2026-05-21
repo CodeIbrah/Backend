@@ -1,0 +1,2240 @@
+{
+  "scanDate": "2026-05-21T07:38:17.499Z",
+  "projectRoot": "C:\\Users\\iqliz\\backend-template",
+  "filesScanned": 154,
+  "summary": {
+    "total": 277,
+    "bySeverity": {
+      "CRITICAL": 6,
+      "HIGH": 22,
+      "MEDIUM": 142,
+      "LOW": 107,
+      "INFO": 0
+    },
+    "byCategory": {
+      "SECURITY": 137,
+      "BUG": 31,
+      "PERFORMANCE": 22,
+      "EXPLOIT": 1,
+      "QUALITY": 86
+    }
+  },
+  "findings": [
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "Auth middleware extracts token but does not verify it",
+      "suggestion": "Add JWT verification (jwt.verify) to validate tokens"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "Auth middleware extracts token but does not verify it",
+      "suggestion": "Add JWT verification (jwt.verify) to validate tokens"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "Auth middleware extracts token but does not verify it",
+      "suggestion": "Add JWT verification (jwt.verify) to validate tokens"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "Auth middleware extracts token but does not verify it",
+      "suggestion": "Add JWT verification (jwt.verify) to validate tokens"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\analyzers\\fix-suggester.ts",
+      "line": 99,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "eval() usage detected - code injection risk",
+      "suggestion": "Avoid eval(). Use JSON.parse() for JSON, or safer alternatives"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\analyzers\\fix-suggester.ts",
+      "line": 100,
+      "severity": "CRITICAL",
+      "category": "SECURITY",
+      "description": "eval() usage detected - code injection risk",
+      "suggestion": "Avoid eval(). Use JSON.parse() for JSON, or safer alternatives"
+    },
+    {
+      "file": "main\\src\\analytics\\analytics.service.ts",
+      "line": 189,
+      "severity": "HIGH",
+      "category": "PERFORMANCE",
+      "description": "Possible N+1 query - database operation inside loop",
+      "suggestion": "Use Prisma findMany with where.in, or batch operations"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 9,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 17,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 9,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 17,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\admin.controller.ts",
+      "line": 99,
+      "severity": "HIGH",
+      "category": "PERFORMANCE",
+      "description": "Possible N+1 query - database operation inside loop",
+      "suggestion": "Use Prisma findMany with where.in, or batch operations"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 18,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 26,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 37,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\admin.service.ts",
+      "line": 299,
+      "severity": "HIGH",
+      "category": "PERFORMANCE",
+      "description": "Possible N+1 query - database operation inside loop",
+      "suggestion": "Use Prisma findMany with where.in, or batch operations"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\admin.service.ts",
+      "line": 329,
+      "severity": "HIGH",
+      "category": "PERFORMANCE",
+      "description": "Possible N+1 query - database operation inside loop",
+      "suggestion": "Use Prisma findMany with where.in, or batch operations"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 9,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 17,
+      "severity": "HIGH",
+      "category": "QUALITY",
+      "description": "Sensitive data may be logged (password/token/secret)",
+      "suggestion": "Never log sensitive data. Use masking or exclude sensitive fields from logs"
+    },
+    {
+      "file": "microservices\\users-service\\src\\services\\users.service.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "BUG",
+      "description": "Users service uses in-memory Map store - data lost on restart",
+      "suggestion": "Use a persistent database (PostgreSQL, MongoDB) for production"
+    },
+    {
+      "file": "microservices\\users-service\\src\\services\\users.service.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "User service does not hash passwords",
+      "suggestion": "Use bcrypt or argon2 to hash passwords before storage"
+    },
+    {
+      "file": "packages\\shared-utils\\src\\crypto.ts",
+      "line": 18,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Math.random() used for token/secret generation - not cryptographically secure",
+      "suggestion": "Use crypto.randomBytes() or crypto.randomUUID() for security-sensitive random values"
+    },
+    {
+      "file": "packages\\shared-utils\\src\\crypto.ts",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Token generation uses Math.random() - not cryptographically secure",
+      "suggestion": "Use crypto.randomBytes() for secure token generation"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\analyzers\\fix-suggester.ts",
+      "line": 188,
+      "severity": "HIGH",
+      "category": "EXPLOIT",
+      "description": "HTTP request with user-controlled URL - SSRF risk",
+      "suggestion": "Validate URLs against allowlist, block internal IP ranges"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 93,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Server listening on port 80 without HTTPS redirect",
+      "suggestion": "Add HTTPS redirect or configure SSL/TLS"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Grafana exposed without authentication at nginx level",
+      "suggestion": "Add auth_basic or IP restriction to Grafana location"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Prometheus exposed without authentication at nginx level",
+      "suggestion": "Add auth_basic or IP restriction to Prometheus location"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 1,
+      "severity": "HIGH",
+      "category": "SECURITY",
+      "description": "Jaeger UI exposed without authentication at nginx level",
+      "suggestion": "Add auth_basic or IP restriction to Jaeger location"
+    },
+    {
+      "file": "main\\src\\activity-log\\interceptors\\activity-log.interceptor.ts",
+      "line": 68,
+      "severity": "MEDIUM",
+      "category": "BUG",
+      "description": "Error silently swallowed - no logging or handling",
+      "suggestion": "Log errors or rethrow them; never silently catch"
+    },
+    {
+      "file": "main\\src\\analytics\\analytics.service.ts",
+      "line": 22,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "setInterval without corresponding clearInterval - memory leak risk",
+      "suggestion": "Store interval ID and clear it on module destroy or component unmount"
+    },
+    {
+      "file": "main\\src\\modules\\health\\health.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "QUALITY",
+      "description": "Health check has no actual health indicators configured",
+      "suggestion": "Add database, Redis, and other service health checks"
+    },
+    {
+      "file": "main\\src\\modules\\metrics\\metrics.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Prometheus metrics endpoint exposed without authentication",
+      "suggestion": "Add authentication or IP restriction to /metrics endpoint"
+    },
+    {
+      "file": "main\\src\\prisma\\prisma.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "BUG",
+      "description": "Prisma $connect() without error handling",
+      "suggestion": "Wrap $connect() in try/catch to handle connection failures"
+    },
+    {
+      "file": "main\\src\\queue\\queue.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "QUALITY",
+      "description": "Queue service methods accept \"any\" type - no input validation",
+      "suggestion": "Define proper interfaces for queue job data"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 36,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 71,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 77,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 81,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 87,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 104,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "main\\src\\reports\\reports.service.ts",
+      "line": 107,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\controllers\\auth.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\controllers\\auth.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "CORS enabled with default settings (allows all origins)",
+      "suggestion": "Configure CORS with specific allowed origins"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\auth.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\auth.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\services\\auth.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\services\\auth.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\validators\\auth.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\validators\\auth.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\controllers\\notifications.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\controllers\\notifications.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "CORS enabled with default settings (allows all origins)",
+      "suggestion": "Configure CORS with specific allowed origins"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\notifications.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\notifications.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\services\\notifications.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\services\\notifications.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\queue.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\queue.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\validators\\notifications.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\validators\\notifications.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\admin.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\admin.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\invoice.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\invoice.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\payment.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\payment.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\receipt.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\receipt.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "CORS enabled with default settings (allows all origins)",
+      "suggestion": "Configure CORS with specific allowed origins"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 69,
+      "severity": "MEDIUM",
+      "category": "BUG",
+      "description": "process.exit() called - may prevent graceful shutdown",
+      "suggestion": "Use proper error handling and let the process exit naturally"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\admin.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\admin.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\invoice.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\invoice.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\payment.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\payment.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\receipt.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\receipt.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\admin.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\admin.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\invoice.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\invoice.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\payment.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\payment.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\receipt.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\receipt.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\types.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\types.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\pdf-generator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\pdf-generator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\validators\\payment.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\validators\\payment.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\payment-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\payment-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\controllers\\users.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\controllers\\users.controller.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "CORS enabled with default settings (allows all origins)",
+      "suggestion": "Configure CORS with specific allowed origins"
+    },
+    {
+      "file": "microservices\\users-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\users.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\users.routes.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\services\\users.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\services\\users.service.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\src\\validators\\users.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\src\\validators\\users.validator.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "microservices\\users-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without Helmet security headers",
+      "suggestion": "Add: app.use(helmet()); for security headers"
+    },
+    {
+      "file": "microservices\\users-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "Express app without rate limiting",
+      "suggestion": "Add express-rate-limit middleware"
+    },
+    {
+      "file": "packages\\shared-analytics\\src\\analytics.ts",
+      "line": 160,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "setInterval without corresponding clearInterval - memory leak risk",
+      "suggestion": "Store interval ID and clear it on module destroy or component unmount"
+    },
+    {
+      "file": "packages\\shared-reports\\src\\generator.ts",
+      "line": 20,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "packages\\shared-reports\\src\\generator.ts",
+      "line": 23,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Synchronous file system operation blocks event loop",
+      "suggestion": "Use async fs.promises API instead of sync operations"
+    },
+    {
+      "file": "packages\\shared-utils\\src\\validation.ts",
+      "line": 1,
+      "severity": "MEDIUM",
+      "category": "SECURITY",
+      "description": "sanitizeInput only removes <> characters - incomplete XSS protection",
+      "suggestion": "Use a proper sanitization library like DOMPurify or sanitize-html"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\agents\\fix-suggestion-agent.ts",
+      "line": 113,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Unbounded array push - potential memory leak",
+      "suggestion": "Add size limits or use LRU cache with max size"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\memory\\knowledge-base.ts",
+      "line": 100,
+      "severity": "MEDIUM",
+      "category": "PERFORMANCE",
+      "description": "Unbounded array push - potential memory leak",
+      "suggestion": "Add size limits or use LRU cache with max size"
+    },
+    {
+      "file": "main\\src\\analytics\\analytics.module.ts",
+      "line": 65,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\analytics\\analytics.service.ts",
+      "line": 25,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\analytics\\analytics.service.ts",
+      "line": 155,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\auth\\auth.service.ts",
+      "line": 96,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\auth\\auth.service.ts",
+      "line": 163,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\auth\\auth.service.ts",
+      "line": 176,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\auth\\auth.service.ts",
+      "line": 190,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\main.ts",
+      "line": 81,
+      "severity": "LOW",
+      "category": "PERFORMANCE",
+      "description": "Event listener added without removal - potential memory leak",
+      "suggestion": "Remove event listeners when no longer needed"
+    },
+    {
+      "file": "main\\src\\modules\\ops\\ops.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Ops dashboard returns stub/empty data",
+      "suggestion": "Implement actual data fetching for dashboard metrics"
+    },
+    {
+      "file": "main\\src\\prisma\\prisma.service.ts",
+      "line": 6,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\queue\\queue.module.ts",
+      "line": 83,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\queue\\queue.service.ts",
+      "line": 57,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\queue\\queue.service.ts",
+      "line": 68,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\queue\\queue.service.ts",
+      "line": 74,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\queue\\queue.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Excessive use of 'any' type (5 occurrences)",
+      "suggestion": "Replace \"any\" with specific types for better type safety"
+    },
+    {
+      "file": "main\\src\\reports\\reports.controller.ts",
+      "line": 26,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\telemetry\\otel.ts",
+      "line": 18,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://jaeger:4318/v1/traces",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "main\\src\\users\\users.service.ts",
+      "line": 68,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\users\\users.service.ts",
+      "line": 103,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\users\\users.service.ts",
+      "line": 134,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\users\\users.service.ts",
+      "line": 172,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "main\\src\\users\\users.service.ts",
+      "line": 189,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\controllers\\auth.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\auth.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\services\\auth.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\src\\validators\\auth.validator.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\auth-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\controllers\\notifications.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\routes\\notifications.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\services\\notifications.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\queue.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\src\\validators\\notifications.validator.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\notifications-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\admin.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\invoice.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\payment.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\controllers\\receipt.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 78,
+      "severity": "LOW",
+      "category": "PERFORMANCE",
+      "description": "Event listener added without removal - potential memory leak",
+      "suggestion": "Remove event listeners when no longer needed"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 79,
+      "severity": "LOW",
+      "category": "PERFORMANCE",
+      "description": "Event listener added without removal - potential memory leak",
+      "suggestion": "Remove event listeners when no longer needed"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 81,
+      "severity": "LOW",
+      "category": "PERFORMANCE",
+      "description": "Event listener added without removal - potential memory leak",
+      "suggestion": "Remove event listeners when no longer needed"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\index.ts",
+      "line": 86,
+      "severity": "LOW",
+      "category": "PERFORMANCE",
+      "description": "Event listener added without removal - potential memory leak",
+      "suggestion": "Remove event listeners when no longer needed"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\admin.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\invoice.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\payment.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\routes\\receipt.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\admin.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\invoice.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\payment.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\services\\receipt.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\types.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\pdf-generator.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\src\\validators\\payment.validator.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\payment-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\controllers\\users.controller.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\users-service\\src\\logging\\logger.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\auth.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\middlewares\\error.middleware.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\index.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "No global unhandledRejection/uncaughtException handler",
+      "suggestion": "Add process.on(\"unhandledRejection\") handler for graceful error handling"
+    },
+    {
+      "file": "microservices\\users-service\\src\\routes\\users.routes.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\services\\users.service.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\telemetry\\tracer.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\utils\\response.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\src\\validators\\users.validator.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\test\\app.test.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "microservices\\users-service\\test\\jest.config.js",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "No graceful shutdown handlers configured",
+      "suggestion": "Add SIGTERM/SIGINT handlers for clean shutdown"
+    },
+    {
+      "file": "packages\\shared-ai\\src\\providers\\base.ts",
+      "line": 1,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Excessive use of 'any' type (4 occurrences)",
+      "suggestion": "Replace \"any\" with specific types for better type safety"
+    },
+    {
+      "file": "packages\\shared-ai\\src\\providers\\ollama.ts",
+      "line": 12,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\integrations\\alert-service.ts",
+      "line": 137,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: https://api.telegram.org/bot${botToken}/sendMessage`;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "infrastructure\\ai-doctor\\integrations\\auto-recovery.ts",
+      "line": 227,
+      "severity": "LOW",
+      "category": "BUG",
+      "description": "Async function with multiple awaits but no try/catch block",
+      "suggestion": "Add try/catch to handle potential rejections gracefully"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 111,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://auth-service;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 125,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://users-service;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 139,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://payment-service;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 221,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://notifications-service;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 235,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://main;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 285,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://grafana/;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 296,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://prometheus/;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    },
+    {
+      "file": "gateway\\nginx.conf",
+      "line": 307,
+      "severity": "LOW",
+      "category": "QUALITY",
+      "description": "Hardcoded URL: http://jaeger/;",
+      "suggestion": "Move URLs to environment variables or configuration"
+    }
+  ]
+}
