@@ -17,6 +17,8 @@ import { ActivityLogModule } from './activity-log/activity-log.module';
 import { HealthController } from './modules/health/health.controller';
 import { MetricsController } from './modules/metrics/metrics.controller';
 
+import { WebsocketModule } from './websocket/websocket.module';
+
 @Module({
   imports: [
     AppConfigModule,
@@ -53,6 +55,7 @@ import { MetricsController } from './modules/metrics/metrics.controller';
     QueueModule,
     OpsModule,
     ActivityLogModule,
+    WebsocketModule,
   ],
   controllers: [HealthController, MetricsController],
 })

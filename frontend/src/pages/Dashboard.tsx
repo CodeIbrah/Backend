@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Users, Activity, TrendingUp, AlertTriangle, Clock, ArrowUpRight, ArrowDownRight,
   Shield, Database, HardDrive, Server, Zap,
@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Skeleton } from '../components/ui';
 import { fetchHealth, fetchMetrics, fetchOpsStatus, fetchActivityLogs, fetchUsers } from '../hooks/api';
+import { useWebSocket } from '../hooks/websocket';
 
 const chartData = [
   { time: '00:00', requests: 120, errors: 2, latency: 45 },
@@ -43,6 +44,27 @@ export default function Dashboard() {
     { name: 'Jaeger', icon: Zap, status: 'checking', color: 'text-amber-400' },
   ]);
   const [loading, setLoading] = useState(true);
+  const [wsStats, setWsStats] = useState({ connected: 0 });
+
+  const { isConnected } = useWebSocket('/events', {
+    autoConnect: true,
+    onMessage: useCallback(({ event, data }: { event: string; data: any }) => {
+      if (event === 'stats') setWsStats(data);
+      if (event === 'health_update') {
+        setSystemStatus(prev => prev.map(s => {
+          const key = s.name.toLowerCase().replace(' ', '');
+          if (data[key]) {
+            const isUp = data[key].status === 'up';
+            return { ...s, status: isUp ? 'operational' : 'degraded', color: isUp ? 'text-green-400' : 'text-red-400' };
+          }
+          return s;
+        }));
+      }
+      if (event === 'new_activity') {
+        setRecentLogs(prev => [data, ...prev].slice(0, 5));
+      }
+    }, []),
+  });
 
   useEffect(() => {
     const load = async () => {
@@ -119,7 +141,14 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted text-xs">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className={isConnected ? 'text-green-400' : 'text-red-400'}>{isConnected ? 'Live' : 'Offline'}</span>
+            {wsStats.connected > 0 && <span className="text-muted-foreground">· {wsStats.connected} connected</span>}
+          </div>
+        </div>
         <p className="text-muted-foreground mt-1">Overview of your system performance and activity</p>
       </div>
 
