@@ -175,12 +175,12 @@ export default function UsersPage() {
       {/* Modal */}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingUser ? 'Edit User' : 'Create User'}>
         <div className="space-y-4">
-          <Input label="Name" value={formName} onChange={setFormName} placeholder="John Doe" />
-          <Input label="Email" type="email" value={formEmail} onChange={setFormEmail} placeholder="user@example.com" required />
+          <Input label="Name" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="John Doe" />
+          <Input label="Email" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} placeholder="user@example.com" required />
           <Select
             label="Role"
             value={formRole}
-            onChange={setFormRole}
+            onValueChange={setFormRole}
             options={[
               { value: 'USER', label: 'User' },
               { value: 'MODERATOR', label: 'Moderator' },
