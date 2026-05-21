@@ -42,7 +42,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(
     cors({
-      origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),
+      origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:5173'),
       credentials: true,
     }),
   );
