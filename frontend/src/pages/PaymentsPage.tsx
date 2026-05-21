@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { CreditCard, DollarSign, TrendingUp, TrendingDown, Plus, Download, Search, Filter, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { Badge, Button } from '../components/ui';
+import { CreditCard, DollarSign, TrendingUp, TrendingDown, Plus, Download, Search, Filter, ArrowUpRight, Clock } from 'lucide-react';
+import { Badge, Button, Card, CardContent, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui';
 
 const payments = [
   { id: 'pay_1', amount: 299.99, currency: 'USD', status: 'completed', method: 'credit_card', customer: 'John Doe', email: 'john@example.com', createdAt: '2026-05-21T10:00:00Z' },
@@ -26,7 +26,7 @@ const statusMap: Record<string, { badge: 'success' | 'warning' | 'error' | 'info
   paid: { badge: 'success', label: 'Paid' },
   sent: { badge: 'info', label: 'Sent' },
   overdue: { badge: 'error', label: 'Overdue' },
-  draft: { badge: 'info' as const, label: 'Draft' },
+  draft: { badge: 'info', label: 'Draft' },
 };
 
 export default function PaymentsPage() {
@@ -48,139 +48,106 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Payments & Invoices</h1>
-        <p className="text-[#6a6a82] mt-1">Manage transactions and billing</p>
+        <h1 className="text-2xl font-bold text-foreground">Payments & Invoices</h1>
+        <p className="text-muted-foreground mt-1">Manage transactions and billing</p>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl p-5">
+        <Card className="p-5">
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[#6a6a82]">Total Revenue</p>
-              <p className="text-2xl font-bold text-white mt-1">${totalRevenue.toFixed(2)}</p>
-            </div>
+            <div><p className="text-sm text-muted-foreground">Total Revenue</p><p className="text-2xl font-bold text-foreground mt-1">${totalRevenue.toFixed(2)}</p></div>
             <div className="p-2.5 rounded-lg bg-green-500/10"><DollarSign className="w-5 h-5 text-green-400" /></div>
           </div>
           <div className="flex items-center gap-1 mt-3"><ArrowUpRight className="w-3.5 h-3.5 text-green-400" /><span className="text-xs font-medium text-green-400">+12.5%</span></div>
-        </div>
-        <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl p-5">
+        </Card>
+        <Card className="p-5">
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[#6a6a82]">Pending</p>
-              <p className="text-2xl font-bold text-white mt-1">${pendingTotal.toFixed(2)}</p>
-            </div>
+            <div><p className="text-sm text-muted-foreground">Pending</p><p className="text-2xl font-bold text-foreground mt-1">${pendingTotal.toFixed(2)}</p></div>
             <div className="p-2.5 rounded-lg bg-amber-500/10"><Clock className="w-5 h-5 text-amber-400" /></div>
           </div>
-        </div>
-        <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl p-5">
+        </Card>
+        <Card className="p-5">
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[#6a6a82]">Refunds</p>
-              <p className="text-2xl font-bold text-white mt-1">${refundTotal.toFixed(2)}</p>
-            </div>
+            <div><p className="text-sm text-muted-foreground">Refunds</p><p className="text-2xl font-bold text-foreground mt-1">${refundTotal.toFixed(2)}</p></div>
             <div className="p-2.5 rounded-lg bg-red-500/10"><TrendingDown className="w-5 h-5 text-red-400" /></div>
           </div>
-        </div>
-        <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl p-5">
+        </Card>
+        <Card className="p-5">
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-[#6a6a82]">Transactions</p>
-              <p className="text-2xl font-bold text-white mt-1">{payments.length}</p>
-            </div>
+            <div><p className="text-sm text-muted-foreground">Transactions</p><p className="text-2xl font-bold text-foreground mt-1">{payments.length}</p></div>
             <div className="p-2.5 rounded-lg bg-blue-500/10"><CreditCard className="w-5 h-5 text-blue-400" /></div>
           </div>
           <div className="flex items-center gap-1 mt-3"><ArrowUpRight className="w-3.5 h-3.5 text-green-400" /><span className="text-xs font-medium text-green-400">+3</span></div>
+        </Card>
+      </div>
+
+      <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+        <TabsList>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+        </TabsList>
+
+        <div className="flex items-center gap-3 mt-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={`Search ${tab}...`} className="w-full bg-background border border-input rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all" />
+          </div>
+          <Button variant="outline"><Filter className="w-4 h-4 mr-2" />Filter</Button>
+          <Button><Plus className="w-4 h-4 mr-2" />New {tab === 'payments' ? 'Payment' : 'Invoice'}</Button>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 bg-[#12121a] border border-[#2a2a3e] rounded-lg p-1 w-fit">
-        {(['payments', 'invoices'] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${tab === t ? 'bg-indigo-600 text-white' : 'text-[#6a6a82] hover:text-white'}`}
-          >
-            {t === 'payments' ? 'Payments' : 'Invoices'}
-          </button>
-        ))}
-      </div>
+        <TabsContent value="payments" className="mt-4">
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Method</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPayments.map((p) => {
+                  const st = statusMap[p.status];
+                  return (
+                    <TableRow key={p.id}>
+                      <TableCell><p className="text-sm font-medium text-foreground">{p.customer}</p><p className="text-xs text-muted-foreground">{p.email}</p></TableCell>
+                      <TableCell className="font-semibold text-foreground">${p.amount.toFixed(2)}</TableCell>
+                      <TableCell className="text-muted-foreground capitalize">{p.method.replace('_', ' ')}</TableCell>
+                      <TableCell><Badge variant={st.badge}>{st.label}</Badge></TableCell>
+                      <TableCell className="text-muted-foreground">{new Date(p.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right"><Button variant="ghost" size="icon"><Download className="w-3.5 h-3.5" /></Button></TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
 
-      {/* Search */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6a6a82]" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={`Search ${tab}...`}
-            className="w-full bg-[#12121a] border border-[#2a2a3e] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-[#6a6a82] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          />
-        </div>
-        <Button variant="secondary"><Filter className="w-4 h-4" /> Filter</Button>
-        <Button><Plus className="w-4 h-4" /> New {tab === 'payments' ? 'Payment' : 'Invoice'}</Button>
-      </div>
-
-      {/* Table */}
-      <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl overflow-hidden">
-        {tab === 'payments' ? (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#2a2a3e]">
-                {['Customer', 'Amount', 'Method', 'Status', 'Date', ''].map((h) => (
-                  <th key={h} className={`text-left px-4 py-3 text-xs font-medium text-[#6a6a82] uppercase tracking-wider ${h === '' ? 'text-right' : ''}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPayments.map((p) => {
-                const st = statusMap[p.status];
-                return (
-                  <tr key={p.id} className="border-b border-[#2a2a3e]/50 hover:bg-[#1a1a2e]/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-white">{p.customer}</p>
-                        <p className="text-xs text-[#6a6a82]">{p.email}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-white">${p.amount.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-[#a0a0b8] capitalize">{p.method.replace('_', ' ')}</td>
-                    <td className="px-4 py-3"><Badge variant={st.badge}>{st.label}</Badge></td>
-                    <td className="px-4 py-3 text-sm text-[#6a6a82]">{new Date(p.createdAt).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="sm"><Download className="w-3.5 h-3.5" /></Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        <TabsContent value="invoices" className="mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredInvoices.map((inv) => {
               const st = statusMap[inv.status];
               return (
-                <div key={inv.id} className="bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg p-5 hover:border-[#3a3a52] transition-colors">
+                <Card key={inv.id} className="p-5 hover:border-border/80 transition-colors">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-mono font-medium text-white">{inv.number}</span>
+                    <span className="text-sm font-mono font-medium text-foreground">{inv.number}</span>
                     <Badge variant={st.badge}>{st.label}</Badge>
                   </div>
-                  <p className="text-sm text-[#a0a0b8]">{inv.customer}</p>
-                  <p className="text-2xl font-bold text-white mt-2">${inv.amount.toFixed(2)}</p>
-                  <p className="text-xs text-[#6a6a82] mt-1">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
-                  <Button variant="secondary" size="sm" className="w-full mt-4"><Download className="w-3.5 h-3.5" /> Download PDF</Button>
-                </div>
+                  <p className="text-sm text-muted-foreground">{inv.customer}</p>
+                  <p className="text-2xl font-bold text-foreground mt-2">${inv.amount.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
+                  <Button variant="outline" size="sm" className="w-full mt-4"><Download className="w-3.5 h-3.5 mr-2" />Download PDF</Button>
+                </Card>
               );
             })}
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
-
-function Clock({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>;
 }

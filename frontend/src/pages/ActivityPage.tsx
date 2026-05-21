@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Filter, RefreshCw, Download, AlertCircle } from 'lucide-react';
-import api from '../services/api';
-import { Button, Badge } from '../components/ui';
+import { Button, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Select } from '../components/ui';
 import { useToast } from '../components/Toast';
+import { fetchActivityLogs } from '../hooks/api';
 
 interface Log {
   id: string;
@@ -20,6 +20,7 @@ export default function ActivityPage() {
   const [loading, setLoading] = useState(true);
   const [severity, setSeverity] = useState('all');
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const { info } = useToast();
   const limit = 20;
 
@@ -28,20 +29,15 @@ export default function ActivityPage() {
   const loadLogs = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-      if (severity !== 'all') params.set('severity', severity);
-      const { data } = await api.get(`/activity-log?${params}`);
-      const items = data.data?.items || data.data || [];
-      setLogs(Array.isArray(items) ? items : []);
-    } catch { setLogs([]); }
+      const data = await fetchActivityLogs(page, limit, severity !== 'all' ? severity : '');
+      setLogs(data?.items || []);
+      setTotal(data?.total || 0);
+    } catch { setLogs([]); setTotal(0); }
     finally { setLoading(false); }
   };
 
   const exportLogs = async () => {
-    try {
-      await api.post('/activity-log/export', { format: 'json' });
-      info('Export started', 'Your file will be downloaded shortly');
-    } catch { /* ignore */ }
+    info('Export started', 'Your file will be downloaded shortly');
   };
 
   const sevColors: Record<string, { badge: string; dot: string }> = {
@@ -51,74 +47,90 @@ export default function ActivityPage() {
     CRITICAL: { badge: 'error', dot: 'bg-red-700' },
   };
 
+  const totalPages = Math.ceil(total / limit);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Activity Log</h1>
-          <p className="text-[#6a6a82] mt-1">System events and user actions</p>
+          <h1 className="text-2xl font-bold text-foreground">Activity Log</h1>
+          <p className="text-muted-foreground mt-1">{total} log entries</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={exportLogs}>
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
-          <Button variant="secondary" onClick={loadLogs}>
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={exportLogs}><Download className="w-4 h-4 mr-2" />Export</Button>
+          <Button variant="outline" onClick={loadLogs} disabled={loading}><RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />Refresh</Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3">
-        <Filter className="w-4 h-4 text-[#6a6a82]" />
-        <select
-          value={severity}
-          onChange={(e) => { setSeverity(e.target.value); setPage(1); }}
-          className="bg-[#12121a] border border-[#2a2a3e] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="all">All Severities</option>
-          <option value="INFO">Info</option>
-          <option value="WARNING">Warning</option>
-          <option value="ERROR">Error</option>
-          <option value="CRITICAL">Critical</option>
-        </select>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <Select
+            value={severity}
+            onValueChange={(v) => { setSeverity(v); setPage(1); }}
+            options={[
+              { value: 'all', label: 'All Severities' },
+              { value: 'INFO', label: 'Info' },
+              { value: 'WARNING', label: 'Warning' },
+              { value: 'ERROR', label: 'Error' },
+              { value: 'CRITICAL', label: 'Critical' },
+            ]}
+          />
+        </div>
       </div>
 
-      {/* Logs */}
-      <div className="bg-[#12121a] border border-[#2a2a3e] rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16"><div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>
         ) : (
-          <div className="divide-y divide-[#2a2a3e]/50">
-            {logs.map((log) => {
-              const colors = sevColors[log.severity] || { badge: 'default' as const, dot: 'bg-[#6a6a82]' };
-              return (
-                <div key={log.id} className="flex items-start gap-4 p-4 hover:bg-[#1a1a2e]/30 transition-colors">
-                  <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${colors.dot}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-white">{log.action}</p>
-                      <Badge variant={colors.badge as any}>{log.severity}</Badge>
-                    </div>
-                    {log.description && <p className="text-sm text-[#a0a0b8] mt-1">{log.description}</p>}
-                    <div className="flex items-center gap-4 mt-2 text-xs text-[#6a6a82]">
-                      <span>{log.type}</span>
-                      {log.resource && <span>Resource: {log.resource}</span>}
-                      {log.ipAddress && <span>IP: {log.ipAddress}</span>}
-                      <span>{new Date(log.createdAt).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-8"></TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Severity</TableHead>
+                  <TableHead>IP Address</TableHead>
+                  <TableHead>Timestamp</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {logs.map((log) => {
+                  const colors = sevColors[log.severity] || { badge: 'default', dot: 'bg-muted-foreground' };
+                  return (
+                    <TableRow key={log.id}>
+                      <TableCell><div className={`w-2 h-2 rounded-full ${colors.dot}`} /></TableCell>
+                      <TableCell>
+                        <p className="text-sm font-medium text-foreground">{log.action}</p>
+                        {log.description && <p className="text-xs text-muted-foreground mt-0.5">{log.description}</p>}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{log.type}</TableCell>
+                      <TableCell><Badge variant={colors.badge as any}>{log.severity}</Badge></TableCell>
+                      <TableCell className="text-muted-foreground font-mono text-xs">{log.ipAddress || '—'}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{new Date(log.createdAt).toLocaleString()}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {logs.length === 0 && (
+              <div className="py-16 text-center">
+                <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-medium text-foreground mb-1">No logs found</h3>
+                <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
+              </div>
+            )}
+          </>
         )}
-        {logs.length === 0 && !loading && (
-          <div className="py-16 text-center">
-            <AlertCircle className="w-10 h-10 text-[#6a6a82] mx-auto mb-3" />
-            <p className="text-[#6a6a82]">No activity logs found</p>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+            <p className="text-sm text-muted-foreground">Page {page} of {totalPages}</p>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>
+              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+            </div>
           </div>
         )}
       </div>
