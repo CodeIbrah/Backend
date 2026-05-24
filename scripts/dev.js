@@ -1,29 +1,28 @@
+
 const { spawn } = require('child_process');
 const path = require('path');
+const isWindows = process.platform === 'win32';
 
 const services = [
-  {
-    name: 'frontend',
-    command: 'npm',
-    args: ['run', 'dev'],
-    cwd: path.join(__dirname, '..', 'frontend'),
-    port: 5173,
-    color: '\x1b[36m',
-  },
-  {
-    name: 'main',
-    command: 'npm',
-    args: ['run', 'dev'],
-    cwd: path.join(__dirname, '..', 'main'),
-    port: 3000,
-    color: '\x1b[32m',
-  },
-];
+  { name: 'main',          cwd: 'main',                    port: 3000, color: '\x1b[32m' },
+  { name: 'auth-service',  cwd: 'microservices/auth-service',        port: 3001, color: '\x1b[36m' },
+  { name: 'users-service', cwd: 'microservices/users-service',       port: 3002, color: '\x1b[33m' },
+  { name: 'notifications-service', cwd: 'microservices/notifications-service', port: 3003, color: '\x1b[35m' },
+  { name: 'payment-service', cwd: 'microservices/payment-service',   port: 3004, color: '\x1b[34m' },
+  { name: 'invoice-service', cwd: 'microservices/invoice-service',   port: 3006, color: '\x1b[31m' },
+  { name: 'mail-service',  cwd: 'microservices/mail-service',        port: 3007, color: '\x1b[37m' },
+  { name: 'sms-service',   cwd: 'microservices/sms-service',         port: 3008, color: '\x1b[38m' },
+].map((s) => ({
+  ...s,
+  command: isWindows ? 'npm.cmd' : 'npm',
+  args: ['run', 'dev'],
+  cwd: path.join(__dirname, '..', s.cwd),
+}));
 
 const processes = [];
 
 function log(service, data, color) {
-  const lines = data.toString().split('\n').filter((l) => l.trim());
+  const lines = data.toString().split('\\n').filter((l) => l.trim());
   lines.forEach((line) => {
     console.log(`${color}[${service}]\x1b[0m ${line}`);
   });
@@ -37,6 +36,7 @@ function startService(service) {
       cwd: service.cwd,
       env: { ...process.env, PORT: service.port.toString() },
       stdio: ['pipe', 'pipe', 'pipe'],
+      shell: true,
     });
 
     proc.stdout.on('data', (data) => log(service.name, data, service.color));
@@ -57,7 +57,7 @@ function startService(service) {
 }
 
 async function startAll() {
-  console.log('\x1b[1m\x1b[32m🚀 Starting frontend + backend...\x1b[0m\n');
+  console.log('\x1b[1m\x1b[32m🚀 Starting all services...\x1b[0m\n');
 
   const promises = services.map((s) => startService(s));
 
@@ -65,7 +65,7 @@ async function startAll() {
 }
 
 function shutdown() {
-  console.log('\n\x1b[1m\x1b[33m🛑 Shutting down all services...\x1b[0m');
+  console.log('\\n\\x1b[1m\\x1b[33m🛑 Shutting down all services...\\x1b[0m');
   processes.forEach(({ name, proc }) => {
     console.log(`\x1b[33m[${name}]\x1b[0m Stopping...`);
     proc.kill('SIGTERM');

@@ -1,3 +1,4 @@
+
 export enum PaymentStatus {
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
@@ -11,9 +12,14 @@ export enum PaymentMethod {
   CREDIT_CARD = 'CREDIT_CARD',
   DEBIT_CARD = 'DEBIT_CARD',
   PAYPAL = 'PAYPAL',
+  BIZUM = 'BIZUM',
+  APPLE_PAY = 'APPLE_PAY',
+  GOOGLE_PAY = 'GOOGLE_PAY',
   BANK_TRANSFER = 'BANK_TRANSFER',
   CRYPTO = 'CRYPTO',
   CASH = 'CASH',
+  KLARNA = 'KLARNA',
+  SEPA = 'SEPA',
 }
 
 export enum InvoiceStatus {

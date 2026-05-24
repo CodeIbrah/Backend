@@ -1,0 +1,349 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH & USERS
+// ============================================
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  analyticsEvents AnalyticsEvent[]
+  incidents       Incident[]
+  auditLogs       AuditLog[]
+  activityLogs    ActivityLog[]
+  payments        Payment[]
+  invoices        Invoice[]
+  receipts        Receipt[]
+  notifications   Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("users")
+}
+
+// ============================================
+// ANALYTICS & OBSERVABILITY
+// ============================================
+
+enum AnalyticsEventType {
+  LOGIN
+  REGISTER
+  FAILED_AUTH
+  ENDPOINT_CALL
+  USER_ACTIVITY
+  API_LATENCY
+  ERROR
+  SERVICE_CALL
+}
+
+model AnalyticsEvent {
+  id        String             @id @default(uuid())
+  type      AnalyticsEventType
+  userId    String?
+  user      User?              @relation(fields: [userId], references: [id])
+  metadata  Json?
+  timestamp DateTime           @default(now())
+  traceId   String?
+  service   String?
+
+  @@index([type, timestamp(sort: Desc)])
+  @@index([service, timestamp(sort: Desc)])
+  @@index([userId, timestamp(sort: Desc)])
+  @@map("analytics_events")
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  CLOSED
+}
+
+model Incident {
+  id            String          @id @default(uuid())
+  severity      IncidentSeverity
+  title         String
+  description   String
+  rootCause     String?
+  suggestedFix  String?
+  status        IncidentStatus  @default(OPEN)
+  userId        String?
+  user          User?           @relation(fields: [userId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  resolvedAt    DateTime?
+
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("incidents")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  resource  String
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  LOGIN_FAILED
+  PAYMENT_CREATED
+  PAYMENT_COMPLETED
+  PAYMENT_FAILED
+  PAYMENT_REFUNDED
+  INVOICE_GENERATED
+  INVOICE_DOWNLOADED
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  ROLE_CHANGED
+  PASSWORD_CHANGED
+  SETTINGS_UPDATED
+  DATA_EXPORTED
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+  API_KEY_CREATED
+  API_KEY_REVOKED
+  CONFIG_CHANGED
+  SYSTEM_ALERT
+}
+
+enum ActivitySeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+model ActivityLog {
+  id          String           @id @default(uuid())
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id])
+  type        ActivityType
+  severity    ActivitySeverity @default(INFO)
+  action      String
+  resource    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  traceId     String?
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type, createdAt(sort: Desc)])
+  @@index([severity, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@map("activity_logs")
+}
+
+model ErrorLog {
+  id        String   @id @default(uuid())
+  message   String
+  stack     String?
+  level     String
+  service   String
+  traceId   String?
+  context   Json?
+  createdAt DateTime @default(now())
+
+  @@index([level])
+  @@index([service])
+  @@index([createdAt])
+  @@index([traceId])
+  @@map("error_logs")
+}
+
+// ============================================
+// PAYMENTS
+// ============================================
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  CRYPTO
+  WALLET
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+  MOCK
+}
+
+model Payment {
+  id              String         @id @default(uuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  amount          Decimal        @db.Decimal(10, 2)
+  currency        String         @default("USD")
+  status          PaymentStatus  @default(PENDING)
+  method          PaymentMethod
+  provider        PaymentProvider @default(MOCK)
+  providerId      String?
+  idempotencyKey  String         @unique
+  metadata        Json?
+  failureReason   String?
+  refundedAmount  Decimal        @default(0) @db.Decimal(10, 2)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  completedAt     DateTime?
+  refundedAt      DateTime?
+
+  invoice         Invoice?
+  receipts        Receipt[]
+  ledgerEntries   PaymentLedger[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([provider, createdAt(sort: Desc)])
+  @@index([idempotencyKey])
+  @@map("payments")
+}
+
+model PaymentLedger {
+  id          String   @id @default(uuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+  entryType   String
+  amount      Decimal  @db.Decimal(10, 2)
+  balance     Decimal  @db.Decimal(10, 2)
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([paymentId, createdAt(sort: Desc)])
+  @@map("payment_ledger")
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  number      String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  paymentId   String?  @unique
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  status      String   @default("draft")
+  dueDate     DateTime
+  paidAt      DateTime?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([number])
+  @@map("invoices")
+}
+
+model Receipt {
+  id          String   @id @default(uuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  number      String   @unique
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  issuedAt    DateTime @default(now())
+  metadata    Json?
+
+  @@index([paymentId])
+  @@index([userId])
+  @@index([number])
+  @@map("receipts")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+enum NotificationType {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+  WEBHOOK
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  type        NotificationType
+  status      NotificationStatus @default(PENDING)
+  title       String
+  message     String
+  channel     String?
+  metadata    Json?
+  sentAt      DateTime?
+  readAt      DateTime?
+  failedAt    DateTime?
+  failureReason String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([type, createdAt(sort: Desc)])
+  @@map("notifications")
+}

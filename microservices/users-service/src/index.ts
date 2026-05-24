@@ -5,6 +5,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import { Registry } from 'prom-client';
+import { connectPrisma, disconnectPrisma, prisma } from '@backend/shared-prisma';
 
 import { logger } from './logging/logger';
 import './telemetry/tracer';
@@ -15,7 +16,7 @@ import { successResponse } from './utils/response';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3002', 10);
 
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',');
 
 app.use(helmet());
 app.use(cors({
@@ -48,23 +49,68 @@ app.get('/metrics', async (_req: Request, res: Response) => {
   res.end(await metricsRegistry.metrics());
 });
 
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json(
-    successResponse({
-      service: 'users-service',
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    })
-  );
+app.get('/health', async (_req: Request, res: Response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json(
+      successResponse({
+        service: 'users-service',
+        status: 'healthy',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+      })
+    );
+  } catch {
+    res.status(503).json(
+      successResponse({
+        service: 'users-service',
+        status: 'unhealthy',
+        database: 'disconnected',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+      })
+    );
+  }
 });
 
 app.use(routes);
 
 app.use(errorMiddleware);
 
-app.listen(PORT, () => {
-  logger.info(`Users service listening on port ${PORT}`);
-});
+let server: ReturnType<typeof app.listen>;
+
+async function start() {
+  try {
+    await connectPrisma();
+    server = app.listen(PORT, () => {
+      logger.info(`Users service listening on port ${PORT}`);
+    });
+  } catch (err) {
+    logger.error(`Failed to start users service: ${(err as Error).message}`);
+    process.exit(1);
+  }
+}
+
+function gracefulShutdown(signal: string) {
+  logger.info(`Received ${signal}. Starting graceful shutdown...`);
+  if (server) {
+    server.close(async () => {
+      await disconnectPrisma();
+      process.exit(0);
+    });
+    setTimeout(() => {
+      logger.warn('Forcing shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+start();
 
 export default app;
