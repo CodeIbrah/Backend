@@ -18,6 +18,8 @@ import { HealthController } from './modules/health/health.controller';
 import { MetricsController } from './modules/metrics/metrics.controller';
 
 import { WebsocketModule } from './websocket/websocket.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { InvoicesModule } from './modules/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { WebsocketModule } from './websocket/websocket.module';
     OpsModule,
     ActivityLogModule,
     WebsocketModule,
+    PaymentsModule,
+    InvoicesModule,
   ],
   controllers: [HealthController, MetricsController],
 })
