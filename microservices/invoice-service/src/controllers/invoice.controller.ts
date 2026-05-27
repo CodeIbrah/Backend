@@ -6,9 +6,12 @@ import {
   validateCreateReceipt,
   validatePaymentWebhook,
   validatePagination,
-  validateInvoiceFilters,
   validateResend,
 } from '../validators/invoice.validator';
+
+interface AuthenticatedRequest extends Request {
+  user?: { userId: string; role?: string };
+}
 import { logger } from '../logging/logger';
 import { InvoiceChannel } from '../types';
 
@@ -108,7 +111,11 @@ export async function listInvoicesHandler(req: Request, res: Response): Promise<
       return;
     }
 
-    const user = (req as any).user;
+    const user = (req as AuthenticatedRequest).user;
+    if (!user) {
+      res.status(401).json(errorResponse('UNAUTHORIZED', 'Authentication required'));
+      return;
+    }
     const result = await invoiceService.findAllInvoices(user.userId, paginationValidation.data.page, paginationValidation.data.limit);
     res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
@@ -119,9 +126,14 @@ export async function listInvoicesHandler(req: Request, res: Response): Promise<
 
 export async function getInvoiceHandler(req: Request, res: Response): Promise<void> {
   try {
-    const invoice = await invoiceService.findInvoice(req.params.id);
+    const { id } = req.params;
+    if (!id || typeof id !== 'string' || id.trim() === '') {
+      res.status(400).json(errorResponse('VALIDATION_ERROR', 'Invoice ID is required'));
+      return;
+    }
+    const invoice = await invoiceService.findInvoice(id);
     if (!invoice) {
-      res.status(404).json(errorResponse('NOT_FOUND', `Invoice ${req.params.id} not found`));
+      res.status(404).json(errorResponse('NOT_FOUND', `Invoice ${id} not found`));
       return;
     }
     res.status(200).json(successResponse(invoice));
@@ -133,9 +145,14 @@ export async function getInvoiceHandler(req: Request, res: Response): Promise<vo
 
 export async function getInvoiceByNumberHandler(req: Request, res: Response): Promise<void> {
   try {
-    const invoice = await invoiceService.findInvoiceByNumber(req.params.number);
+    const { number } = req.params;
+    if (!number || typeof number !== 'string' || number.trim() === '') {
+      res.status(400).json(errorResponse('VALIDATION_ERROR', 'Invoice number is required'));
+      return;
+    }
+    const invoice = await invoiceService.findInvoiceByNumber(number);
     if (!invoice) {
-      res.status(404).json(errorResponse('NOT_FOUND', `Invoice ${req.params.number} not found`));
+      res.status(404).json(errorResponse('NOT_FOUND', `Invoice ${number} not found`));
       return;
     }
     res.status(200).json(successResponse(invoice));
@@ -153,7 +170,11 @@ export async function listReceiptsHandler(req: Request, res: Response): Promise<
       return;
     }
 
-    const user = (req as any).user;
+    const user = (req as AuthenticatedRequest).user;
+    if (!user) {
+      res.status(401).json(errorResponse('UNAUTHORIZED', 'Authentication required'));
+      return;
+    }
     const result = await invoiceService.findAllReceipts(user.userId, paginationValidation.data.page, paginationValidation.data.limit);
     res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {

@@ -1,5 +1,4 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 interface ErrorResponse {
@@ -30,7 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message =
         typeof exceptionResponse === 'string'
           ? exceptionResponse
-          : (exceptionResponse as any).message || exception.message;
+          : (exceptionResponse as Record<string, unknown>).message ?? exception.message;
     } else if (exception instanceof Error) {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       error = exception.name;

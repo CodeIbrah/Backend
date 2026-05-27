@@ -47,7 +47,7 @@ class UsersService {
           { name: { contains: filters.search, mode: 'insensitive' } },
         ];
       }
-      if (filters?.role) where.role = filters.role as any;
+      if (filters?.role) where.role = filters.role;
       if (filters?.isActive !== undefined) where.isActive = filters.isActive;
 
       const [items, total] = await Promise.all([
@@ -163,7 +163,7 @@ class UsersService {
         data: {
           email: input.email,
           name: input.name,
-          role: (input.role || 'USER') as any,
+          role: input.role ?? 'USER',
           password: '',
           isActive: true,
         },
@@ -224,7 +224,7 @@ class UsersService {
         data: {
           ...(input.email && { email: input.email }),
           ...(input.name && { name: input.name }),
-          ...(input.role && { role: input.role as any }),
+          ...(input.role && { role: input.role }),
           ...(input.isActive !== undefined && { isActive: input.isActive }),
         },
         select: {

@@ -5,9 +5,16 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AnalyticsEventType } from '@prisma/client';
 
+interface AnalyticsMetadata {
+  latency?: number;
+  endpoint?: string;
+  errorType?: string;
+  [key: string]: unknown;
+}
+
 @Injectable()
 export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
-  private eventBuffer: Array<{ type: AnalyticsEventType; data: any; timestamp: Date }> = [];
+  private eventBuffer: Array<{ type: AnalyticsEventType; data: Record<string, unknown>; timestamp: Date }> = [];
   private flushInterval: NodeJS.Timeout | null = null;
   private readonly FLUSH_INTERVAL_MS = 5000;
   private readonly MAX_BUFFER_SIZE = 100;
@@ -131,14 +138,14 @@ export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
     const endpointCalls = endpointEvents.length;
 
     const latencies = endpointEvents
-      .map((e) => (e.metadata as any)?.latency)
+      .map((e) => (e.metadata as AnalyticsMetadata)?.latency)
       .filter((l): l is number => typeof l === 'number');
 
     const avgLatency = latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0;
 
     const endpointCounts = new Map<string, number>();
     for (const event of endpointEvents) {
-      const endpoint = (event.metadata as any)?.endpoint ?? 'unknown';
+      const endpoint = (event.metadata as AnalyticsMetadata)?.endpoint ?? 'unknown';
       endpointCounts.set(endpoint, (endpointCounts.get(endpoint) || 0) + 1);
     }
 
@@ -180,7 +187,7 @@ export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
 
     const errorTypeCounts = new Map<string, number>();
     for (const event of errorEvents) {
-      const errorType = (event.metadata as any)?.errorType ?? 'Unknown';
+      const errorType = (event.metadata as AnalyticsMetadata)?.errorType ?? 'Unknown';
       errorTypeCounts.set(errorType, (errorTypeCounts.get(errorType) || 0) + 1);
     }
 
@@ -235,7 +242,7 @@ export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
     });
 
     const latencies = events
-      .map((e) => (e.metadata as any)?.latency)
+      .map((e) => (e.metadata as AnalyticsMetadata)?.latency)
       .filter((l): l is number => typeof l === 'number')
       .sort((a, b) => a - b);
 
@@ -251,13 +258,14 @@ export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
 
     const endpointLatencies = new Map<string, number[]>();
     for (const event of events) {
-      const endpoint = (event.metadata as any)?.endpoint ?? 'unknown';
-      const latency = (event.metadata as any)?.latency;
+      const endpoint = (event.metadata as AnalyticsMetadata)?.endpoint ?? 'unknown';
+      const latency = (event.metadata as AnalyticsMetadata)?.latency;
       if (typeof latency === 'number') {
         if (!endpointLatencies.has(endpoint)) {
           endpointLatencies.set(endpoint, []);
         }
-        endpointLatencies.get(endpoint)!.push(latency);
+        const latencies = endpointLatencies.get(endpoint);
+        if (latencies) latencies.push(latency);
       }
     }
 

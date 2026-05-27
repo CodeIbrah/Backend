@@ -3,7 +3,14 @@ import * as jwt from 'jsonwebtoken';
 import { logger } from '../logging/logger';
 import { errorResponse } from '../utils/response';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
+interface AuthenticatedRequest extends Request {
+  user?: { userId: string; email: string; role: string };
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
@@ -24,7 +31,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string; role: string };
-    (req as Request & { user?: { userId: string; email: string; role: string } }).user = decoded;
+    (req as AuthenticatedRequest).user = decoded;
     next();
   } catch (err) {
     logger.warn(`Invalid token: ${(err as Error).message}`);
