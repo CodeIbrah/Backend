@@ -179,6 +179,7 @@ export class AuthService {
       return null;
     }
 
+    if (!user.password) return null;
     const isPasswordValid = await this.comparePassword(password, user.password);
     if (!isPasswordValid) {
       return null;

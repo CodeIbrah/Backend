@@ -1,0 +1,27 @@
+# Azure Pipelines — Build & deploy to App Service
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  dockerRegistryServiceConnection: "acr-connection"
+  imageRepository: "backend-template"
+  dockerfilePath: "infrastructure/deploy/azure-app-service/Dockerfile"
+  tag: "$(Build.BuildId)"
+
+stages:
+  - stage: Build
+    displayName: Build Docker image
+    jobs:
+      - job: Build
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Docker@2
+            displayName: Build & push
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              tags: $(tag)

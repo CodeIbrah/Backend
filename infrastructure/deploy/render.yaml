@@ -1,0 +1,47 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: backend-template
+    env: docker
+    repo: https://github.com/CodeIbrah/Backend
+    plan: starter
+    region: oregon
+    dockerfilePath: main/Dockerfile
+    dockerContext: main
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: backend-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: backend-cache
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: OTEL_SERVICE_NAME
+        value: backend-template
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: ""  # configure if using a tracing backend
+
+databases:
+  - name: backend-db
+    plan: starter
+    region: oregon
+    postgresMajorVersion: 16
+
+redis:
+  - name: backend-cache
+    plan: starter
+    region: oregon
+    maxmemoryPolicy: allkeys-lru

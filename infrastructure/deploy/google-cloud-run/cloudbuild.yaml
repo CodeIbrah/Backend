@@ -1,0 +1,44 @@
+# Google Cloud Build — CI/CD pipeline for Cloud Run
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - "--tag=gcr.io/$PROJECT_ID/backend-template:$COMMIT_SHA"
+      - "--file=infrastructure/deploy/google-cloud-run/Dockerfile"
+      - "."
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "gcr.io/$PROJECT_ID/backend-template:$COMMIT_SHA"
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - backend-template
+      - "--image=gcr.io/$PROJECT_ID/backend-template:$COMMIT_SHA"
+      - "--region=us-central1"
+      - "--platform=managed"
+      - "--allow-unauthenticated"
+      - "--set-env-vars=NODE_ENV=production,DATABASE_URL=$$DATABASE_URL,REDIS_URL=$$REDIS_URL,JWT_SECRET=$$JWT_SECRET,ENCRYPTION_KEY=$$ENCRYPTION_KEY"
+      - "--update-secrets=DATABASE_URL=projects/$PROJECT_ID/secrets/DATABASE_URL:latest,REDIS_URL=projects/$PROJECT_ID/secrets/REDIS_URL:latest,JWT_SECRET=projects/$PROJECT_ID/secrets/JWT_SECRET:latest,ENCRYPTION_KEY=projects/$PROJECT_ID/secrets/ENCRYPTION_KEY:latest"
+    secretEnv:
+      - DATABASE_URL
+      - REDIS_URL
+      - JWT_SECRET
+      - ENCRYPTION_KEY
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/DATABASE_URL/versions/latest
+      env: DATABASE_URL
+    - versionName: projects/$PROJECT_ID/secrets/REDIS_URL/versions/latest
+      env: REDIS_URL
+    - versionName: projects/$PROJECT_ID/secrets/JWT_SECRET/versions/latest
+      env: JWT_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/ENCRYPTION_KEY/versions/latest
+      env: ENCRYPTION_KEY
+
+timeout: 1200s

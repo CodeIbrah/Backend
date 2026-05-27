@@ -15,11 +15,6 @@ const steps = [
     cwd: path.join(__dirname, '..', 'main'),
   },
   {
-    name: 'Installing frontend dependencies',
-    command: 'npm install',
-    cwd: path.join(__dirname, '..', 'frontend'),
-  },
-  {
     name: 'Installing auth-service dependencies',
     command: 'npm install',
     cwd: path.join(__dirname, '..', 'microservices', 'auth-service'),

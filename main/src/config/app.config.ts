@@ -28,6 +28,14 @@ const envSchema = Joi.object({
   RATE_LIMIT_MAX: Joi.number().default(100),
   LOG_LEVEL: Joi.string().default('debug'),
   LOG_FORMAT: Joi.string().valid('json', 'pretty').default('json'),
+
+  // Encryption
+  ENCRYPTION_KEY: Joi.string().min(0).default(''),
+
+  // TLS (optional — no validation required for file paths)
+  SSL_KEY_PATH: Joi.string().optional().allow(''),
+  SSL_CERT_PATH: Joi.string().optional().allow(''),
+  SSL_CA_PATH: Joi.string().optional().allow(''),
 });
 
 @Module({

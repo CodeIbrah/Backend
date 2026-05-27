@@ -1,0 +1,22 @@
+# Netlify — for serverless functions or edge middleware.
+# The main backend Docker service should be hosted elsewhere (Render, Cloud Run); 
+# Netlify can serve the frontend (if any) or run API functions.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-app.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"

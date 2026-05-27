@@ -19,7 +19,6 @@
     "dev": "node scripts/dev.js",
     "dev:all": "node scripts/dev-all.js",
     "dev:main": "npm run dev -w main",
-    "dev:frontend": "npm run dev -w frontend",
     "dev:auth": "npm run dev -w microservices/auth-service",
     "dev:users": "npm run dev -w microservices/users-service",
     "dev:payments": "npm run dev -w microservices/payment-service",
@@ -31,8 +30,6 @@
     "health": "node scripts/check-health.js",
     "lint": "npm run lint -w main",
     "test": "npm run test -w main",
-    "test:frontend": "npm run test -w frontend",
-    "test:e2e": "npm run test:e2e -w frontend",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "prepare": "husky",
     "commitlint": "commitlint --edit"

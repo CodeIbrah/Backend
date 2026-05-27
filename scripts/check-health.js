@@ -6,7 +6,6 @@ const services = [
   { name: 'Users Service', port: 3002, path: '/health' },
   { name: 'Payment Service', port: 3003, path: '/health' },
   { name: 'Notifications Service', port: 3004, path: '/health' },
-  { name: 'Frontend', port: 5173, path: '/' },
 ];
 
 function checkService({ name, port, path }) {

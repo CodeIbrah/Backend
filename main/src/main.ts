@@ -6,6 +6,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
 import * as cors from 'cors';
 import * as csurf from 'csurf';
+import * as fs from 'fs';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -19,15 +20,34 @@ async function bootstrap() {
     console.warn('OpenTelemetry not available, skipping initialization');
   }
 
+  // --- HTTPS / TLS 1.2+ support ---
+  // Provide SSL_KEY_PATH and SSL_CERT_PATH env vars to enable HTTPS.
+  // TLS termination typically happens at the reverse proxy (nginx, Cloud Run, ELB)
+  // in production; this enables direct TLS when needed.
+  const httpsOptions = loadTlsOptions();
+  const listenProtocol = httpsOptions ? 'HTTPS' : 'HTTP';
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
     abortOnError: false,
+    ...(httpsOptions ? { httpsOptions } : {}),
   });
 
   const configService = app.get(ConfigService);
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
   app.useLogger(logger);
+
+  // ---- Security headers (HSTS included, TLS 1.2+) ----
+  app.use(
+    helmet({
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+    }),
+  );
 
   app.setGlobalPrefix('api/v1');
 
@@ -44,10 +64,9 @@ async function bootstrap() {
     }),
   );
 
-  app.use(helmet());
   app.use(
     cors({
-      origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:5173'),
+      origin: configService.get<string>('CORS_ORIGIN', '*'),
       credentials: true,
     }),
   );
@@ -95,9 +114,9 @@ async function bootstrap() {
 
   try {
     await app.listen(port);
-    logger.log(`Application is running on port ${port}`, 'Bootstrap');
+    logger.log(`Application is running on port ${port} (${listenProtocol})`, 'Bootstrap');
   } catch (err) {
-    logger.error(`Failed to start on port ${port}: ${err.message}`, 'Bootstrap');
+    logger.error(`Failed to start on port ${port}: ${(err as Error).message}`, 'Bootstrap');
     process.exit(1);
   }
 
@@ -110,6 +129,30 @@ async function bootstrap() {
       process.exit(0);
     });
   });
+}
+
+/**
+ * Load TLS options from environment variables.
+ * Provide SSL_KEY_PATH and SSL_CERT_PATH pointing to PEM files.
+ * Optionally SSL_CA_PATH for intermediate CA bundles.
+ */
+function loadTlsOptions(): { key: string; cert: string; ca?: string } | null {
+  const keyPath = process.env['SSL_KEY_PATH'];
+  const certPath = process.env['SSL_CERT_PATH'];
+
+  if (!keyPath || !certPath) return null;
+
+  try {
+    const key = fs.readFileSync(keyPath, 'utf-8');
+    const cert = fs.readFileSync(certPath, 'utf-8');
+    const caPath = process.env['SSL_CA_PATH'];
+    const ca = caPath ? fs.readFileSync(caPath, 'utf-8') : undefined;
+    console.log(`[Bootstrap] TLS certificates loaded (key: ${keyPath}, cert: ${certPath})`);
+    return { key, cert, ca };
+  } catch (err) {
+    console.warn(`[Bootstrap] Failed to load TLS certificates: ${(err as Error).message}. Falling back to HTTP.`);
+    return null;
+  }
 }
 
 bootstrap().catch((err) => {
