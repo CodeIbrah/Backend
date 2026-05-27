@@ -46,6 +46,21 @@ coverage/
 # OpenCode
 .omo/
 
+# Compiled outputs from ts-build
+main/src/**/*.d.ts
+main/src/**/*.d.ts.map
+main/src/**/*.js
+main/src/**/*.js.map
+
+# Frontend stub
+frontend/
+
+# Microservice logs and compiled outputs
+main/main-stderr.log
+main/main-stdout.log
+main/error.log
+main/main/
+
 # Prisma
 main/src/prisma/migrations/
 
