@@ -1,4 +1,243 @@
-# Backend Template\n\n**Enterprise-Ready Backend with Hybrid Monolith + Microservices Architecture**\n\nA production-grade backend template built with NestJS and Express, featuring a hybrid architecture that combines a feature-rich monolith with independent microservices. Includes comprehensive observability, AI-powered error diagnosis, analytics, queue-based processing, and automated incident response.\n\n---\n\n## Table of Contents\n\n- [Architecture Overview](#architecture-overview)\n- [Tech Stack](#tech-stack)\n- [Project Structure](#project-structure)\n- [Quick Start](#quick-start)\n- [Development Setup](#development-setup)\n- [Environment Variables](#environment-variables)\n- [API Endpoints](#api-endpoints)\n- [Observability](#observability)\n- [AI Error Doctor System](#ai-error-doctor-system)\n- [Analytics System](#analytics-system)\n- [Queue System](#queue-system)\n- [Alert System](#alert-system)\n- [Automatic Reports](#automatic-reports)\n- [Security](#security)\n- [Testing](#testing)\n- [Docker Setup](#docker-setup)\n- [Troubleshooting](#troubleshooting)\n- [Contributing](#contributing)\n- [License](#license)\n\n## Architecture Overview\n\nThe system follows a hybrid architecture combining a feature-rich monolith with independent microservices:\n\n`\n+-----------------------------------------------------------------------------------------+\n�                              HYBRID ARCHITECTURE                                �\n+-----------------------------------------------------------------------------------------�\n�                                                                                         �\n�  +-----------------------------------------------------------------------------+       �\n�  �                                MAIN MONOLITH                              �       �\n�  �                                                                                     �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  �  �                        CORE DOMAIN SERVICES                        �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  �  �  Auth       �  �  Users      �  �  Products   �  �  Orders     �  �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  �                                                                                     �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  �  �                        SUPPORTING SERVICES                        �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  �  �  Logging    �  �  Telemetry  �  �  Queue      �  �  Reports    �  �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  +-----------------------------------------------------------------------------+       �\n�                                                                                         �\n�  +-----------------------------------------------------------------------------+       �\n�  �                                MICROSERVICES                             �       �\n�  �                                                                                     �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  �  �                        INDEPENDENT SERVICES                        �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  �  �  Auth        �  �  Notifications �  �  Payments    �  �  Inventory  �  �           �       �\n�  �  �  +-------------+  +-------------+  +-------------+  +-------------+  �           �       �\n�  �  +-----------------------------------------------------------------+           �       �\n�  +-----------------------------------------------------------------------------+       �\n�                                                                                         �\n+-----------------------------------------------------------------------------------------+\n`\n\n## Tech Stack\n\n- **Backend**: NestJS/Express (Node.js/TypeScript)\n- **Database**: PostgreSQL + Prisma\n- **Caching**: Redis\n- **Queue System**: BullMQ\n- **Logging**: Winston\n- **Tracing**: OpenTelemetry + Jaeger\n- **Metrics**: Prometheus\n- **Log Aggregation**: Loki\n- **Dashboard**: Grafana\n- **AI System**: Custom AI agents for error diagnosis and incident response\n\n## Project Structure\n\n`\nbackend-template/\n+-- main/                  # Main monolith application\n+-- microservices/         # Independent microservices\n�   +-- auth-service/       # Authentication service\n�   +-- notifications-service/ # Notifications service\n�   +-- payment-service/    # Payment processing service\n�   +-- users-service/      # User management service\n+-- gateway/               # API Gateway\n+-- infrastructure/        # Infrastructure configuration\n+-- scripts/               # Utility scripts\n+-- reports/               # Automatic reports\n+-- skills/                # AI agent skills\n+-- context/               # Contextual information\n+-- docs/                  # Documentation\n+-- .env.example           # Environment variables template\n+-- package.json           # Project dependencies\n+-- README.md              # Project documentation\n`\n\n## Quick Start\n\n1. Clone the repository\n2. Install dependencies:
+﻿# Backend Template
 
-pm install\n3. Set up environment variables (copy .env.example to .env)\n4. Start the development server:
-pm run dev\n\n## Development Setup\n\n1. Install Node.js (v20+)\n2. Install PostgreSQL\n3. Install Redis\n4. Install Docker (for infrastructure)\n\n## Environment Variables\n\nCreate a .env file based on .env.example and configure:\n\n`\n# Database\nDATABASE_URL=postgresql://user:password@localhost:5432/dbname\n\n# Redis\nREDIS_URL=redis://localhost:6379\n\n# JWT\nJWT_SECRET=your_jwt_secret\n\n# Stripe\nSTRIPE_SECRET_KEY=your_stripe_secret_key\nSTRIPE_WEBHOOK_SECRET=your_webhook_secret\n\n# Observability\nPROMETHEUS_URL=http://localhost:9090\nGRAFANA_URL=http://localhost:3000\nLOKI_URL=http://localhost:3100\nJAEGER_URL=http://localhost:16686\n\n# AI System\nAI_DOCTOR_API_KEY=your_ai_doctor_api_key\n`\n\n## API Endpoints\n\nThe system exposes the following main endpoints:\n\n- **Auth Service**: /api/auth\n- **Users Service**: /api/users\n- **Payment Service**: /api/payments\n- **Notifications Service**: /api/notifications\n- **Inventory Service**: /api/inventory\n\n## Observability\n\nThe system includes comprehensive observability features:\n\n- **Metrics**: Prometheus for metrics collection\n- **Logs**: Winston + Loki for log aggregation\n- **Traces**: OpenTelemetry + Jaeger for distributed tracing\n- **Dashboards**: Grafana for visualization\n\n## AI Error Doctor System\n\nThe AI Error Doctor system provides automated error diagnosis and incident response:\n\n- **Error Analysis**: AI-powered error analysis and root cause identification\n- **Incident Response**: Automated incident response and resolution\n- **Error Patterns**: Detection of recurring error patterns\n- **Recommendations**: Actionable recommendations for error resolution\n\n## Analytics System\n\nThe analytics system provides comprehensive insights into system performance and user behavior:\n\n- **User Analytics**: Tracking of user activity and behavior\n- **Performance Analytics**: Monitoring of system performance metrics\n- **Error Analytics**: Analysis of error patterns and trends\n- **Business Analytics**: Insights into business metrics and KPIs\n\n## Queue System\n\nThe queue system handles asynchronous processing and background jobs:\n\n- **Job Processing**: Processing of background jobs\n- **Job Scheduling**: Scheduling of recurring jobs\n- **Job Monitoring**: Monitoring of job status and progress\n\n## Alert System\n\nThe alert system provides real-time notifications and alerts:\n\n- **Alert Types**: Various types of alerts (error, warning, info)\n- **Alert Channels**: Multiple alert channels (email, Slack, PagerDuty)\n- **Alert Escalation**: Alert escalation policies\n\n## Automatic Reports\n\nThe system generates automatic reports for monitoring and analysis:\n\n- **Performance Reports**: Reports on system performance\n- **Error Reports**: Reports on error patterns and trends\n- **Business Reports**: Reports on business metrics and KPIs\n\n## Security\n\nThe system includes comprehensive security features:\n\n- **Authentication**: JWT-based authentication\n- **Authorization**: Role-based access control\n- **Data Protection**: Encryption of sensitive data\n- **Security Audits**: Regular security audits and vulnerability scanning\n\n## Testing\n\nThe system includes comprehensive testing:\n\n- **Unit Tests**: Unit tests for individual components\n- **Integration Tests**: Integration tests for component interactions\n- **End-to-End Tests**: End-to-end tests for user flows\n- **Load Testing**: Load testing for performance evaluation\n\n## Docker Setup\n\nThe system includes Docker configuration for easy deployment:\n\n- **Docker Compose**: Multi-container Docker setup\n- **Docker Images**: Pre-built Docker images\n- **Docker Hub**: Docker images available on Docker Hub\n\n## Troubleshooting\n\nCommon issues and solutions:\n\n- **Issue**: Application not starting\n **Solution**: Check logs and ensure all dependencies are installed\n\n- **Issue**: Database connection errors\n **Solution**: Verify database credentials and connection URL\n\n- **Issue**: API endpoint not working\n **Solution**: Check API Gateway configuration and microservice status\n\n## Contributing\n\nSee [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.\n\n## License\n\nThis project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Enterprise-Ready Backend with Hybrid Monolith + Microservices Architecture**
+
+A production-grade backend template built with NestJS and Express, featuring a hybrid architecture that combines a feature-rich monolith with independent microservices. Includes comprehensive observability, AI-powered error diagnosis, analytics, queue-based processing, and automated incident response.
+
+---
+
+## Table of Contents
+
+- [Architecture Overview](#architecture-overview)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Development Setup](#development-setup)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Observability](#observability)
+- [AI Error Doctor System](#ai-error-doctor-system)
+- [Analytics System](#analytics-system)
+- [Queue System](#queue-system)
+- [Alert System](#alert-system)
+- [Automatic Reports](#automatic-reports)
+- [Security](#security)
+- [Testing](#testing)
+- [Docker Setup](#docker-setup)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Architecture Overview
+
+The system follows a hybrid architecture combining a feature-rich monolith with independent microservices:
+
+`+-----------------------------------------------------------------------------------------+
+|                              HYBRID ARCHITECTURE                                        |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  +-----------------------------------------------------------------------------+       |
+|  |                                MAIN MONOLITH                              |       |
+|  |                                                                             |       |
+|  |  +-----------------------------------------------------------------+       |       |
+|  |  |                        CORE DOMAIN SERVICES                        |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  |  | Auth        |  | Users       |  | Products    |  | Orders      |  |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  +-----------------------------------------------------------------+   |       |       |
+|  |                                                                         |       |       |
+|  |  +-----------------------------------------------------------------+   |       |       |
+|  |  |                        SUPPORTING SERVICES                        |   |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  |  | Logging     |  | Telemetry   |  | Queue       |  | Reports     |  |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  +-----------------------------------------------------------------+   |       |       |
+|  +-----------------------------------------------------------------------------+       |
+|                                                                                         |
+|  +-----------------------------------------------------------------------------+       |
+|  |                                MICROSERVICES                                        |
+|  |                                                                             |       |
+|  |  +-----------------------------------------------------------------+       |       |
+|  |  |                        INDEPENDENT SERVICES                        |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  |  | Auth        |  | Notifications|  | Payment     |  | Inventory   |  |       |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |       |       |
+|  |  +-----------------------------------------------------------------+   |       |       |
+|  +-----------------------------------------------------------------------------+       |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+`
+backend-template/
++-- main/ # Main monolith application
++-- microservices/ # Independent microservices
+| +-- auth-service/ # Authentication service
+| +-- notifications-service/ # Notifications service
+| +-- payment-service/ # Payment processing service
+| +-- users-service/ # User management service
++-- gateway/ # API Gateway
++-- infrastructure/ # Infrastructure configuration
++-- scripts/ # Utility scripts
++-- reports/ # Automatic reports
++-- skills/ # AI agent skills
++-- context/ # Contextual information
++-- docs/ # Documentation
++-- .env.example # Environment variables template
++-- package.json # Project dependencies
++-- README.md # Project documentation
+`
+
+## Quick Start
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables (copy `.env.example` to `.env`)
+4. Start the development server: `npm run dev`
+
+## Development Setup
+
+1. Install Node.js (v20+)
+2. Install PostgreSQL
+3. Install Redis
+4. Install Docker (for infrastructure)
+
+## Environment Variables
+
+Create a .env file based on .env.example and configure:
+
+`
+
+# Database
+
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+
+# Redis
+
+REDIS_URL=redis://localhost:6379
+
+# JWT
+
+JWT_SECRET=your_jwt_secret
+
+# Stripe
+
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+# Observability
+
+PROMETHEUS_URL=http://localhost:9090
+GRAFANA_URL=http://localhost:3000
+LOKI_URL=http://localhost:3100
+JAEGER_URL=http://localhost:16686
+
+# AI System
+
+AI_DOCTOR_API_KEY=your_ai_doctor_api_key
+`
+
+## API Endpoints
+
+The system exposes the following main endpoints:
+
+- **Auth Service**: /api/auth
+- **Users Service**: /api/users
+- **Payment Service**: /api/payments
+- **Notifications Service**: /api/notifications
+- **Inventory Service**: /api/inventory
+
+## Observability
+
+The system includes comprehensive observability features:
+
+- **Metrics**: Prometheus for metrics collection
+- **Logs**: Winston + Loki for log aggregation
+- **Traces**: OpenTelemetry + Jaeger for distributed tracing
+- **Dashboards**: Grafana for visualization
+
+## AI Error Doctor System
+
+The AI Error Doctor system provides automated error diagnosis and incident response:
+
+- **Error Analysis**: AI-powered error analysis and root cause identification
+- **Incident Response**: Automated incident response and resolution
+- **Error Patterns**: Detection of recurring error patterns
+- **Recommendations**: Actionable recommendations for error resolution
+
+## Analytics System
+
+The analytics system provides comprehensive insights into system performance and user behavior:
+
+- **User Analytics**: Tracking of user activity and behavior
+- **Performance Analytics**: Monitoring of system performance metrics
+- **Error Analytics**: Analysis of error patterns and trends
+- **Business Analytics**: Insights into business metrics and KPIs
+
+## Queue System
+
+The queue system handles asynchronous processing and background jobs:
+
+- **Job Processing**: Processing of background jobs
+- **Job Scheduling**: Scheduling of recurring jobs
+- **Job Monitoring**: Monitoring of job status and progress
+
+## Alert System
+
+The alert system provides real-time notifications and alerts:
+
+- **Alert Types**: Various types of alerts (error, warning, info)
+- **Alert Channels**: Multiple alert channels (email, Slack, PagerDuty)
+- **Alert Escalation**: Alert escalation policies
+
+## Automatic Reports
+
+The system generates automatic reports for monitoring and analysis:
+
+- **Performance Reports**: Reports on system performance
+- **Error Reports**: Reports on error patterns and trends
+- **Business Reports**: Reports on business metrics and KPIs
+
+## Security
+
+The system includes comprehensive security features:
+
+- **Authentication**: JWT-based authentication
+- **Authorization**: Role-based access control
+- **Data Protection**: Encryption of sensitive data
+- **Security Audits**: Regular security audits and vulnerability scanning
+
+## Testing
+
+The system includes comprehensive testing:
+
+- **Unit Tests**: Unit tests for individual components
+- **Integration Tests**: Integration tests for component interactions
+- **End-to-End Tests**: End-to-end tests for user flows
+- **Load Testing**: Load testing for performance evaluation
+
+## Docker Setup
+
+The system includes Docker configuration for easy deployment:
+
+- **Docker Compose**: Multi-container Docker setup
+- **Docker Images**: Pre-built Docker images
+- **Docker Hub**: Docker images available on Docker Hub
+
+## Troubleshooting
+
+Common issues and solutions:
+
+- **Issue**: Application not starting
+  **Solution**: Check logs and ensure all dependencies are installed
+
+- **Issue**: Database connection errors
+  **Solution**: Verify database credentials and connection URL
+
+- **Issue**: API endpoint not working
+  **Solution**: Check API Gateway configuration and microservice status
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

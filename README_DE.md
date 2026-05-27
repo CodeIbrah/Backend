@@ -1,4 +1,259 @@
-# Backend-Vorlage\n\n**Unternehmensbereites Backend mit Hybridarchitektur Monolith + Microservices**\n\nEine Produktionsfähige Backend-Vorlage, die mit NestJS und Express entwickelt wurde und eine Hybridarchitektur kombiniert, die einen funktionsreichen Monolith mit unabhängigen Microservices verbindet. Enthält umfassende Observabilität, KI-gestützte Fehlerdiagnose, Analytik, Warteschlangensysteme und automatisierte Incident-Behandlung.\n\n---\n\n## Inhaltsverzeichnis\n\n- [Architekturübersicht](#architekturübersicht)\n- [Technologie-Stack](#technologie-stack)\n- [Projektstruktur](#projektstruktur)\n- [Schnellstart](#schnellstart)\n- [Entwicklungsumgebung](#entwicklungsumgebung)\n- [Umgebungsvariablen](#umgebungsvariablen)\n- [API-Endpunkte](#api-endpunkte)\n- [Observabilität](#observabilität)\n- [AI Error Doctor-System](#ai-error-doctor-system)\n- [Analytik-System](#analytik-system)\n- [Warteschlangensystem](#warteschlangensystem)\n- [Alarm-System](#alarm-system)\n- [Automatische Berichte](#automatische-berichte)\n- [Sicherheit](#sicherheit)\n- [Tests](#tests)\n- [Docker-Einrichtung](#docker-einrichtung)\n- [Fehlerbehebung](#fehlerbehebung)\n- [Mitwirken](#mitwirken)\n- [Lizenz](#lizenz)\n\n## Architekturübersicht\n\nDas System folgt einer Hybridarchitektur, die einen funktionsreichen Monolith mit unabhängigen Microservices kombiniert:\n\n`\n┌─────────────────────────────────────────────────────────────────────────────────────────┐\n│                              HYBRIDARCHITEKTUR                                │\n├─────────────────────────────────────────────────────────────────────────────────────────┤\n│                                                                                         │\n│  ┌─────────────────────────────────────────────────────────────────────────────┐       │\n│  │                                HAUPTMONOLITH                              │       │\n│  │                                                                                     │       │\n│  │  ┌─────────────────────────────────────────────────────────────────┐           │       │\n│  │  │                        KERN-DOMÄNEN-DIENSTE                        │           │       │\n│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │           │       │\n│  │  │  │  Authentifizierung │  │  Benutzer    │  │  Produkte    │  │  Bestellungen │  │           │       │\n│  │  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  │           │       │\n│  │  └─────────────────────────────────────────────────────────────────┘           │       │\n│  │                                                                                     │       │\n│  │  ┌─────────────────────────────────────────────────────────────────┐           │       │\n│  │  │                        UNTERSTÜTZENDE DIENSTE                        │           │       │\n│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │           │       │\n│  │  │  │  Protokollierung │  │  Telemetrie  │  │  Warteschlange │  │  Berichte    │  │           │       │\n│  │  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  │           │       │\n│  │  └─────────────────────────────────────────────────────────────────┘           │       │\n│  └─────────────────────────────────────────────────────────────────────────────┘       │\n│                                                                                         │\n│  ┌─────────────────────────────────────────────────────────────────────────────┐       │\n│  │                                MICROSERVICES                             │       │\n│  │                                                                                     │       │\n│  │  ┌─────────────────────────────────────────────────────────────────┐           │       │\n│  │  │                        UNGESTÜRTE DIENSTE                          │           │       │\n│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │           │       │\n│  │  │  │  Authentifizierung │  │  Benachrichtigungen │  │  Zahlungen    │  │  Inventar    │  │           │       │\n│  │  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  │           │       │\n│  │  └─────────────────────────────────────────────────────────────────┘           │       │\n│  └─────────────────────────────────────────────────────────────────────────────┘       │\n│                                                                                         │\n└─────────────────────────────────────────────────────────────────────────────────────────┘\n`\n\n## Technologie-Stack\n\n- **Backend**: NestJS/Express (Node.js/TypeScript)\n- **Datenbank**: PostgreSQL + Prisma\n- **Caching**: Redis\n- **Warteschlangensystem**: BullMQ\n- **Protokollierung**: Winston\n- **Tracing**: OpenTelemetry + Jaeger\n- **Metriken**: Prometheus\n- **Log-Aggregation**: Loki\n- **Dashboard**: Grafana\n- **KI-System**: KI-gestützte Agenten für Fehlerdiagnose und Incident-Behandlung\n\n## Projektstruktur\n\n`\nbackend-vorlage/\n├── main/                  # Hauptmonolith-Anwendung\n├── microservices/         # Unabhängige Microservices\n│   ├── auth-service/       # Authentifizierungsdienst\n│   ├── notifications-service/ # Benachrichtigungsdienst\n│   ├── payment-service/    # Zahlungsverarbeitungsdienst\n│   └── users-service/      # Benutzerverwaltungsdienst\n├── gateway/               # API-Gateway\n├── infrastructure/        # Infrastruktur-Konfiguration\n├── scripts/               # Hilfsskripte\n├── reports/               # Automatische Berichte\n├── skills/                # KI-Agenten-Fähigkeiten\n├── context/               # Kontextuelle Informationen\n├── docs/                  # Dokumentation\n├── .env.example           # Vorlage für Umgebungsvariablen\n├── package.json           # Projektabhängigkeiten\n└── README.md              # Projektdokumentation\n`\n\n## Schnellstart\n\n1. Repository klonen\n2. Abhängigkeiten installieren:
+﻿# Backend-Vorlage
 
-pm install\n3. Umgebungsvariablen einrichten (.env.example nach .env kopieren)\n4. Entwicklungsserver starten:
-pm run dev\n\n## Entwicklungsumgebung\n\n1. Node.js installieren (v20+)\n2. PostgreSQL installieren\n3. Redis installieren\n4. Docker installieren (für Infrastruktur)\n\n## Umgebungsvariablen\n\nErstellen Sie eine .env-Datei basierend auf .env.example und konfigurieren Sie:\n\n`\n# Datenbank\nDATABASE_URL=postgresql://benutzer:passwort@localhost:5432/datenbankname\n\n# Redis\nREDIS_URL=redis://localhost:6379\n\n# JWT\nJWT_SECRET=ihr_jwt_secret\n\n# Stripe\nSTRIPE_SECRET_KEY=ihr_stripe_secret_key\nSTRIPE_WEBHOOK_SECRET=ihr_webhook_secret\n\n# Observabilität\nPROMETHEUS_URL=http://localhost:9090\nGRAFANA_URL=http://localhost:3000\nLOKI_URL=http://localhost:3100\nJAEGER_URL=http://localhost:16686\n\n# KI-System\nAI_DOCTOR_API_KEY=ihr_ai_doctor_api_key\n`\n\n## API-Endpunkte\n\nDas System stellt folgende Haupt-Endpunkte bereit:\n\n- **Authentifizierungsdienst**: /api/auth\n- **Benutzerdienst**: /api/users\n- **Zahlungsdienst**: /api/payments\n- **Benachrichtigungsdienst**: /api/notifications\n- **Inventardienst**: /api/inventory\n\n## Observabilität\n\nDas System enthält umfassende Observabilitätsfunktionen:\n\n- **Metriken**: Prometheus für die Metriken-Sammlung\n- **Logs**: Winston + Loki für die Log-Aggregation\n- **Traces**: OpenTelemetry + Jaeger für verteiltes Tracing\n- **Dashboards**: Grafana für die Visualisierung\n\n## AI Error Doctor-System\n\nDas AI Error Doctor-System bietet automatisierte Fehlerdiagnose und Incident-Behandlung:\n\n- **Fehleranalyse**: KI-gestützte Fehleranalyse und Ursachenforschung\n- **Incident-Behandlung**: Automatisierte Incident-Behandlung und -Auflösung\n- **Fehlermuster**: Erkennung wiederkehrender Fehlermuster\n- **Empfehlungen**: Handlungsfähige Empfehlungen zur Fehlerbehebung\n\n## Analytik-System\n\nDas Analytik-System bietet umfassende Einblicke in die Systemleistung und das Nutzerverhalten:\n\n- **Nutzeranalytik**: Verfolgung der Nutzeraktivität und -verhalten\n- **Leistungsanalytik**: Überwachung der Systemleistungsmetriken\n- **Fehleranalytik**: Analyse von Fehlermustern und -trends\n- **Geschäftsanalytik**: Einblicke in Geschäftsmetriken und KPIs\n\n## Warteschlangensystem\n\nDas Warteschlangensystem behandelt asynchrone Verarbeitung und Hintergrundaufgaben:\n\n- **Job-Verarbeitung**: Verarbeitung von Hintergrundjobs\n- **Job-Planung**: Planung wiederkehrender Jobs\n- **Job-Überwachung**: Überwachung des Job-Status und -Fortschritts\n\n## Alarm-System\n\nDas Alarm-System bietet Echtzeit-Benachrichtigungen und -alarme:\n\n- **Alarm-Typen**: Verschiedene Alarm-Typen (Fehler, Warnung, Info)\n- **Alarm-Kanäle**: Mehrere Alarm-Kanäle (E-Mail, Slack, PagerDuty)\n- **Alarm-Eskalation**: Alarm-Eskalationsrichtlinien\n\n## Automatische Berichte\n\nDas System generiert automatische Berichte für Monitoring und Analyse:\n\n- **Leistungsberichte**: Berichte über die Systemleistung\n- **Fehlerberichte**: Berichte über Fehlermuster und -trends\n- **Geschäftsberichte**: Berichte über Geschäftsmetriken und KPIs\n\n## Sicherheit\n\nDas System enthält umfassende Sicherheitsfunktionen:\n\n- **Authentifizierung**: JWT-basierte Authentifizierung\n- **Autorisierung**: Rollenbasierte Zugriffskontrolle\n- **Datenschutz**: Verschlüsselung sensibler Daten\n- **Sicherheitsaudits**: Regelmäßige Sicherheitsaudits und Schwachstellen-Scans\n\n## Tests\n\nDas System enthält umfassende Tests:\n\n- **Einheitstests**: Einheitstests für einzelne Komponenten\n- **Integrations-Tests**: Integrations-Tests für Komponenten-Interaktionen\n- **End-to-End-Tests**: End-to-End-Tests für Nutzerflows\n- **Last-Tests**: Last-Tests für die Leistungsbewertung\n\n## Docker-Einrichtung\n\nDas System enthält Docker-Konfiguration für einfache Bereitstellung:\n\n- **Docker Compose**: Multi-Container-Docker-Einrichtung\n- **Docker-Images**: Vordefinierte Docker-Images\n- **Docker Hub**: Docker-Images auf Docker Hub verfügbar\n\n## Fehlerbehebung\n\nHäufige Probleme und Lösungen:\n\n- **Problem**: Anwendung startet nicht\n **Lösung**: Protokolle überprüfen und sicherstellen, dass alle Abhängigkeiten installiert sind\n\n- **Problem**: Datenbankverbindungsfehler\n **Lösung**: Datenbank-Anmeldeinformationen und Verbindungs-URL überprüfen\n\n- **Problem**: API-Endpunkt funktioniert nicht\n **Lösung**: API-Gateway-Konfiguration und Microservice-Status überprüfen\n\n## Mitwirken\n\nSiehe [CONTRIBUTING.md](CONTRIBUTING.md) für Mitwirkungsrichtlinien.\n\n## Lizenz\n\nDieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
+**Unternehmensbereites Backend mit Hybridarchitektur Monolith + Microservices**
+
+Eine Produktionsfähige Backend-Vorlage, die mit NestJS und Express entwickelt wurde und eine Hybridarchitektur kombiniert, die einen funktionsreichen Monolith mit unabhängigen Microservices verbindet. Enthält umfassende Observabilität, KI-gestützte Fehlerdiagnose, Analytik, Warteschlangensysteme und automatisierte Incident-Behandlung.
+
+---
+
+## Inhaltsverzeichnis
+
+- [Architekturübersicht](#architekturübersicht)
+- [Technologie-Stack](#technologie-stack)
+- [Projektstruktur](#projektstruktur)
+- [Schnellstart](#schnellstart)
+- [Entwicklungsumgebung](#entwicklungsumgebung)
+- [Umgebungsvariablen](#umgebungsvariablen)
+- [API-Endpunkte](#api-endpunkte)
+- [Observabilität](#observabilität)
+- [AI Error Doctor-System](#ai-error-doctor-system)
+- [Analytik-System](#analytik-system)
+- [Warteschlangensystem](#warteschlangensystem)
+- [Alarm-System](#alarm-system)
+- [Automatische Berichte](#automatische-berichte)
+- [Sicherheit](#sicherheit)
+- [Tests](#tests)
+- [Docker-Einrichtung](#docker-einrichtung)
+- [Fehlerbehebung](#fehlerbehebung)
+- [Mitwirken](#mitwirken)
+- [Lizenz](#lizenz)
+
+## Architekturübersicht
+
+Das System folgt einer Hybridarchitektur, die einen funktionsreichen Monolith mit unabhängigen Microservices kombiniert:
+
+`+-----------------------------------------------------------------------------------------+
+|                              HYBRIDARCHITEKTUR                                |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  +-----------------------------------------------------------------------------+       |
+|  |                                HAUPTMONOLITH                              |       |
+|  |                                                                                     |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  |  |                        KERN-DOMÄNEN-DIENSTE                        |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  |  |  Authentifizierung |  |  Benutzer    |  |  Produkte    |  |  Bestellungen |  |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  |                                                                                     |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  |  |                        UNTERSTÜTZENDE DIENSTE                        |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  |  |  Protokollierung |  |  Telemetrie  |  |  Warteschlange |  |  Berichte    |  |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  +-----------------------------------------------------------------------------+       |
+|                                                                                         |
+|  +-----------------------------------------------------------------------------+       |
+|  |                                MICROSERVICES                             |       |
+|  |                                                                                     |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  |  |                        UNGESTÜRTE DIENSTE                          |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  |  |  Authentifizierung |  |  Benachrichtigungen |  |  Zahlungen    |  |  Inventar    |  |           |       |
+|  |  |  +-------------+  +-------------+  +-------------+  +-------------+  |           |       |
+|  |  +-----------------------------------------------------------------+           |       |
+|  +-----------------------------------------------------------------------------+       |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+`
+
+## Technologie-Stack
+
+- **Backend**: NestJS/Express (Node.js/TypeScript)
+- **Datenbank**: PostgreSQL + Prisma
+- **Caching**: Redis
+- **Warteschlangensystem**: BullMQ
+- **Protokollierung**: Winston
+- **Tracing**: OpenTelemetry + Jaeger
+- **Metriken**: Prometheus
+- **Log-Aggregation**: Loki
+- **Dashboard**: Grafana
+- **KI-System**: KI-gestützte Agenten für Fehlerdiagnose und Incident-Behandlung
+
+## Projektstruktur
+
+`backend-vorlage/
++-- main/                  # Hauptmonolith-Anwendung
++-- microservices/         # Unabhängige Microservices
+|   +-- auth-service/       # Authentifizierungsdienst
+|   +-- notifications-service/ # Benachrichtigungsdienst
+|   +-- payment-service/    # Zahlungsverarbeitungsdienst
+|   +-- users-service/      # Benutzerverwaltungsdienst
++-- gateway/               # API-Gateway
++-- infrastructure/        # Infrastruktur-Konfiguration
++-- scripts/               # Hilfsskripte
++-- reports/               # Automatische Berichte
++-- skills/                # KI-Agenten-Fähigkeiten
++-- context/               # Kontextuelle Informationen
++-- docs/                  # Dokumentation
++-- .env.example           # Vorlage für Umgebungsvariablen
++-- package.json           # Projektabhängigkeiten
++-- README.md              # Projektdokumentation`
+
+## Schnellstart
+
+1. Repository klonen
+2. Abhängigkeiten installieren:
+
+npm install 3. Umgebungsvariablen einrichten (.env.example nach .env kopieren) 4. Entwicklungsserver starten:
+npm run dev
+
+## Entwicklungsumgebung
+
+1. Node.js installieren (v20+)
+2. PostgreSQL installieren
+3. Redis installieren
+4. Docker installieren (für Infrastruktur)
+
+## Umgebungsvariablen
+
+Erstellen Sie eine .env-Datei basierend auf .env.example und konfigurieren Sie:
+
+`
+
+# Datenbank
+
+DATABASE_URL=postgresql://benutzer:passwort@localhost:5432/datenbankname
+
+# Redis
+
+REDIS_URL=redis://localhost:6379
+
+# JWT
+
+JWT_SECRET=ihr_jwt_secret
+
+# Stripe
+
+STRIPE_SECRET_KEY=ihr_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=ihr_webhook_secret
+
+# Observabilität
+
+PROMETHEUS_URL=http://localhost:9090
+GRAFANA_URL=http://localhost:3000
+LOKI_URL=http://localhost:3100
+JAEGER_URL=http://localhost:16686
+
+# KI-System
+
+AI_DOCTOR_API_KEY=ihr_ai_doctor_api_key
+`
+
+## API-Endpunkte
+
+Das System stellt folgende Haupt-Endpunkte bereit:
+
+- **Authentifizierungsdienst**: /api/auth
+- **Benutzerdienst**: /api/users
+- **Zahlungsdienst**: /api/payments
+- **Benachrichtigungsdienst**: /api/notifications
+- **Inventardienst**: /api/inventory
+
+## Observabilität
+
+Das System enthält umfassende Observabilitätsfunktionen:
+
+- **Metriken**: Prometheus für die Metriken-Sammlung
+- **Logs**: Winston + Loki für die Log-Aggregation
+- **Traces**: OpenTelemetry + Jaeger für verteiltes Tracing
+- **Dashboards**: Grafana für die Visualisierung
+
+## AI Error Doctor-System
+
+Das AI Error Doctor-System bietet automatisierte Fehlerdiagnose und Incident-Behandlung:
+
+- **Fehleranalyse**: KI-gestützte Fehleranalyse und Ursachenforschung
+- **Incident-Behandlung**: Automatisierte Incident-Behandlung und -Auflösung
+- **Fehlermuster**: Erkennung wiederkehrender Fehlermuster
+- **Empfehlungen**: Handlungsfähige Empfehlungen zur Fehlerbehebung
+
+## Analytik-System
+
+Das Analytik-System bietet umfassende Einblicke in die Systemleistung und das Nutzerverhalten:
+
+- **Nutzeranalytik**: Verfolgung der Nutzeraktivität und -verhalten
+- **Leistungsanalytik**: Überwachung der Systemleistungsmetriken
+- **Fehleranalytik**: Analyse von Fehlermustern und -trends
+- **Geschäftsanalytik**: Einblicke in Geschäftsmetriken und KPIs
+
+## Warteschlangensystem
+
+Das Warteschlangensystem behandelt asynchrone Verarbeitung und Hintergrundaufgaben:
+
+- **Job-Verarbeitung**: Verarbeitung von Hintergrundjobs
+- **Job-Planung**: Planung wiederkehrender Jobs
+- **Job-Überwachung**: Überwachung des Job-Status und -Fortschritts
+
+## Alarm-System
+
+Das Alarm-System bietet Echtzeit-Benachrichtigungen und -alarme:
+
+- **Alarm-Typen**: Verschiedene Alarm-Typen (Fehler, Warnung, Info)
+- **Alarm-Kanäle**: Mehrere Alarm-Kanäle (E-Mail, Slack, PagerDuty)
+- **Alarm-Eskalation**: Alarm-Eskalationsrichtlinien
+
+## Automatische Berichte
+
+Das System generiert automatische Berichte für Monitoring und Analyse:
+
+- **Leistungsberichte**: Berichte über die Systemleistung
+- **Fehlerberichte**: Berichte über Fehlermuster und -trends
+- **Geschäftsberichte**: Berichte über Geschäftsmetriken und KPIs
+
+## Sicherheit
+
+Das System enthält umfassende Sicherheitsfunktionen:
+
+- **Authentifizierung**: JWT-basierte Authentifizierung
+- **Autorisierung**: Rollenbasierte Zugriffskontrolle
+- **Datenschutz**: Verschlüsselung sensibler Daten
+- **Sicherheitsaudits**: Regelmäßige Sicherheitsaudits und Schwachstellen-Scans
+
+## Tests
+
+Das System enthält umfassende Tests:
+
+- **Einheitstests**: Einheitstests für einzelne Komponenten
+- **Integrations-Tests**: Integrations-Tests für Komponenten-Interaktionen
+- **End-to-End-Tests**: End-to-End-Tests für Nutzerflows
+- **Last-Tests**: Last-Tests für die Leistungsbewertung
+
+## Docker-Einrichtung
+
+Das System enthält Docker-Konfiguration für einfache Bereitstellung:
+
+- **Docker Compose**: Multi-Container-Docker-Einrichtung
+- **Docker-Images**: Vordefinierte Docker-Images
+- **Docker Hub**: Docker-Images auf Docker Hub verfügbar
+
+## Fehlerbehebung
+
+Häufige Probleme und Lösungen:
+
+- **Problem**: Anwendung startet nicht
+  **Lösung**: Protokolle überprüfen und sicherstellen, dass alle Abhängigkeiten installiert sind
+
+- **Problem**: Datenbankverbindungsfehler
+  **Lösung**: Datenbank-Anmeldeinformationen und Verbindungs-URL überprüfen
+
+- **Problem**: API-Endpunkt funktioniert nicht
+  **Lösung**: API-Gateway-Konfiguration und Microservice-Status überprüfen
+
+## Mitwirken
+
+Siehe [CONTRIBUTING.md](CONTRIBUTING.md) für Mitwirkungsrichtlinien.
+
+## Lizenz
+
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
