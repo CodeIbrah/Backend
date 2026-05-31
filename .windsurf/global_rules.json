@@ -1,0 +1,12 @@
+{
+  "project": "backend-template",
+  "description": "Enterprise NestJS monolith with microservices",
+  "stack": ["NestJS", "Express", "PostgreSQL", "Redis", "Prisma", "TypeScript"],
+  "skills_dir": "./skills",
+  "rules_dir": ".windsurf/rules",
+  "features": {
+    "auth": "JWT + OAuth2 social login",
+    "encryption": "AES-256-GCM at rest",
+    "observability": "Winston + OpenTelemetry + Prometheus"
+  }
+}

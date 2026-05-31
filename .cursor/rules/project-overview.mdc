@@ -1,0 +1,44 @@
+---
+description: Project overview and conventions for backend-template
+globs: ["**/*.ts", "**/*.prisma", "**/*.json"]
+---
+
+# backend-template — Cursor Rules
+
+## Tech Stack
+- **Framework**: NestJS (Express) + TypeScript 5.4
+- **Database**: PostgreSQL 16 via Prisma ORM
+- **Cache**: Redis 7 via ioredis
+- **Auth**: JWT (passport) + OAuth2 social login
+- **Encryption**: AES-256-GCM
+- **Logging**: Winston + Loki
+- **Tracing**: OpenTelemetry + Jaeger
+
+## Architecture
+- Hybrid monolith (`main/`) + microservices (`microservices/`)
+- Global guards: JwtAuthGuard + RolesGuard
+- Validation: class-validator DTOs + global ValidationPipe (whitelist, forbidNonWhitelisted)
+- All DB access via Prisma (no raw SQL)
+
+## Security Constraints
+- Every authenticated endpoint must use @UseGuards(JwtAuthGuard)
+- Admin endpoints must add @Roles('ADMIN') + RolesGuard
+- Refresh tokens are rotated (SHA-256 hash in refresh_tokens table)
+- Token theft detection: reused revoked tokens trigger full session revocation
+- User.isActive verified on every JWT request
+
+## Skills Reference
+Skills are in `./skills/`. Load a skill with: read `skills/<name>.skill.md`
+- `error-analysis.skill.md` — Error analysis and root cause
+- `security.skill.md` — Security monitoring and anomaly detection
+- `observability.skill.md` — Metrics, logs, traces
+- `diagnostics.skill.md` — System diagnostics
+- `prisma-debug.skill.md` — Prisma optimization
+- `performance.skill.md` — Performance profiling
+- `docker-ops.skill.md` — Docker management
+- `queue-management.skill.md` — Queue operations
+- `incident-response.skill.md` — Incident handling
+- `auto-recovery.skill.md` — Automated recovery
+- `reporting.skill.md` — Report generation
+- `analytics.skill.md` — Analytics
+- `tracing.skill.md` — Distributed tracing

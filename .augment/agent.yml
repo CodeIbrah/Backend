@@ -1,0 +1,41 @@
+version: "1.0"
+project: backend-template
+description: Enterprise NestJS monolith with microservices
+
+stack:
+  - NestJS
+  - Express
+  - TypeScript 5.4
+  - PostgreSQL 16
+  - Prisma ORM
+  - Redis 7
+  - Docker
+
+skills_dir: ./skills
+rules_dir: .augment/rules
+
+instructions: |
+  This is a NestJS backend with:
+  - JWT authentication with refresh token rotation
+  - OAuth2 social login (6 providers)
+  - AES-256-GCM encryption at rest
+  - Redis caching layer
+  - WebSocket analytics
+  - gRPC server/client template
+  - Prisma ORM for PostgreSQL
+  
+  Security rules:
+  - All DTOs validated with class-validator
+  - JwtAuthGuard on authenticated endpoints
+  - RolesGuard + @Roles('ADMIN') for admin endpoints
+  - Refresh tokens rotated on use, theft detection active
+  - User.isActive verified on every request
+  
+  13 skills available in ./skills/ directory for domain-specific tasks.
+
+ignored:
+  - node_modules
+  - dist
+  - .turbo
+  - coverage
+  - .env

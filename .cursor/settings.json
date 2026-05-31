@@ -1,0 +1,17 @@
+{
+  "project": "backend-template",
+  "description": "Enterprise NestJS monolith with microservices",
+  "stack": ["NestJS", "Express", "PostgreSQL", "Redis", "Prisma", "TypeScript"],
+  "skills_dir": "./skills",
+  "rules_dir": ".cursor/rules",
+  "preferences": {
+    "typescript": {
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true
+    },
+    "format": "prettier",
+    "lint": "eslint"
+  },
+  "ignored_directories": ["node_modules", "dist", ".turbo", "coverage"]
+}

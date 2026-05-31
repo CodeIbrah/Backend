@@ -1,0 +1,26 @@
+---
+description: NestJS coding conventions
+globs: ["**/*.ts"]
+---
+
+# NestJS Conventions
+
+## Module Structure
+```
+module/
+├── module.controller.ts
+├── module.service.ts
+├── module.module.ts
+├── dto/
+│   └── *.dto.ts
+└── interfaces/
+    └── *.interface.ts
+```
+
+## Patterns
+- DTOs use class-validator (`@IsString`, `@IsEmail`, `@IsNotEmpty`, `@MaxLength(255)`)
+- Services throw NestJS HTTP exceptions (`NotFoundException`, `ConflictException`, `UnauthorizedException`)
+- Auth guards: `JwtAuthGuard` (any authenticated), `RolesGuard` + `@Roles('ADMIN')` (admin only)
+- `@CurrentUser()` decorator extracts user from request (set by JwtStrategy)
+- Global `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })`
+- Logging via Winston (NOT console.log except in services without DI)

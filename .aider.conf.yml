@@ -1,0 +1,32 @@
+# Aider AI Configuration for backend-template
+model: claude-3-5-sonnet-20241022
+editor-model: claude-3-5-haiku-20241022
+project: backend-template
+restore-chat-history: true
+git: true
+map-refresh: auto
+show-diffs: true
+auto-commits: false
+lint: true
+lint-cmd: npm run lint
+
+# Directories to ignore
+ignore:
+  - node_modules/**
+  - dist/**
+  - .turbo/**
+  - coverage/**
+  - .git/**
+
+# Read-only files for context
+read:
+  - AGENTS.md
+  - package.json
+  - main/src/app.module.ts
+  - main/src/prisma/schema.prisma
+
+# Watch files for auto-context
+watch:
+  - skills/*.skill.md
+  - main/src/**/*.ts
+  - main/package.json

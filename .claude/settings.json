@@ -1,0 +1,8 @@
+{
+  "project": "backend-template",
+  "description": "Enterprise NestJS monolith with microservices",
+  "stack": ["NestJS", "Express", "PostgreSQL", "Redis", "Prisma", "TypeScript"],
+  "skills_dir": "./skills",
+  "allowed_commands": ["npm", "npx", "node", "git", "docker", "docker-compose"],
+  "dangerous_commands": ["rm -rf", "sudo", "chmod", "> /dev"]
+}

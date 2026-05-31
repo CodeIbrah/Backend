@@ -1,0 +1,92 @@
+{
+  "name": "backend-template",
+  "description": "Enterprise NestJS monolith with microservices",
+  "stack": ["NestJS", "Express", "PostgreSQL", "Prisma", "Redis", "TypeScript"],
+  "disableIndexing": false,
+  "disableSessionLogging": false,
+  "skills": {
+    "directory": "./skills",
+    "formats": [".skill.md"]
+  },
+  "slashCommands": [
+    {
+      "name": "error-analysis",
+      "description": "Analyze errors, parse stack traces, detect root cause",
+      "prompt": "Read skills/error-analysis.skill.md and apply its methodology to analyze: "
+    },
+    {
+      "name": "security",
+      "description": "Security audit, secret detection, anomaly analysis",
+      "prompt": "Read skills/security.skill.md and apply its methodology to: "
+    },
+    {
+      "name": "observability",
+      "description": "Metrics, logging, tracing, dashboards",
+      "prompt": "Read skills/observability.skill.md and apply its methodology to: "
+    },
+    {
+      "name": "diagnostics",
+      "description": "System diagnostics and health checks",
+      "prompt": "Read skills/diagnostics.skill.md to diagnose: "
+    },
+    {
+      "name": "prisma-debug",
+      "description": "Prisma query optimization and N+1 detection",
+      "prompt": "Read skills/prisma-debug.skill.md to debug: "
+    },
+    {
+      "name": "performance",
+      "description": "Performance profiling and optimization",
+      "prompt": "Read skills/performance.skill.md to optimize: "
+    },
+    {
+      "name": "docker-ops",
+      "description": "Docker operations and container management",
+      "prompt": "Read skills/docker-ops.skill.md to: "
+    },
+    {
+      "name": "queue-management",
+      "description": "Queue monitoring and management",
+      "prompt": "Read skills/queue-management.skill.md to manage: "
+    },
+    {
+      "name": "incident-response",
+      "description": "Incident lifecycle management",
+      "prompt": "Read skills/incident-response.skill.md for: "
+    },
+    {
+      "name": "auto-recovery",
+      "description": "Automated system recovery",
+      "prompt": "Read skills/auto-recovery.skill.md to recover: "
+    },
+    {
+      "name": "reporting",
+      "description": "Report generation",
+      "prompt": "Read skills/reporting.skill.md to generate: "
+    },
+    {
+      "name": "analytics",
+      "description": "Analytics and metrics",
+      "prompt": "Read skills/analytics.skill.md to analyze: "
+    },
+    {
+      "name": "tracing",
+      "description": "Distributed tracing",
+      "prompt": "Read skills/tracing.skill.md to trace: "
+    }
+  ],
+  "context": [
+    {
+      "title": "Project Overview",
+      "content": "Enterprise-ready backend template. NestJS monolith + microservices. PostgreSQL/Prisma, Redis, JWT + OAuth2 auth, AES-256-GCM encryption. Skills in ./skills/"
+    },
+    {
+      "title": "Architecture",
+      "content": "main/ (monolith) with modules: auth, users, social-auth, cipher, websocket, cache, audit, grpc. Global guards: JwtAuthGuard + RolesGuard. Global ValidationPipe (whitelist, forbidNonWhitelisted). All DB via Prisma."
+    },
+    {
+      "title": "Security",
+      "content": "Refresh tokens rotated (SHA-256 hash in refresh_tokens). Token theft detection revokes all sessions. User.isActive verified on every JWT request. Passwords bcrypt(10). Encryption with AES-256-GCM. @MaxLength(255) on all DTOs."
+    }
+  ]
+}
