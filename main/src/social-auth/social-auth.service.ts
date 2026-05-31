@@ -383,6 +383,8 @@ export class SocialAuthService {
   }
 
   private async generateTokens(userId: string, role: string): Promise<AuthTokens> {
+    const refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '30d');
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         { sub: userId, role },
@@ -395,10 +397,20 @@ export class SocialAuthService {
         { sub: userId, type: 'refresh' },
         {
           secret: this.configService.get<string>('JWT_SECRET'),
-          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '30d'),
+          expiresIn: refreshExpiresIn,
         },
       ),
     ]);
+
+    // Persist refresh token hash (same rotation logic as AuthService)
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const parsedExpiry = parseExpiry(refreshExpiresIn);
+
+    await this.prisma.refreshToken.create({
+      data: { userId, tokenHash, expiresAt: parsedExpiry },
+    }).catch((err) => {
+      this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
+    });
 
     return { accessToken, refreshToken };
   }
@@ -416,4 +428,23 @@ export class SocialAuthService {
       // Non-critical
     }
   }
+}
+
+/** Parse '7d', '30d', '1h' style expiry strings into a Date */
+function parseExpiry(expiresIn: string): Date {
+  const match = expiresIn.match(/^(\d+)([dhms])$/);
+  if (!match) return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2];
+
+  const multipliers: Record<string, number> = {
+    d: 24 * 60 * 60 * 1000,
+    h: 60 * 60 * 1000,
+    m: 60 * 1000,
+    s: 1000,
+  };
+
+  const ms = (multipliers[unit] ?? 30 * 24 * 60 * 60 * 1000) * value;
+  return new Date(Date.now() + ms);
 }

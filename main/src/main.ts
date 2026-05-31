@@ -64,9 +64,10 @@ async function bootstrap() {
     }),
   );
 
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
   app.use(
     cors({
-      origin: configService.get<string>('CORS_ORIGIN', '*'),
+      origin: corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
       credentials: true,
     }),
   );

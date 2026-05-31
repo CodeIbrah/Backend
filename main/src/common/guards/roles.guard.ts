@@ -12,7 +12,7 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (!requiredRoles) {
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
 
@@ -23,7 +23,9 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('No user found in request');
     }
 
-    const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
+    // user.role is set by JwtStrategy.validate()
+    const userRole = user.role as string | undefined;
+    const hasRole = userRole !== undefined && requiredRoles.includes(userRole);
 
     if (!hasRole) {
       throw new ForbiddenException('Insufficient permissions');

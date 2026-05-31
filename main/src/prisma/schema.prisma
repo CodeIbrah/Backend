@@ -53,6 +53,7 @@ model User {
   auditLogs       AuditLog[]
   activityLogs    ActivityLog[]
   socialAccounts  SocialAccount[]
+  refreshTokens   RefreshToken[]
 
   @@index([email])
   @@index([role])
@@ -79,6 +80,20 @@ model SocialAccount {
   @@index([userId])
   @@index([provider])
   @@map("social_accounts")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
 }
 
 model AnalyticsEvent {

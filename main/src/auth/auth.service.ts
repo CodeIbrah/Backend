@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { ActivityLogService } from '../activity-log/activity-log.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { AnalyticsEventType } from '@prisma/client';
 
 export interface Tokens {
@@ -63,7 +64,7 @@ export class AuthService {
       },
     });
 
-    const tokens = await this.getTokens(user.id, user.role);
+    const tokens = await this.generateTokens(user.id, user.role);
 
     await this.trackAnalyticsEvent({
       type: AnalyticsEventType.REGISTER,
@@ -109,7 +110,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.getTokens(user.id, user.role);
+    const tokens = await this.generateTokens(user.id, user.role);
 
     await this.trackAnalyticsEvent({
       type: AnalyticsEventType.LOGIN,
@@ -135,37 +136,75 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<{ tokens: Tokens }> {
+    // 1. Verify JWT signature + expiration
+    let payload: { sub: string; type: string };
     try {
-      const payload = this.jwtService.verify(refreshToken, {
+      payload = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_SECRET'),
-      });
-
-      if (payload.type !== 'refresh') {
-        throw new UnauthorizedException('Invalid token type');
-      }
-
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-      });
-
-      if (!user || !user.isActive) {
-        throw new UnauthorizedException('User not found or inactive');
-      }
-
-      const tokens = await this.getTokens(user.id, user.role);
-
-      return { tokens };
-    } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
+      }) as { sub: string; type: string };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
+
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedException('Invalid token type');
+    }
+
+    // 2. Compute SHA-256 hash of the raw token
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    // 3. Lookup in DB — if missing, the token was already rotated or revoked
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash },
+    });
+
+    if (!stored) {
+      throw new UnauthorizedException('Refresh token has been revoked or reused');
+    }
+
+    // 4. Check expiry
+    if (stored.expiresAt < new Date()) {
+      await this.prisma.refreshToken.delete({ where: { id: stored.id } });
+      throw new UnauthorizedException('Refresh token expired');
+    }
+
+    // 5. Check if already revoked (token theft detection)
+    if (stored.revokedAt) {
+      // Token reuse detected — revoke ALL tokens for this user (compromised)
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: stored.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      throw new UnauthorizedException('Refresh token reuse detected — all sessions revoked');
+    }
+
+    // 6. Revoke this specific token (rotation)
+    await this.prisma.refreshToken.update({
+      where: { id: stored.id },
+      data: { revokedAt: new Date() },
+    });
+
+    // 7. Verify user is still active
+    const user = await this.prisma.user.findUnique({
+      where: { id: stored.userId },
+      select: { id: true, isActive: true, role: true },
+    });
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('User not found or inactive');
+    }
+
+    // 8. Issue new token pair
+    const tokens = await this.generateTokens(user.id, user.role);
+
+    return { tokens };
   }
 
   async logout(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        updatedAt: new Date(),
-      },
+    // Revoke ALL refresh tokens for this user
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
 
     await this.activityLogService.logLogout(userId);
@@ -239,6 +278,47 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  /**
+   * Generate tokens AND persist the refresh token hash to the database
+   * for rotation + revocation support.
+   */
+  private async generateTokens(userId: string, role: string): Promise<Tokens> {
+    const refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '30d');
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        { sub: userId, role },
+        {
+          secret: this.configService.get<string>('JWT_SECRET'),
+          expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '7d'),
+        },
+      ),
+      this.jwtService.signAsync(
+        { sub: userId, type: 'refresh' },
+        {
+          secret: this.configService.get<string>('JWT_SECRET'),
+          expiresIn: refreshExpiresIn,
+        },
+      ),
+    ]);
+
+    // Persist refresh token hash to DB
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const parsedExpiry = parseExpiry(refreshExpiresIn);
+
+    await this.prisma.refreshToken.create({
+      data: {
+        userId,
+        tokenHash,
+        expiresAt: parsedExpiry,
+      },
+    }).catch((err) => {
+      this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
+    });
+
+    return { accessToken, refreshToken };
+  }
+
   private async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
@@ -271,4 +351,23 @@ export class AuthService {
       );
     }
   }
+}
+
+/** Parse '7d', '30d', '1h' style expiry strings into a Date (native Date) */
+function parseExpiry(expiresIn: string): Date {
+  const match = expiresIn.match(/^(\d+)([dhms])$/);
+  if (!match) return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2];
+
+  const multipliers: Record<string, number> = {
+    d: 24 * 60 * 60 * 1000,
+    h: 60 * 60 * 1000,
+    m: 60 * 1000,
+    s: 1000,
+  };
+
+  const ms = (multipliers[unit] ?? 30 * 24 * 60 * 60 * 1000) * value;
+  return new Date(Date.now() + ms);
 }
