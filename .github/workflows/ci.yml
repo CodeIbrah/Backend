@@ -36,7 +36,7 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: .
-      - run: npx prisma generate
+      - run: npx prisma generate --schema=src/prisma/schema.prisma
       - run: npm run typecheck
 
   test:
@@ -53,7 +53,7 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: .
-      - run: npx prisma generate
+      - run: npx prisma generate --schema=src/prisma/schema.prisma
       - run: npm test
 
   build:
@@ -71,5 +71,5 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
         working-directory: .
-      - run: npx prisma generate
+      - run: npx prisma generate --schema=src/prisma/schema.prisma
       - run: npm run build
