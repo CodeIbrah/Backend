@@ -138,11 +138,15 @@ class InvoiceService {
       const shouldEmail = invoice.channel === InvoiceChannel.EMAIL || invoice.channel === InvoiceChannel.BOTH;
       const shouldSms = invoice.channel === InvoiceChannel.SMS || invoice.channel === InvoiceChannel.BOTH;
 
-      if (shouldEmail && invoice.userEmail) {
-        await this.sendEmail(invoice);
-      }
-      if (shouldSms && invoice.userPhone) {
-        await this.sendSms(invoice);
+      const results = await Promise.allSettled([
+        shouldEmail && invoice.userEmail ? this.sendEmail(invoice) : Promise.resolve(),
+        shouldSms && invoice.userPhone ? this.sendSms(invoice) : Promise.resolve(),
+      ]);
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          logger.error({ message: 'Failed to send via channel', error: result.reason, invoiceId: invoice.id });
+        }
       }
 
       invoice.sentAt = new Date();
@@ -170,11 +174,15 @@ class InvoiceService {
   async sendReceipt(receipt: Receipt): Promise<void> {
     const span = tracer.startSpan('receipt.send');
     try {
-      if (receipt.userEmail) {
-        await this.sendReceiptEmail(receipt);
-      }
-      if (receipt.userPhone) {
-        await this.sendReceiptSms(receipt);
+      const results = await Promise.allSettled([
+        receipt.userEmail ? this.sendReceiptEmail(receipt) : Promise.resolve(),
+        receipt.userPhone ? this.sendReceiptSms(receipt) : Promise.resolve(),
+      ]);
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          logger.error({ message: 'Failed to send receipt via channel', error: result.reason, receiptId: receipt.id });
+        }
       }
 
       receipt.sentAt = new Date();
@@ -253,13 +261,19 @@ class InvoiceService {
       subject: `Invoice ${invoice.invoiceNumber} - ${invoice.currency} ${invoice.total.toFixed(2)}`,
       body: this.formatInvoiceEmailBody(invoice),
     };
-    const res = await fetch(`${MAIL_SERVICE_URL}/api/v1/mail/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      throw new Error(`Mail service responded with ${res.status}`);
+    try {
+      const res = await fetch(`${MAIL_SERVICE_URL}/api/v1/mail/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error(`Mail service responded with ${res.status}`);
+      }
+      logger.info({ message: 'Invoice email sent', invoiceId: invoice.id });
+    } catch (error) {
+      logger.error({ message: 'Failed to send invoice email', error, invoiceId: invoice.id, mailServiceUrl: MAIL_SERVICE_URL });
+      throw error;
     }
   }
 
@@ -268,13 +282,19 @@ class InvoiceService {
       to: invoice.userPhone,
       message: `Invoice ${invoice.invoiceNumber} for ${invoice.currency} ${invoice.total.toFixed(2)} is now available. Due: ${invoice.dueDate.toISOString().split('T')[0]}`,
     };
-    const res = await fetch(`${SMS_SERVICE_URL}/api/v1/sms/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      throw new Error(`SMS service responded with ${res.status}`);
+    try {
+      const res = await fetch(`${SMS_SERVICE_URL}/api/v1/sms/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error(`SMS service responded with ${res.status}`);
+      }
+      logger.info({ message: 'Invoice SMS sent', invoiceId: invoice.id });
+    } catch (error) {
+      logger.error({ message: 'Failed to send invoice SMS', error, invoiceId: invoice.id, smsServiceUrl: SMS_SERVICE_URL });
+      throw error;
     }
   }
 
@@ -284,13 +304,19 @@ class InvoiceService {
       subject: `Receipt ${receipt.receiptNumber} - Payment Confirmed`,
       body: this.formatReceiptEmailBody(receipt),
     };
-    const res = await fetch(`${MAIL_SERVICE_URL}/api/v1/mail/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      throw new Error(`Mail service responded with ${res.status}`);
+    try {
+      const res = await fetch(`${MAIL_SERVICE_URL}/api/v1/mail/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error(`Mail service responded with ${res.status}`);
+      }
+      logger.info({ message: 'Receipt email sent', receiptId: receipt.id });
+    } catch (error) {
+      logger.error({ message: 'Failed to send receipt email', error, receiptId: receipt.id, mailServiceUrl: MAIL_SERVICE_URL });
+      throw error;
     }
   }
 
@@ -299,13 +325,19 @@ class InvoiceService {
       to: receipt.userPhone,
       message: `Receipt ${receipt.receiptNumber}: Payment of ${receipt.currency} ${receipt.amount.toFixed(2)} confirmed. Thank you!`,
     };
-    const res = await fetch(`${SMS_SERVICE_URL}/api/v1/sms/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      throw new Error(`SMS service responded with ${res.status}`);
+    try {
+      const res = await fetch(`${SMS_SERVICE_URL}/api/v1/sms/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error(`SMS service responded with ${res.status}`);
+      }
+      logger.info({ message: 'Receipt SMS sent', receiptId: receipt.id });
+    } catch (error) {
+      logger.error({ message: 'Failed to send receipt SMS', error, receiptId: receipt.id, smsServiceUrl: SMS_SERVICE_URL });
+      throw error;
     }
   }
 

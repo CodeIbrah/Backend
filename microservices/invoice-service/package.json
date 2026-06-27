@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "test": "jest --config test/jest.config.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "doctor": "ts-node src/ai-doctor/run.ts"
   },
   "dependencies": {
     "@backend/shared-logger": "1.0.0",
