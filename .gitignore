@@ -66,6 +66,9 @@ main/src/prisma/migrations/
 
 # Reports (keep .gitkeep)
 reports/report-*.md
+reports/*.json
+reports/invoice-doctor-*.json
+reports/ai-doctor-scan-*.json
 
 # AI Doctor memory (sensitive data)
 infrastructure/ai-doctor/memory/*.json
