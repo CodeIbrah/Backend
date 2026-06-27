@@ -6,20 +6,13 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
 import * as cors from 'cors';
 import * as csurf from 'csurf';
+import * as compression from 'compression';
 import * as fs from 'fs';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { initOpenTelemetry } from './telemetry/otel';
 
 async function bootstrap() {
-  try {
-    initOpenTelemetry();
-  } catch {
-    console.warn('OpenTelemetry not available, skipping initialization');
-  }
-
   // --- HTTPS / TLS 1.2+ support ---
   // Provide SSL_KEY_PATH and SSL_CERT_PATH env vars to enable HTTPS.
   // TLS termination typically happens at the reverse proxy (nginx, Cloud Run, ELB)
@@ -51,8 +44,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
 
+  // Compression (gzip/brotli)
+  app.use(compression());
+
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
-  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
+  app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
