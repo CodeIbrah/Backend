@@ -1,10 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  Optional,
-} from '@nestjs/common';
-import { AnalyticsEventType, Role, User } from '@prisma/client';
+import { Injectable, NotFoundException, ConflictException, Optional } from '@nestjs/common';
+import { type Prisma, AnalyticsEventType, Role, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from '../cache/cache.service';
@@ -22,9 +17,15 @@ type UserWithoutPassword = {
 @Injectable()
 export class UsersService {
   private readonly logger = {
-    log: (message: string): void => { console.log(`[UsersService] ${message}`); },
-    error: (message: string): void => { console.error(`[UsersService] ${message}`); },
-    warn: (message: string): void => { console.warn(`[UsersService] ${message}`); },
+    log: (message: string): void => {
+      console.log(`[UsersService] ${message}`);
+    },
+    error: (message: string): void => {
+      console.error(`[UsersService] ${message}`);
+    },
+    warn: (message: string): void => {
+      console.warn(`[UsersService] ${message}`);
+    },
   };
 
   constructor(
@@ -39,7 +40,12 @@ export class UsersService {
   ): Promise<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }> {
     const cacheKey = `users:list:${page}:${limit}`;
     const cached = this.cacheService
-      ? await this.cacheService.get<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }>(cacheKey)
+      ? await this.cacheService.get<{
+          users: UserWithoutPassword[];
+          total: number;
+          page: number;
+          limit: number;
+        }>(cacheKey)
       : null;
     if (cached) return cached;
 
@@ -253,9 +259,7 @@ export class UsersService {
       },
     });
 
-    this.logger.log(
-      `Toggled user ${id} active status to ${user.isActive}`,
-    );
+    this.logger.log(`Toggled user ${id} active status to ${user.isActive}`);
 
     // Invalidate caches
     if (this.cacheService) {
@@ -268,9 +272,7 @@ export class UsersService {
 
   async count(): Promise<number> {
     const cacheKey = 'users:count';
-    const cached = this.cacheService
-      ? await this.cacheService.get<number>(cacheKey)
-      : null;
+    const cached = this.cacheService ? await this.cacheService.get<number>(cacheKey) : null;
     if (cached !== null) return cached;
 
     const total = await this.prisma.user.count();
@@ -291,14 +293,12 @@ export class UsersService {
         data: {
           type: event.type,
           userId: event.userId,
-          metadata: event.metadata || {},
+          metadata: (event.metadata ?? {}) as Prisma.InputJsonValue,
           service: this.configService.get<string>('OTEL_SERVICE_NAME'),
         },
       });
     } catch (error) {
-      this.logger.error(
-        `Failed to track analytics event: ${event.type}`,
-      );
+      this.logger.error(`Failed to track analytics event: ${event.type}`);
     }
   }
 }

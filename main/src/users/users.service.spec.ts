@@ -39,7 +39,7 @@ describe('UsersService', () => {
       count: jest.fn(),
     },
     analyticsEvent: {
-      create: jest.fn().mockResolvedValue({}),
+      create: jest.fn().mockResolvedValue({ id: 'event-1', metadata: null }),
     },
   };
 
@@ -119,8 +119,7 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('should create a new user', async () => {
-      mockPrisma.user.findUnique
-        .mockResolvedValueOnce(null); // findByEmail returns null
+      mockPrisma.user.findUnique.mockResolvedValueOnce(null); // findByEmail returns null
       mockPrisma.user.create.mockResolvedValue(mockUser);
 
       const result = await service.create({
@@ -158,7 +157,7 @@ describe('UsersService', () => {
     it('should update a user', async () => {
       mockPrisma.user.findUnique
         .mockResolvedValueOnce(mockUser) // existing user check
-        .mockResolvedValueOnce(null);    // email not taken
+        .mockResolvedValueOnce(null); // email not taken
 
       const updatedUser = { ...mockUserWithoutPassword, name: 'Updated Name' };
       mockPrisma.user.update.mockResolvedValue(updatedUser);
@@ -172,9 +171,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException when user not found', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.update('nonexistent', { name: 'New Name' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('nonexistent', { name: 'New Name' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseDto<T> {
   @ApiProperty()
-  data: T;
+  data!: T;
 
   @ApiProperty({
     example: {
@@ -10,7 +10,7 @@ export class ResponseDto<T> {
       path: '/api/v1/resource',
     },
   })
-  meta: {
+  meta!: {
     timestamp: string;
     path: string;
     [key: string]: unknown;

@@ -39,7 +39,7 @@ describe('AuthService', () => {
       delete: jest.fn(),
     },
     analyticsEvent: {
-      create: jest.fn().mockResolvedValue({}),
+      create: jest.fn().mockResolvedValue({ id: 'event-1', metadata: null }),
     },
   };
 
@@ -110,9 +110,9 @@ describe('AuthService', () => {
     it('should throw ConflictException when email already exists', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(
-        service.register('test@example.com', 'password123'),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.register('test@example.com', 'password123')).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -129,17 +129,17 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException for invalid email', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.login('wrong@example.com', 'password123'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.login('wrong@example.com', 'password123')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException for inactive user', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ ...mockUser, isActive: false });
 
-      await expect(
-        service.login('test@example.com', 'password123'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.login('test@example.com', 'password123')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 

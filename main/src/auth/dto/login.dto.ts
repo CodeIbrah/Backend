@@ -6,11 +6,11 @@ export class LoginDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(255)
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'password123' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  password: string;
+  password!: string;
 }

@@ -99,15 +99,13 @@ interface OpsDashboardData {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('ops')
 export class OpsController {
-  constructor(
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger) {}
 
   @Get()
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Get operations dashboard data' })
   @ApiResponse({ status: 200, description: 'Operations dashboard data' })
-  getDashboard(): Promise<OpsDashboardData> {
+  getDashboard(): OpsDashboardData {
     this.logger.debug('Fetching ops dashboard data');
 
     return {

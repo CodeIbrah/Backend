@@ -25,9 +25,9 @@ export class AuditController {
     @Query('to') to?: string,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('offset', new ParseIntPipe({ optional: true })) offset?: number,
-  ): Promise<{ enabled: boolean; message: string }> {
+  ): Promise<{ entries: unknown[]; total: number }> {
     if (!this.auditService?.enabled) {
-      return { enabled: false, message: 'Audit trail is disabled' };
+      return { entries: [], total: 0 };
     }
     return this.auditService.find({
       entity,

@@ -8,21 +8,41 @@ export async function initOpenTelemetry(): Promise<void> {
   }
 
   try {
-    const { NodeSDK: NodeSDKClass } = await import('@opentelemetry/sdk-node') as { NodeSDK: typeof NodeSDK };
-    const { getNodeAutoInstrumentations } = await import('@opentelemetry/auto-instrumentations-node') as { getNodeAutoInstrumentations: () => unknown };
-    const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http') as { OTLPTraceExporter: new (config: { url?: string }) => unknown };
-    const { Resource } = await import('@opentelemetry/resources') as { Resource: new (attributes: Record<string, string>) => unknown };
-    const { SemanticResourceAttributes } = await import('@opentelemetry/semantic-conventions') as { SemanticResourceAttributes: Record<string, string> };
+    const { NodeSDK: NodeSDKClass } = (await import('@opentelemetry/sdk-node')) as {
+      NodeSDK: typeof NodeSDK;
+    };
+    // @ts-expect-error - optional dependency
+    const { getNodeAutoInstrumentations } =
+      (await import('@opentelemetry/auto-instrumentations-node')) as {
+        getNodeAutoInstrumentations: () => unknown;
+      };
+    const { OTLPTraceExporter } = (await import('@opentelemetry/exporter-trace-otlp-http')) as {
+      OTLPTraceExporter: new (config: { url?: string }) => unknown;
+    };
+    const { Resource } = (await import('@opentelemetry/resources')) as {
+      Resource: new (attributes: Record<string, string>) => unknown;
+    };
+    const { SemanticResourceAttributes } =
+      (await import('@opentelemetry/semantic-conventions')) as {
+        SemanticResourceAttributes: Record<string, string>;
+      };
+
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+    const resource = new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]:
+        process.env.OTEL_SERVICE_NAME || 'backend-template',
+    });
+    const traceExporter = new OTLPTraceExporter({
+      url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://jaeger:4318/v1/traces',
+    });
+    const instrumentations = [getNodeAutoInstrumentations()];
 
     const sdk = new NodeSDKClass({
-      resource: new Resource({
-        [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'backend-template',
-      }),
-      traceExporter: new OTLPTraceExporter({
-        url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://jaeger:4318/v1/traces',
-      }),
-      instrumentations: [getNodeAutoInstrumentations()],
+      resource: resource as any,
+      traceExporter: traceExporter as any,
+      instrumentations: instrumentations as any,
     });
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
     sdk.start();
     sdkInstance = sdk;

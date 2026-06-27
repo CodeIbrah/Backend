@@ -55,7 +55,9 @@ export class SocialAuthController {
     if (!code) {
       return { error: 'Missing authorization code' };
     }
-    return this.socialAuthService.handleCallback(provider, code, state) as Promise<Record<string, unknown>>;
+    return this.socialAuthService.handleCallback(provider, code, state) as unknown as Promise<
+      Record<string, unknown>
+    >;
   }
 
   @Post(':provider/callback')
@@ -68,7 +70,11 @@ export class SocialAuthController {
     if (!body.code) {
       return { error: 'Missing authorization code' };
     }
-    return this.socialAuthService.handleCallback(provider, body.code, body.state) as Promise<Record<string, unknown>>;
+    return this.socialAuthService.handleCallback(
+      provider,
+      body.code,
+      body.state,
+    ) as unknown as Promise<Record<string, unknown>>;
   }
 
   @Post(':provider/link')

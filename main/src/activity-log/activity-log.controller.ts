@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ActivityLog } from '@prisma/client';
@@ -42,13 +33,42 @@ export class ActivityLogController {
   @ApiOperation({ summary: 'Get all activity logs (admin only)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'type', required: false, enum: ['LOGIN', 'LOGOUT', 'LOGIN_FAILED', 'PAYMENT_CREATED', 'PAYMENT_COMPLETED', 'PAYMENT_FAILED', 'PAYMENT_REFUNDED', 'INVOICE_GENERATED', 'INVOICE_DOWNLOADED', 'USER_CREATED', 'USER_UPDATED', 'USER_DELETED', 'ROLE_CHANGED', 'PASSWORD_CHANGED', 'SETTINGS_UPDATED', 'DATA_EXPORTED', 'PERMISSION_GRANTED', 'PERMISSION_REVOKED', 'API_KEY_CREATED', 'API_KEY_REVOKED', 'CONFIG_CHANGED', 'SYSTEM_ALERT'] })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    enum: [
+      'LOGIN',
+      'LOGOUT',
+      'LOGIN_FAILED',
+      'PAYMENT_CREATED',
+      'PAYMENT_COMPLETED',
+      'PAYMENT_FAILED',
+      'PAYMENT_REFUNDED',
+      'INVOICE_GENERATED',
+      'INVOICE_DOWNLOADED',
+      'USER_CREATED',
+      'USER_UPDATED',
+      'USER_DELETED',
+      'ROLE_CHANGED',
+      'PASSWORD_CHANGED',
+      'SETTINGS_UPDATED',
+      'DATA_EXPORTED',
+      'PERMISSION_GRANTED',
+      'PERMISSION_REVOKED',
+      'API_KEY_CREATED',
+      'API_KEY_REVOKED',
+      'CONFIG_CHANGED',
+      'SYSTEM_ALERT',
+    ],
+  })
   @ApiQuery({ name: 'severity', required: false, enum: ['INFO', 'WARNING', 'ERROR', 'CRITICAL'] })
   @ApiQuery({ name: 'userId', required: false, type: String })
   @ApiQuery({ name: 'dateFrom', required: false, type: String })
   @ApiQuery({ name: 'dateTo', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
-  async findAll(@Query() query: QueryActivityDto): Promise<{ activities: ActivityLog[]; total: number }> {
+  async findAll(
+    @Query() query: QueryActivityDto,
+  ): Promise<{ activities: ActivityLog[]; total: number }> {
     const { page = 1, limit = 20, ...filters } = query;
     return this.activityLogService.getSystemActivities(page, limit, filters);
   }
@@ -78,7 +98,12 @@ export class ActivityLogController {
   async getStats(
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
-  ): Promise<{ byType: Record<string, number>; bySeverity: Record<string, number>; byUser: Record<string, number>; total: number }> {
+  ): Promise<{
+    byType: Record<string, number>;
+    bySeverity: Record<string, number>;
+    byUser: Record<string, number>;
+    total: number;
+  }> {
     return this.activityLogService.getActivityStats(dateFrom, dateTo);
   }
 
@@ -105,7 +130,7 @@ export class ActivityLogController {
         'Content-Disposition',
         `attachment; filename=activity-log-${new Date().toISOString().split('T')[0]}.csv`,
       );
-      return res.send(csv);
+      res.send(csv);
     }
 
     res.setHeader('Content-Type', 'application/json');
@@ -113,7 +138,7 @@ export class ActivityLogController {
       'Content-Disposition',
       `attachment; filename=activity-log-${new Date().toISOString().split('T')[0]}.json`,
     );
-    return res.json(activities);
+    res.json(activities);
   }
 
   private convertToCsv(activities: CsvActivity[]): string {

@@ -1,12 +1,13 @@
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { LoggerService, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
-import * as cors from 'cors';
-import * as csurf from 'csurf';
-import * as compression from 'compression';
+import type { RequestHandler } from 'express';
+import * as corsModule from 'cors';
+import * as csurfModule from 'csurf';
+import * as compressionModule from 'compression';
 import * as fs from 'fs';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
@@ -27,7 +28,8 @@ async function bootstrap(): Promise<void> {
   });
 
   const configService = app.get<ConfigService>(ConfigService);
-  const logger = app.get<Logger>(WINSTON_MODULE_NEST_PROVIDER);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const logger: LoggerService = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
   app.useLogger(logger);
 
@@ -45,6 +47,7 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api/v1');
 
   // Compression (gzip/brotli)
+  const compression = compressionModule as unknown as () => RequestHandler;
   app.use(compression());
 
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
@@ -61,9 +64,11 @@ async function bootstrap(): Promise<void> {
   );
 
   const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
+  const cors = corsModule as unknown as (opts?: Record<string, unknown>) => RequestHandler;
   app.use(
     cors({
-      origin: corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
+      origin:
+        corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
       credentials: true,
     }),
   );
@@ -71,6 +76,7 @@ async function bootstrap(): Promise<void> {
   // CSRF protection - disabled in development
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
   if (nodeEnv === 'production') {
+    const csurf = csurfModule as unknown as (opts?: Record<string, unknown>) => RequestHandler;
     app.use(
       csurf({
         cookie: {
@@ -107,7 +113,7 @@ async function bootstrap(): Promise<void> {
   });
 
   const port = configService.get<number>('PORT', 3000);
-  const httpServer = app.getHttpServer() as { close: (callback?: () => void) => void };  
+  const httpServer = app.getHttpServer() as { close: (callback?: () => void) => void };
 
   try {
     await app.listen(port);
@@ -147,7 +153,9 @@ function loadTlsOptions(): { key: string; cert: string; ca?: string } | null {
     console.log(`[Bootstrap] TLS certificates loaded (key: ${keyPath}, cert: ${certPath})`);
     return { key, cert, ca };
   } catch (err) {
-    console.warn(`[Bootstrap] Failed to load TLS certificates: ${(err as Error).message}. Falling back to HTTP.`);
+    console.warn(
+      `[Bootstrap] Failed to load TLS certificates: ${(err as Error).message}. Falling back to HTTP.`,
+    );
     return null;
   }
 }

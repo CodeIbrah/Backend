@@ -6,14 +6,14 @@ export class RegisterDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(255)
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'password123', minLength: 8 })
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(255)
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 'John Doe', required: false })
   @IsString()

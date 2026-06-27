@@ -69,7 +69,7 @@ export class ReportsService {
   generateReport(
     type: 'daily' | 'weekly' | 'incident' | 'manual',
     data?: Partial<ReportData>,
-  ): Promise<string> {
+  ): string {
     this.logger.info('Generating report', { type });
 
     const reportData: ReportData = {

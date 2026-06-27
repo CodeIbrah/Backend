@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-  Optional,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, Optional } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,7 +6,7 @@ import { ActivityLogService } from '../activity-log/activity-log.service';
 import { CacheService } from '../cache/cache.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { AnalyticsEventType, User } from '@prisma/client';
+import { type Prisma, AnalyticsEventType, User } from '@prisma/client';
 
 export interface Tokens {
   accessToken: string;
@@ -44,11 +39,7 @@ export class AuthService {
     @Optional() private cacheService?: CacheService,
   ) {}
 
-  async register(
-    email: string,
-    password: string,
-    name?: string,
-  ): Promise<AuthResponse> {
+  async register(email: string, password: string, name?: string): Promise<AuthResponse> {
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       throw new ConflictException('Email already registered');
@@ -276,10 +267,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_SECRET'),
-          expiresIn: this.configService.get<string>(
-            'JWT_REFRESH_EXPIRES_IN',
-            '30d',
-          ),
+          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '30d'),
         },
       ),
     ]);
@@ -315,15 +303,17 @@ export class AuthService {
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
     const parsedExpiry = parseExpiry(refreshExpiresIn);
 
-    await this.prisma.refreshToken.create({
-      data: {
-        userId,
-        tokenHash,
-        expiresAt: parsedExpiry,
-      },
-    }).catch((err) => {
-      this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
-    });
+    await this.prisma.refreshToken
+      .create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: parsedExpiry,
+        },
+      })
+      .catch((err) => {
+        this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
+      });
 
     return { accessToken, refreshToken };
   }
@@ -333,10 +323,7 @@ export class AuthService {
     return bcrypt.hash(password, saltRounds);
   }
 
-  private async comparePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
+  private async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
 
@@ -350,14 +337,12 @@ export class AuthService {
         data: {
           type: event.type,
           userId: event.userId,
-          metadata: event.metadata || {},
+          metadata: (event.metadata ?? {}) as Prisma.InputJsonValue,
           service: this.configService.get<string>('OTEL_SERVICE_NAME'),
         },
       });
     } catch (error) {
-      this.logger.error(
-        `Failed to track analytics event: ${event.type}`,
-      );
+      this.logger.error(`Failed to track analytics event: ${event.type}`);
     }
   }
 }
