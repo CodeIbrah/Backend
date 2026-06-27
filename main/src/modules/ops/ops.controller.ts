@@ -1,8 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { Inject } from '@nestjs/common';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 interface Incident {
   id: string;
@@ -92,6 +95,8 @@ interface OpsDashboardData {
 }
 
 @ApiTags('Ops')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('ops')
 export class OpsController {
   constructor(
@@ -99,6 +104,7 @@ export class OpsController {
   ) {}
 
   @Get()
+  @Roles('ADMIN')
   @ApiOperation({ summary: 'Get operations dashboard data' })
   @ApiResponse({ status: 200, description: 'Operations dashboard data' })
   async getDashboard(): Promise<OpsDashboardData> {

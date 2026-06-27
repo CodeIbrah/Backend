@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -14,6 +15,7 @@ import { ActivityLogModule } from './activity-log/activity-log.module';
 import { HealthController } from './modules/health/health.controller';
 import { MetricsController } from './modules/metrics/metrics.controller';
 import { OpsModule } from './modules/ops/ops.module';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 // Optional modules — imported for registration; they self-configure via factory providers
 import { WebsocketModule } from './websocket/websocket.module';
@@ -96,5 +98,15 @@ import { CipherModule } from './cipher/cipher.module';
     TelemetryModule,
   ],
   controllers: [HealthController, MetricsController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}
