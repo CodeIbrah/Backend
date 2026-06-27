@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, Req } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import * as promClient from 'prom-client';

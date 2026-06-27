@@ -13,7 +13,7 @@ export class ResponseDto<T> {
   meta: {
     timestamp: string;
     path: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 

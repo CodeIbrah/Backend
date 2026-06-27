@@ -40,7 +40,7 @@ export class UsersController {
   async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
-  ) {
+  ): Promise<unknown> {
     // Validate + clamp pagination to prevent DoS
     const safePage = Math.max(1, Math.floor(Number(page)) || 1);
     const safeLimit = Math.min(100, Math.max(1, Math.floor(Number(limit)) || 10));
@@ -53,8 +53,7 @@ export class UsersController {
   async findOne(
     @Param('id') id: string,
     @CurrentUser() user: { id: string; role: string },
-  ) {
-    // Only allow admins or the user themselves (IDOR protection)
+  ): Promise<unknown> {
     if (id !== user.id && user.role !== 'ADMIN') {
       throw new ForbiddenException('You can only view your own profile');
     }
@@ -68,7 +67,7 @@ export class UsersController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
+  ): Promise<unknown> {
     return this.usersService.update(id, updateUserDto);
   }
 
@@ -77,7 +76,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete user' })
   @ApiParam({ name: 'id', type: String })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<void> {
     await this.usersService.remove(id);
   }
 
@@ -85,7 +84,7 @@ export class UsersController {
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Toggle user active status' })
   @ApiParam({ name: 'id', type: String })
-  async toggleActive(@Param('id') id: string) {
+  async toggleActive(@Param('id') id: string): Promise<unknown> {
     return this.usersService.toggleActive(id);
   }
 }

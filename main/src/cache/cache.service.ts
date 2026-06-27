@@ -27,7 +27,7 @@ export class CacheService {
         this._client = new Redis(connection, {
           lazyConnect: true,
           maxRetriesPerRequest: 3,
-          retryStrategy: (times: number) => {
+          retryStrategy: (times: number): number | null => {
             if (times > 3) return null;
             return Math.min(times * 200, 2000);
           },

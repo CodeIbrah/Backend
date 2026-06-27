@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
@@ -47,10 +46,10 @@ import { CipherModule } from './cipher/cipher.module';
             winston.format.timestamp(),
             winston.format.ms(),
             winston.format.colorize(),
-            winston.format.printf(({ timestamp, level, message, context, ...meta }) => {
-              const ctx = context ? `[${context}]` : '';
+            winston.format.printf(({ timestamp, level, message, context, ...meta }: Record<string, unknown>) => {
+              const ctx = context ? `[${String(context)}]` : '';
               const metaStr = Object.keys(meta).length > 1 ? ` ${JSON.stringify(meta)}` : '';
-              return `${timestamp} [${level}] ${ctx} ${message}${metaStr}`;
+              return `${String(timestamp)} [${String(level)}] ${ctx} ${String(message)}${metaStr}`;
             }),
           ),
         }),

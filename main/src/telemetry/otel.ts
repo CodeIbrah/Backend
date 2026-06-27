@@ -1,18 +1,20 @@
+import type { NodeSDK } from '@opentelemetry/sdk-node';
+
 let sdkInstance: { shutdown: () => Promise<void> } | null = null;
 
-export function initOpenTelemetry(): void {
+export async function initOpenTelemetry(): Promise<void> {
   if (process.env.NODE_ENV === 'test') {
     return;
   }
 
   try {
-    const { NodeSDK } = require('@opentelemetry/sdk-node');
-    const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-    const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
-    const { Resource } = require('@opentelemetry/resources');
-    const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+    const { NodeSDK: NodeSDKClass } = await import('@opentelemetry/sdk-node') as { NodeSDK: typeof NodeSDK };
+    const { getNodeAutoInstrumentations } = await import('@opentelemetry/auto-instrumentations-node') as { getNodeAutoInstrumentations: () => unknown };
+    const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http') as { OTLPTraceExporter: new (config: { url?: string }) => unknown };
+    const { Resource } = await import('@opentelemetry/resources') as { Resource: new (attributes: Record<string, string>) => unknown };
+    const { SemanticResourceAttributes } = await import('@opentelemetry/semantic-conventions') as { SemanticResourceAttributes: Record<string, string> };
 
-    const sdk = new NodeSDK({
+    const sdk = new NodeSDKClass({
       resource: new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'backend-template',
       }),

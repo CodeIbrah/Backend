@@ -18,7 +18,7 @@ export class GrpcModule implements OnModuleDestroy {
       providers: [
         {
           provide: GrpcServerService,
-          useFactory: (configService: ConfigService) => {
+          useFactory: (configService: ConfigService): GrpcServerService => {
             const enabled = configService.get<boolean>('GRPC_ENABLED', false);
             if (!enabled) {
               return new GrpcServerService(null as unknown as number);
@@ -30,7 +30,7 @@ export class GrpcModule implements OnModuleDestroy {
         },
         {
           provide: GrpcClientService,
-          useFactory: () => new GrpcClientService(),
+          useFactory: (): GrpcClientService => new GrpcClientService(),
         },
       ],
       exports: [GrpcServerService, GrpcClientService],

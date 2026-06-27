@@ -48,7 +48,7 @@ export class AppleProvider implements SocialProvider {
 
   async exchangeCode(code: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
     // Apple requires a client_secret generated from the private key
-    const clientSecret = await this.generateClientSecret();
+    const clientSecret = this.generateClientSecret();
 
     const resp = await fetch('https://appleid.apple.com/auth/token', {
       method: 'POST',
@@ -77,7 +77,7 @@ export class AppleProvider implements SocialProvider {
   }
 
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn?: number }> {
-    const clientSecret = await this.generateClientSecret();
+    const clientSecret = this.generateClientSecret();
 
     const resp = await fetch('https://appleid.apple.com/auth/token', {
       method: 'POST',
@@ -95,21 +95,21 @@ export class AppleProvider implements SocialProvider {
     return { accessToken: data.access_token, expiresIn: data.expires_in };
   }
 
-  async getProfile(accessToken: string): Promise<SocialProfile> {
+  getProfile(_accessToken: string): Promise<SocialProfile> {
     // Apple does not have a userinfo endpoint that returns profile data.
     // Profile info comes in the id_token (JWT) during initial auth.
     // For subsequent calls, we return provider info only.
-    return {
+    return Promise.resolve({
       provider: this.name,
       providerAccountId: 'apple-user', // will be overridden by id_token sub claim
       email: null,
       name: null,
       avatarUrl: null,
       raw: { note: 'Apple profile data only available in initial id_token' },
-    };
+    });
   }
 
-  private async generateClientSecret(): Promise<string> {
+  private generateClientSecret(): string {
     // In production, use jsonwebtoken to sign a JWT with the Apple private key.
     // This template provides the skeleton; jwt signing requires the `jsonwebtoken` package.
     // For now, return a placeholder — actual implementation:
@@ -143,7 +143,7 @@ export class AppleProvider implements SocialProvider {
     try {
       const parts = idToken.split('.');
       if (parts.length !== 3) throw new Error('Invalid id_token format');
-      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8'));
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8')) as { sub: string; email?: string };
       return { sub: payload.sub, email: payload.email };
     } catch {
       throw new Error('Failed to decode Apple id_token');

@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-  BadRequestException,
   Optional,
 } from '@nestjs/common';
 import { AnalyticsEventType, Role, User } from '@prisma/client';
@@ -23,9 +22,9 @@ type UserWithoutPassword = {
 @Injectable()
 export class UsersService {
   private readonly logger = {
-    log: (message: string) => console.log(`[UsersService] ${message}`),
-    error: (message: string) => console.error(`[UsersService] ${message}`),
-    warn: (message: string) => console.warn(`[UsersService] ${message}`),
+    log: (message: string): void => { console.log(`[UsersService] ${message}`); },
+    error: (message: string): void => { console.error(`[UsersService] ${message}`); },
+    warn: (message: string): void => { console.warn(`[UsersService] ${message}`); },
   };
 
   constructor(
@@ -285,7 +284,7 @@ export class UsersService {
   private async trackAnalyticsEvent(event: {
     type: AnalyticsEventType;
     userId?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }): Promise<void> {
     try {
       await this.prisma.analyticsEvent.create({

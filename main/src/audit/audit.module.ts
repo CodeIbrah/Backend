@@ -11,7 +11,7 @@ import { AuditController } from './audit.controller';
   providers: [
     {
       provide: AuditService,
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService): AuditService => {
         const enabled = configService.get<boolean>('AUDIT_ENABLED', true);
         return new AuditService(enabled);
       },

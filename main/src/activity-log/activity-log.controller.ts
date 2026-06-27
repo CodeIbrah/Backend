@@ -10,11 +10,25 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
+import { ActivityLog } from '@prisma/client';
 import { ActivityLogService } from './activity-log.service';
 import { QueryActivityDto } from './dto/query-activity.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+
+interface CsvActivity {
+  id: string;
+  userId: string | null;
+  user?: { email: string } | null;
+  type: string;
+  severity: string;
+  action: string;
+  resource: string | null;
+  description: string | null;
+  ipAddress: string | null;
+  createdAt: Date;
+}
 
 @ApiTags('Activity Log')
 @ApiBearerAuth()
@@ -34,14 +48,14 @@ export class ActivityLogController {
   @ApiQuery({ name: 'dateFrom', required: false, type: String })
   @ApiQuery({ name: 'dateTo', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
-  async findAll(@Query() query: QueryActivityDto) {
+  async findAll(@Query() query: QueryActivityDto): Promise<{ activities: ActivityLog[]; total: number }> {
     const { page = 1, limit = 20, ...filters } = query;
     return this.activityLogService.getSystemActivities(page, limit, filters);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get activity log by ID (admin only)' })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<ActivityLog> {
     return this.activityLogService.getActivityById(id);
   }
 
@@ -52,7 +66,7 @@ export class ActivityLogController {
   async findUserActivities(
     @Param('userId') userId: string,
     @Query() query: QueryActivityDto,
-  ) {
+  ): Promise<{ activities: ActivityLog[]; total: number }> {
     const { page = 1, limit = 20, ...filters } = query;
     return this.activityLogService.getUserActivities(userId, page, limit, filters);
   }
@@ -64,14 +78,14 @@ export class ActivityLogController {
   async getStats(
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
-  ) {
+  ): Promise<{ byType: Record<string, number>; bySeverity: Record<string, number>; byUser: Record<string, number>; total: number }> {
     return this.activityLogService.getActivityStats(dateFrom, dateTo);
   }
 
   @Get('critical')
   @ApiOperation({ summary: 'Get recent critical/error activities (admin only)' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getCritical(@Query('limit') limit?: number) {
+  async getCritical(@Query('limit') limit?: number): Promise<ActivityLog[]> {
     return this.activityLogService.getRecentCriticalActivities(limit || 20);
   }
 
@@ -80,7 +94,7 @@ export class ActivityLogController {
   async exportActivities(
     @Body() body: QueryActivityDto & { format?: 'csv' | 'json' },
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     const { format = 'json', ...filters } = body;
     const activities = await this.activityLogService.exportActivities(filters);
 
@@ -102,7 +116,7 @@ export class ActivityLogController {
     return res.json(activities);
   }
 
-  private convertToCsv(activities: any[]): string {
+  private convertToCsv(activities: CsvActivity[]): string {
     const headers = [
       'id',
       'userId',

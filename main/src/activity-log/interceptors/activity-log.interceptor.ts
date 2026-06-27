@@ -6,7 +6,20 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Response } from 'express';
 import { ActivityLogService } from '../activity-log.service';
+
+interface RequestWithUser {
+  method: string;
+  url: string;
+  ip: string;
+  headers: Record<string, string | string[] | undefined>;
+  socket?: { remoteAddress?: string };
+  id?: string;
+  user?: { sub?: string };
+  correlationId?: string;
+  query: Record<string, unknown>;
+}
 
 @Injectable()
 export class ActivityLogInterceptor implements NestInterceptor {
@@ -15,22 +28,22 @@ export class ActivityLogInterceptor implements NestInterceptor {
     private readonly options?: { logGetRequests?: boolean },
   ) {}
 
-  async intercept(
+  intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse();
+  ): Observable<unknown> {
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
+    const response = context.switchToHttp().getResponse<Response>();
 
     const method = request.method;
     const path = request.url;
     const userId = request.user?.sub;
-    const ipAddress =
+    const ipAddress: string | undefined =
       request.ip ||
-      request.headers['x-forwarded-for'] ||
-      request.connection?.remoteAddress;
-    const userAgent = request.headers['user-agent'];
-    const traceId = request.headers['x-trace-id'] || request.id;
+      (Array.isArray(request.headers['x-forwarded-for']) ? request.headers['x-forwarded-for'][0] : request.headers['x-forwarded-for']) ||
+      request.socket?.remoteAddress;
+    const userAgent = request.headers['user-agent'] as string | undefined;
+    const traceId = (request.headers['x-trace-id'] as string | undefined) || request.id;
 
     const shouldLog =
       this.options?.logGetRequests || method !== 'GET';
@@ -70,7 +83,7 @@ export class ActivityLogInterceptor implements NestInterceptor {
     );
   }
 
-  private mapMethodToActivityType(method: string): any {
+  private mapMethodToActivityType(method: string): string {
     const typeMap: Record<string, string> = {
       POST: 'USER_CREATED',
       PUT: 'USER_UPDATED',
@@ -80,7 +93,7 @@ export class ActivityLogInterceptor implements NestInterceptor {
     return typeMap[method] || 'USER_UPDATED';
   }
 
-  private mapStatusToSeverity(statusCode: number): any {
+  private mapStatusToSeverity(statusCode: number): string {
     if (statusCode >= 500) return 'ERROR';
     if (statusCode >= 400) return 'WARNING';
     return 'INFO';

@@ -7,7 +7,6 @@ import { Role } from '@prisma/client';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let prisma: PrismaService;
 
   const mockUser = {
     id: 'user-1',
@@ -61,7 +60,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
 
     jest.clearAllMocks();
   });
@@ -108,8 +106,8 @@ describe('UsersService', () => {
       const result = await service.findOne('user-1');
 
       expect(result).toBeDefined();
-      expect(result!.email).toBe('test@example.com');
-      expect(result!.id).toBe('user-1');
+      expect(result?.email).toBe('test@example.com');
+      expect(result?.id).toBe('user-1');
     });
 
     it('should throw NotFoundException when user not found', async () => {
@@ -139,7 +137,7 @@ describe('UsersService', () => {
             email: 'new@example.com',
             name: 'New User',
             role: Role.USER,
-          }),
+          }) as unknown,
         }),
       );
     });

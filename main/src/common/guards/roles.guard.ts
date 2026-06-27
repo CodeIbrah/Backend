@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
@@ -16,15 +17,15 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const request = context.switchToHttp().getRequest<Request>();
+    const user = (request as Record<string, unknown>).user as { role?: string } | undefined;
 
     if (!user) {
       throw new ForbiddenException('No user found in request');
     }
 
     // user.role is set by JwtStrategy.validate()
-    const userRole = user.role as string | undefined;
+    const userRole = user.role;
     const hasRole = userRole !== undefined && requiredRoles.includes(userRole);
 
     if (!hasRole) {

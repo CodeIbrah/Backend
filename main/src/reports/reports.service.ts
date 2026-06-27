@@ -66,9 +66,9 @@ export class ReportsService {
     return resolved;
   }
 
-  async generateReport(
+  generateReport(
     type: 'daily' | 'weekly' | 'incident' | 'manual',
-    data?: any,
+    data?: Partial<ReportData>,
   ): Promise<string> {
     this.logger.info('Generating report', { type });
 
@@ -88,20 +88,20 @@ export class ReportsService {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `${type}-report-${timestamp}.md`;
 
-    await this.saveReport(content, filename);
+    this.saveReport(content, filename);
 
     this.logger.info('Report generated and saved', { type, filename });
     return filename;
   }
 
-  async saveReport(content: string, filename: string): Promise<string> {
+  saveReport(content: string, filename: string): string {
     const filePath = this.resolveSafePath(filename);
     fs.writeFileSync(filePath, content, 'utf-8');
     this.logger.info('Report saved', { filename, path: filePath });
     return filename;
   }
 
-  async getReports(): Promise<ReportInfo[]> {
+  getReports(): ReportInfo[] {
     if (!fs.existsSync(this.reportsDir)) {
       return [];
     }
@@ -127,7 +127,7 @@ export class ReportsService {
     return reports.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async getReportContent(filename: string): Promise<string> {
+  getReportContent(filename: string): string {
     const filePath = this.resolveSafePath(filename);
     if (!fs.existsSync(filePath)) {
       throw new BadRequestException(`Report '${filename}' not found`);

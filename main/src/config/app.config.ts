@@ -54,7 +54,7 @@ const envSchema = Joi.object({
 export class AppConfigModule implements OnModuleInit {
   constructor(private configService: ConfigService) {}
 
-  onModuleInit() {
+  onModuleInit(): void {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
 

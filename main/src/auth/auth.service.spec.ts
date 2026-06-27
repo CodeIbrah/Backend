@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ActivityLogService } from '../activity-log/activity-log.service';
@@ -13,9 +14,6 @@ jest.mock('bcrypt', () => ({
 
 describe('AuthService', () => {
   let service: AuthService;
-  let prisma: PrismaService;
-  let jwtService: JwtService;
-  let configService: ConfigService;
 
   const mockUser = {
     id: 'user-1',
@@ -79,9 +77,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prisma = module.get<PrismaService>(PrismaService);
-    jwtService = module.get<JwtService>(JwtService);
-    configService = module.get<ConfigService>(ConfigService);
 
     jest.clearAllMocks();
   });
@@ -107,7 +102,7 @@ describe('AuthService', () => {
           data: expect.objectContaining({
             email: 'test@example.com',
             name: 'Test User',
-          }),
+          }) as Record<string, unknown>,
         }),
       );
     });
@@ -154,11 +149,10 @@ describe('AuthService', () => {
 
       const result = await service.validateUser('test@example.com', 'password123');
       expect(result).toBeDefined();
-      expect(result!.email).toBe('test@example.com');
+      expect(result?.email).toBe('test@example.com');
     });
 
     it('should return null for invalid password', async () => {
-      const bcrypt = require('bcrypt');
       (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
       mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
@@ -198,7 +192,7 @@ describe('AuthService', () => {
 
       expect(mockPrisma.refreshToken.updateMany).toHaveBeenCalledWith({
         where: { userId: 'user-1', revokedAt: null },
-        data: { revokedAt: expect.any(Date) },
+        data: { revokedAt: expect.any(Date) as unknown },
       });
     });
   });

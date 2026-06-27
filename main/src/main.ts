@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -12,7 +12,7 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   // --- HTTPS / TLS 1.2+ support ---
   // Provide SSL_KEY_PATH and SSL_CERT_PATH env vars to enable HTTPS.
   // TLS termination typically happens at the reverse proxy (nginx, Cloud Run, ELB)
@@ -26,8 +26,8 @@ async function bootstrap() {
     ...(httpsOptions ? { httpsOptions } : {}),
   });
 
-  const configService = app.get(ConfigService);
-  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+  const configService = app.get<ConfigService>(ConfigService);
+  const logger = app.get<Logger>(WINSTON_MODULE_NEST_PROVIDER);
 
   app.useLogger(logger);
 
@@ -107,7 +107,7 @@ async function bootstrap() {
   });
 
   const port = configService.get<number>('PORT', 3000);
-  const httpServer = app.getHttpServer();
+  const httpServer = app.getHttpServer() as { close: (callback?: () => void) => void };  
 
   try {
     await app.listen(port);
@@ -118,14 +118,14 @@ async function bootstrap() {
   }
 
   const signals = ['SIGINT', 'SIGTERM'] as const;
-  signals.forEach((signal) => {
-    process.on(signal, async () => {
+  for (const signal of signals) {
+    process.on(signal, (): void => {
       logger.log(`Received ${signal}, starting graceful shutdown...`, 'Bootstrap');
-      await app.close();
+      void app.close();
       httpServer.close();
       process.exit(0);
     });
-  });
+  }
 }
 
 /**

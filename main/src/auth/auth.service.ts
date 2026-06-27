@@ -2,10 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
-  BadRequestException,
   Optional,
-  forwardRef,
-  Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -14,7 +11,7 @@ import { ActivityLogService } from '../activity-log/activity-log.service';
 import { CacheService } from '../cache/cache.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { AnalyticsEventType } from '@prisma/client';
+import { AnalyticsEventType, User } from '@prisma/client';
 
 export interface Tokens {
   accessToken: string;
@@ -34,9 +31,9 @@ export interface AuthResponse {
 @Injectable()
 export class AuthService {
   private readonly logger = {
-    log: (message: string) => console.log(`[AuthService] ${message}`),
-    error: (message: string) => console.error(`[AuthService] ${message}`),
-    warn: (message: string) => console.warn(`[AuthService] ${message}`),
+    log: (message: string): void => console.log(`[AuthService] ${message}`),
+    error: (message: string): void => console.error(`[AuthService] ${message}`),
+    warn: (message: string): void => console.warn(`[AuthService] ${message}`),
   };
 
   constructor(
@@ -144,7 +141,7 @@ export class AuthService {
     try {
       payload = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_SECRET'),
-      }) as { sub: string; type: string };
+      });
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
@@ -193,7 +190,7 @@ export class AuthService {
       select: { id: true, isActive: true, role: true },
     });
 
-    if (!user || !user.isActive) {
+    if (!user?.isActive) {
       throw new UnauthorizedException('User not found or inactive');
     }
 
@@ -215,9 +212,9 @@ export class AuthService {
     this.logger.log(`User logged out: ${userId}`);
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user || !user.isActive) {
+    if (!user?.isActive) {
       return null;
     }
 
@@ -230,7 +227,7 @@ export class AuthService {
     return user;
   }
 
-  async getProfile(userId: string) {
+  async getProfile(userId: string): Promise<Record<string, unknown>> {
     const cacheKey = `profile:${userId}`;
     const cached = this.cacheService
       ? await this.cacheService.get<Record<string, unknown>>(cacheKey)
@@ -346,7 +343,7 @@ export class AuthService {
   private async trackAnalyticsEvent(event: {
     type: AnalyticsEventType;
     userId?: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }): Promise<void> {
     try {
       await this.prisma.analyticsEvent.create({

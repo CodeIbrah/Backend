@@ -23,7 +23,7 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerDto: RegisterDto) {
+  async register(@Body() registerDto: RegisterDto): Promise<unknown> {
     return this.authService.register(
       registerDto.email,
       registerDto.password,
@@ -35,14 +35,14 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60 } })
   @ApiOperation({ summary: 'Login with email and password' })
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto): Promise<unknown> {
     return this.authService.login(loginDto.email, loginDto.password);
   }
 
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body('refreshToken') refreshToken: string) {
+  async refresh(@Body('refreshToken') refreshToken: string): Promise<unknown> {
     return this.authService.refreshToken(refreshToken);
   }
 
@@ -51,7 +51,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and invalidate session' })
   @HttpCode(HttpStatus.OK)
-  async logout(@CurrentUser('id') userId: string) {
+  async logout(@CurrentUser('id') userId: string): Promise<{ message: string }> {
     await this.authService.logout(userId);
     return { message: 'Logged out successfully' };
   }
@@ -60,7 +60,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
-  async getProfile(@CurrentUser('id') userId: string) {
+  async getProfile(@CurrentUser('id') userId: string): Promise<unknown> {
     return this.authService.getProfile(userId);
   }
 }

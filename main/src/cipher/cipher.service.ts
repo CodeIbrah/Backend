@@ -5,7 +5,6 @@ import * as crypto from 'crypto';
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;     // 128-bit IV for GCM
 const TAG_LENGTH = 16;    // 128-bit auth tag
-const KEY_LENGTH = 32;    // 256-bit key
 
 export interface EncryptedPayload {
   /** Hex-encoded initialization vector */
@@ -113,7 +112,7 @@ export class CipherService {
    * Decrypt a JSON-safe object back to plaintext.
    */
   decryptFromJson(payload: Record<string, string> | null | undefined): string | null {
-    if (!payload || !payload.iv || !payload.data || !payload.tag) return null;
+    if (!payload?.iv || !payload.data || !payload.tag) return null;
     return this.decrypt({ iv: payload.iv, data: payload.data, tag: payload.tag });
   }
 

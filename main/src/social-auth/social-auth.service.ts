@@ -18,7 +18,7 @@ import { MicrosoftProvider } from './providers/microsoft.provider';
 import { GitHubProvider } from './providers/github.provider';
 import { GitLabProvider } from './providers/gitlab.provider';
 import { AppleProvider } from './providers/apple.provider';
-import { SocialProfile, SocialProvider } from './interfaces/social-provider.interface';
+import { SocialProvider } from './interfaces/social-provider.interface';
 
 export interface AuthTokens {
   accessToken: string;
@@ -207,7 +207,6 @@ export class SocialAuthService {
     let userId: string;
     let userRole: string;
     let userEmail: string;
-    const isNewUser = !profile.email;
 
     if (profile.email) {
       const existingUser = await this.prisma.user.findUnique({
@@ -365,7 +364,7 @@ export class SocialAuthService {
   }
 
   /** List social accounts linked to a user */
-  async getUserAccounts(userId: string) {
+  async getUserAccounts(userId: string): Promise<unknown> {
     const accounts = await this.prisma.socialAccount.findMany({
       where: { userId },
       select: {

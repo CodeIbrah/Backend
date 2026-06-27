@@ -8,7 +8,7 @@ import { CacheService } from './cache.service';
   providers: [
     {
       provide: CacheService,
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService): CacheService => {
         const redisUrl = configService.get<string>('REDIS_URL');
         const enabled = configService.get<boolean>('CACHE_ENABLED', true);
         if (!redisUrl || !enabled) {

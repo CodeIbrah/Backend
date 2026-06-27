@@ -1,4 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { Logger } from 'winston';
 
 interface ErrorResponse {
@@ -13,10 +14,10 @@ interface ErrorResponse {
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
 
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let status: number;
     let message: string | string[];

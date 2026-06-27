@@ -107,7 +107,7 @@ export class OpsController {
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Get operations dashboard data' })
   @ApiResponse({ status: 200, description: 'Operations dashboard data' })
-  async getDashboard(): Promise<OpsDashboardData> {
+  getDashboard(): Promise<OpsDashboardData> {
     this.logger.debug('Fetching ops dashboard data');
 
     return {

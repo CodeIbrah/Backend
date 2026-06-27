@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ReportsService, ReportInfo } from './reports.service';
 
 interface GenerateReportDto {
   type: 'daily' | 'weekly' | 'incident' | 'manual';
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 @ApiTags('Reports')
@@ -16,8 +16,8 @@ export class ReportsController {
   @Get()
   @ApiOperation({ summary: 'List all reports' })
   @ApiResponse({ status: 200, description: 'List of reports' })
-  async listReports(): Promise<ReportInfo[]> {
-    return this.reportsService.getReports();
+  listReports(): Promise<ReportInfo[]> {
+    return Promise.resolve(this.reportsService.getReports());
   }
 
   @Post('generate')
@@ -32,8 +32,8 @@ export class ReportsController {
   @ApiOperation({ summary: 'Get report content by filename' })
   @ApiResponse({ status: 200, description: 'Report content' })
   @ApiResponse({ status: 404, description: 'Report not found' })
-  async getReport(@Param('filename') filename: string): Promise<{ content: string }> {
-    const content = await this.reportsService.getReportContent(filename);
+  getReport(@Param('filename') filename: string): { content: string } {
+    const content = this.reportsService.getReportContent(filename);
     return { content };
   }
 }

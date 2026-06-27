@@ -8,15 +8,15 @@ import { QueryActivityDto } from './dto/query-activity.dto';
 
 interface LogActivityData {
   userId?: string;
-  type: ActivityType | string;
+  type: string;
   action: string;
   resource?: string;
   description?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
   traceId?: string;
-  severity?: ActivitySeverity | string;
+  severity?: string;
 }
 
 interface ActivityFilters {
@@ -64,7 +64,7 @@ export class ActivityLogService {
   async logLogin(
     userId: string,
     success: boolean,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     await this.logActivity({
       userId,
@@ -93,7 +93,7 @@ export class ActivityLogService {
     paymentId: string,
     type: 'PAYMENT_CREATED' | 'PAYMENT_COMPLETED' | 'PAYMENT_FAILED' | 'PAYMENT_REFUNDED',
     amount: number,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     const activityTypeMap = {
       PAYMENT_CREATED: ActivityType.PAYMENT_CREATED,
@@ -124,7 +124,7 @@ export class ActivityLogService {
     userId: string,
     invoiceId: string,
     action: 'INVOICE_GENERATED' | 'INVOICE_DOWNLOADED',
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     const activityTypeMap = {
       INVOICE_GENERATED: ActivityType.INVOICE_GENERATED,
@@ -146,7 +146,7 @@ export class ActivityLogService {
     userId: string,
     action: string,
     resource: string,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<void> {
     await this.logActivity({
       userId,
@@ -275,7 +275,7 @@ export class ActivityLogService {
     byUser: Record<string, number>;
     total: number;
   }> {
-    const where: Record<string, any> = {};
+    const where: Record<string, Record<string, Date>> = {};
     if (dateFrom || dateTo) {
       where.createdAt = {};
       if (dateFrom) where.createdAt.gte = new Date(dateFrom);
@@ -359,8 +359,8 @@ export class ActivityLogService {
     return activity;
   }
 
-  private buildWhereClause(filters?: ActivityFilters): Record<string, any> {
-    const where: Record<string, any> = {};
+  private buildWhereClause(filters?: ActivityFilters): Record<string, unknown> {
+    const where: Record<string, unknown> = {};
 
     if (filters?.type) {
       where.type = filters.type;
@@ -375,9 +375,10 @@ export class ActivityLogService {
     }
 
     if (filters?.dateFrom || filters?.dateTo) {
-      where.createdAt = {};
-      if (filters.dateFrom) where.createdAt.gte = new Date(filters.dateFrom);
-      if (filters.dateTo) where.createdAt.lte = new Date(filters.dateTo);
+      const dateFilter: Record<string, Date> = {};
+      if (filters.dateFrom) dateFilter.gte = new Date(filters.dateFrom);
+      if (filters.dateTo) dateFilter.lte = new Date(filters.dateTo);
+      where.createdAt = dateFilter;
     }
 
     if (filters?.search) {

@@ -26,7 +26,7 @@ export class HealthController {
   @HealthCheck()
   check(): Promise<HealthCheckResult> {
     return this.health.check([
-      () => this.pingDatabase('database'),
+      (): Promise<HealthIndicatorResult> => this.pingDatabase('database'),
     ]);
   }
 
@@ -39,7 +39,7 @@ export class HealthController {
   @HealthCheck()
   ready(): Promise<HealthCheckResult> {
     return this.health.check([
-      () => this.pingDatabase('database'),
+      (): Promise<HealthIndicatorResult> => this.pingDatabase('database'),
     ]);
   }
 

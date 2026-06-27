@@ -28,6 +28,7 @@ export interface AnalyticsEvent {
   serveClient: false,
 })
 export class AnalyticsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- NestJS injects via decorator
   @WebSocketServer() server!: Server;
 
   private readonly logger = new Logger('AnalyticsGateway');
@@ -63,7 +64,11 @@ export class AnalyticsGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.roomSubscriptions.set(client.id, new Set());
     }
 
-    const subs = this.roomSubscriptions.get(client.id)!;
+    let subs = this.roomSubscriptions.get(client.id);
+    if (!subs) {
+      subs = new Set();
+      this.roomSubscriptions.set(client.id, subs);
+    }
     for (const ch of channels) {
       subs.add(ch);
       void client.join(`analytics:${ch}`);

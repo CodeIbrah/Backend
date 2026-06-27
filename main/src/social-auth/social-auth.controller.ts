@@ -23,7 +23,7 @@ export class SocialAuthController {
 
   @Get()
   @ApiOperation({ summary: 'List configured social providers' })
-  getProviders() {
+  getProviders(): Array<{ name: string; displayName: string; configured: boolean }> {
     return this.socialAuthService.getConfiguredProviders();
   }
 
@@ -33,7 +33,7 @@ export class SocialAuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List all linked social accounts for the current user' })
-  async getUserAccounts(@CurrentUser('id') userId: string) {
+  async getUserAccounts(@CurrentUser('id') userId: string): Promise<unknown> {
     return this.socialAuthService.getUserAccounts(userId);
   }
 
@@ -41,7 +41,7 @@ export class SocialAuthController {
 
   @Get(':provider')
   @ApiOperation({ summary: 'Get the OAuth2 authorization URL for a provider' })
-  getAuthUrl(@Param('provider') provider: string) {
+  getAuthUrl(@Param('provider') provider: string): { url: string; state: string } {
     return this.socialAuthService.getAuthUrl(provider);
   }
 
@@ -51,11 +51,11 @@ export class SocialAuthController {
     @Param('provider') provider: string,
     @Query('code') code: string,
     @Query('state') state?: string,
-  ) {
+  ): Promise<Record<string, unknown>> {
     if (!code) {
       return { error: 'Missing authorization code' };
     }
-    return this.socialAuthService.handleCallback(provider, code, state);
+    return this.socialAuthService.handleCallback(provider, code, state) as Promise<Record<string, unknown>>;
   }
 
   @Post(':provider/callback')
@@ -64,11 +64,11 @@ export class SocialAuthController {
   async callbackPost(
     @Param('provider') provider: string,
     @Body() body: SocialCallbackDto,
-  ) {
+  ): Promise<Record<string, unknown>> {
     if (!body.code) {
       return { error: 'Missing authorization code' };
     }
-    return this.socialAuthService.handleCallback(provider, body.code, body.state);
+    return this.socialAuthService.handleCallback(provider, body.code, body.state) as Promise<Record<string, unknown>>;
   }
 
   @Post(':provider/link')
@@ -79,7 +79,7 @@ export class SocialAuthController {
     @Param('provider') provider: string,
     @Body('code') code: string,
     @CurrentUser('id') userId: string,
-  ) {
+  ): Promise<Record<string, unknown>> {
     if (!code) {
       return { error: 'Missing authorization code' };
     }
