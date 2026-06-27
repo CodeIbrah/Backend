@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  Optional,
   forwardRef,
   Inject,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { ActivityLogService } from '../activity-log/activity-log.service';
+import { CacheService } from '../cache/cache.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { AnalyticsEventType } from '@prisma/client';
@@ -42,6 +44,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private activityLogService: ActivityLogService,
+    @Optional() private cacheService?: CacheService,
   ) {}
 
   async register(
@@ -228,6 +231,12 @@ export class AuthService {
   }
 
   async getProfile(userId: string) {
+    const cacheKey = `profile:${userId}`;
+    const cached = this.cacheService
+      ? await this.cacheService.get<Record<string, unknown>>(cacheKey)
+      : null;
+    if (cached) return cached;
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -245,6 +254,9 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    if (this.cacheService) {
+      await this.cacheService.set(cacheKey, user, { ttl: 30 });
+    }
     return user;
   }
 

@@ -3,10 +3,12 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { AnalyticsEventType, Role, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { CacheService } from '../cache/cache.service';
 
 type UserWithoutPassword = {
   id: string;
@@ -29,12 +31,19 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigService,
+    @Optional() private cacheService?: CacheService,
   ) {}
 
   async findAll(
     page: number,
     limit: number,
   ): Promise<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }> {
+    const cacheKey = `users:list:${page}:${limit}`;
+    const cached = this.cacheService
+      ? await this.cacheService.get<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }>(cacheKey)
+      : null;
+    if (cached) return cached;
+
     const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([
@@ -62,10 +71,20 @@ export class UsersService {
 
     this.logger.log(`Fetched ${users.length} users (page ${page})`);
 
-    return { users, total, page, limit };
+    const result = { users, total, page, limit };
+    if (this.cacheService) {
+      await this.cacheService.set(cacheKey, result, { ttl: 60 });
+    }
+    return result;
   }
 
   async findOne(id: string): Promise<UserWithoutPassword | null> {
+    const cacheKey = `users:${id}`;
+    const cached = this.cacheService
+      ? await this.cacheService.get<UserWithoutPassword>(cacheKey)
+      : null;
+    if (cached) return cached;
+
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -91,6 +110,9 @@ export class UsersService {
 
     this.logger.log(`Fetched user: ${id}`);
 
+    if (this.cacheService) {
+      await this.cacheService.set(cacheKey, user, { ttl: 120 });
+    }
     return user;
   }
 
@@ -127,6 +149,11 @@ export class UsersService {
     });
 
     this.logger.log(`Created user: ${user.email}`);
+
+    // Invalidate list caches when a new user is created
+    if (this.cacheService) {
+      await this.cacheService.invalidatePattern('users:list:*');
+    }
 
     return user;
   }
@@ -166,6 +193,12 @@ export class UsersService {
 
     this.logger.log(`Updated user: ${id}`);
 
+    // Invalidate caches
+    if (this.cacheService) {
+      await this.cacheService.del(`users:${id}`);
+      await this.cacheService.invalidatePattern('users:list:*');
+    }
+
     return user;
   }
 
@@ -184,6 +217,12 @@ export class UsersService {
     });
 
     this.logger.log(`Deleted user: ${id}`);
+
+    // Invalidate caches
+    if (this.cacheService) {
+      await this.cacheService.del(`users:${id}`);
+      await this.cacheService.invalidatePattern('users:list:*');
+    }
   }
 
   async toggleActive(id: string): Promise<UserWithoutPassword> {
@@ -219,11 +258,28 @@ export class UsersService {
       `Toggled user ${id} active status to ${user.isActive}`,
     );
 
+    // Invalidate caches
+    if (this.cacheService) {
+      await this.cacheService.del(`users:${id}`);
+      await this.cacheService.invalidatePattern('users:list:*');
+    }
+
     return user;
   }
 
   async count(): Promise<number> {
-    return this.prisma.user.count();
+    const cacheKey = 'users:count';
+    const cached = this.cacheService
+      ? await this.cacheService.get<number>(cacheKey)
+      : null;
+    if (cached !== null) return cached;
+
+    const total = await this.prisma.user.count();
+
+    if (this.cacheService) {
+      await this.cacheService.set(cacheKey, total, { ttl: 60 });
+    }
+    return total;
   }
 
   private async trackAnalyticsEvent(event: {
