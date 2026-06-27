@@ -1,3 +1,5 @@
+let sdkInstance: { shutdown: () => Promise<void> } | null = null;
+
 export function initOpenTelemetry(): void {
   if (process.env.NODE_ENV === 'test') {
     return;
@@ -21,7 +23,19 @@ export function initOpenTelemetry(): void {
     });
 
     sdk.start();
+    sdkInstance = sdk;
   } catch {
     console.warn('OpenTelemetry not available, skipping initialization');
+  }
+}
+
+export async function shutdownOpenTelemetry(): Promise<void> {
+  if (sdkInstance) {
+    try {
+      await sdkInstance.shutdown();
+      console.log('[OpenTelemetry] SDK shut down successfully');
+    } catch {
+      console.warn('[OpenTelemetry] Error during SDK shutdown');
+    }
   }
 }
