@@ -1,4 +1,8 @@
-import { validateCreateInvoiceFromPayment, validatePaymentWebhook, validatePagination } from '../src/validators/invoice.validator';
+import {
+  validateCreateInvoiceFromPayment,
+  validatePaymentWebhook,
+  validatePagination,
+} from '../src/validators/invoice.validator';
 import { Currency, InvoiceChannel } from '../src/types';
 
 describe('Invoice Validators', () => {

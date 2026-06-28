@@ -19,7 +19,14 @@ export async function createInvoiceFromPaymentHandler(req: Request, res: Respons
   try {
     const validation = validateCreateInvoiceFromPayment(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -38,7 +45,14 @@ export async function createReceiptHandler(req: Request, res: Response): Promise
   try {
     const validation = validateCreateReceipt(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -57,14 +71,24 @@ export async function paymentWebhookHandler(req: Request, res: Response): Promis
   try {
     const validation = validatePaymentWebhook(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
-    const { event, paymentId, userId, userEmail, userPhone, amount, currency, description, items } = validation.data;
+    const { event, paymentId, userId, userEmail, userPhone, amount, currency, description, items } =
+      validation.data;
 
     if (event === 'payment.completed') {
-      const invoiceItems = items || [{ description: description || 'Payment', quantity: 1, unitPrice: amount }];
+      const invoiceItems = items || [
+        { description: description || 'Payment', quantity: 1, unitPrice: amount },
+      ];
 
       const invoice = await invoiceService.createInvoiceFromPayment({
         userId,
@@ -91,7 +115,12 @@ export async function paymentWebhookHandler(req: Request, res: Response): Promis
       });
       await invoiceService.sendReceipt(receipt);
 
-      logger.info({ message: 'Payment webhook processed', paymentId, invoiceId: invoice.id, receiptId: receipt.id });
+      logger.info({
+        message: 'Payment webhook processed',
+        paymentId,
+        invoiceId: invoice.id,
+        receiptId: receipt.id,
+      });
       res.status(200).json(successResponse({ invoice, receipt }, 'Payment processed successfully'));
     } else {
       logger.info({ message: 'Payment event ignored', event, paymentId });
@@ -107,7 +136,14 @@ export async function listInvoicesHandler(req: Request, res: Response): Promise<
   try {
     const paginationValidation = validatePagination(req.query);
     if (!paginationValidation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', paginationValidation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -116,7 +152,11 @@ export async function listInvoicesHandler(req: Request, res: Response): Promise<
       res.status(401).json(errorResponse('UNAUTHORIZED', 'Authentication required'));
       return;
     }
-    const result = await invoiceService.findAllInvoices(user.userId, paginationValidation.data.page, paginationValidation.data.limit);
+    const result = await invoiceService.findAllInvoices(
+      user.userId,
+      paginationValidation.data.page,
+      paginationValidation.data.limit,
+    );
     res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to list invoices', error });
@@ -166,7 +206,14 @@ export async function listReceiptsHandler(req: Request, res: Response): Promise<
   try {
     const paginationValidation = validatePagination(req.query);
     if (!paginationValidation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', paginationValidation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -175,7 +222,11 @@ export async function listReceiptsHandler(req: Request, res: Response): Promise<
       res.status(401).json(errorResponse('UNAUTHORIZED', 'Authentication required'));
       return;
     }
-    const result = await invoiceService.findAllReceipts(user.userId, paginationValidation.data.page, paginationValidation.data.limit);
+    const result = await invoiceService.findAllReceipts(
+      user.userId,
+      paginationValidation.data.page,
+      paginationValidation.data.limit,
+    );
     res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to list receipts', error });
@@ -201,7 +252,9 @@ export async function getReceiptByPaymentHandler(req: Request, res: Response): P
   try {
     const receipt = await invoiceService.findReceiptByPayment(req.params.paymentId);
     if (!receipt) {
-      res.status(404).json(errorResponse('NOT_FOUND', `Receipt for payment ${req.params.paymentId} not found`));
+      res
+        .status(404)
+        .json(errorResponse('NOT_FOUND', `Receipt for payment ${req.params.paymentId} not found`));
       return;
     }
     res.status(200).json(successResponse(receipt));
@@ -221,7 +274,14 @@ export async function resendInvoiceHandler(req: Request, res: Response): Promise
 
     const validation = validateResend(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -230,7 +290,11 @@ export async function resendInvoiceHandler(req: Request, res: Response): Promise
     await invoiceService.sendInvoice(invoice);
     invoice.channel = originalChannel;
 
-    logger.info({ message: 'Invoice resent', invoiceId: invoice.id, channel: validation.data.channel });
+    logger.info({
+      message: 'Invoice resent',
+      invoiceId: invoice.id,
+      channel: validation.data.channel,
+    });
     res.status(200).json(successResponse(invoice, 'Invoice resent successfully'));
   } catch (error) {
     logger.error({ message: 'Failed to resend invoice', error });

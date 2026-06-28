@@ -38,7 +38,7 @@ export function paginatedResponse<T>(
   total: number,
   page: number,
   limit: number,
-  message?: string
+  message?: string,
 ): PaginatedApiResponse<T> {
   return {
     success: true,

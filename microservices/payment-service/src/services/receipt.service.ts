@@ -1,11 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import {
-  Receipt,
-  PaymentStatus,
-  Currency,
-  PaymentMethod,
-  PaginatedResult,
-} from '../types';
+import { Receipt, PaymentStatus, Currency, PaymentMethod, PaginatedResult } from '../types';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
 import { generateReceiptPDF } from '../utils/pdf-generator';
@@ -25,7 +19,7 @@ class ReceiptService {
   async create(
     paymentId: string,
     invoiceId: string | null,
-    data: CreateReceiptInput
+    data: CreateReceiptInput,
   ): Promise<Receipt> {
     const span = tracer.startSpan('receipt.create');
 
@@ -75,11 +69,7 @@ class ReceiptService {
     }
   }
 
-  async findAll(
-    userId: string,
-    page = 1,
-    limit = 10
-  ): Promise<PaginatedResult<Receipt>> {
+  async findAll(userId: string, page = 1, limit = 10): Promise<PaginatedResult<Receipt>> {
     const span = tracer.startSpan('receipt.findAll');
 
     try {
@@ -87,9 +77,7 @@ class ReceiptService {
       span.setAttribute('page', page);
       span.setAttribute('limit', limit);
 
-      const userReceipts = Array.from(this.store.values()).filter(
-        (r) => r.userId === userId
-      );
+      const userReceipts = Array.from(this.store.values()).filter((r) => r.userId === userId);
       const total = userReceipts.length;
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -141,9 +129,7 @@ class ReceiptService {
     try {
       span.setAttribute('paymentId', paymentId);
 
-      const receipt = Array.from(this.store.values()).find(
-        (r) => r.paymentId === paymentId
-      );
+      const receipt = Array.from(this.store.values()).find((r) => r.paymentId === paymentId);
 
       if (receipt) {
         span.addEvent('Receipt found by payment ID');

@@ -13,7 +13,7 @@ export const bulkNotificationSchema = z.array(
     userId: z.string().uuid('Invalid user ID format'),
     type: notificationTypeSchema,
     message: z.string().min(1, 'Message is required').max(500, 'Message is too long'),
-  })
+  }),
 );
 
 export const notificationIdSchema = z.string().uuid('Invalid notification ID format');

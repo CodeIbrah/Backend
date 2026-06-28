@@ -147,17 +147,39 @@ export class InvoiceDoctor {
         timestamp: new Date().toISOString(),
         service: 'invoice-service',
         diagnostics: {
-          inMemoryStore: { status: 'UNHEALTHY', invoiceCount: 0, receiptCount: 0, invoiceCounter: 0, receiptCounter: 0, maxCapacity: this.maxInMemoryItems, utilizationPercent: 0 },
-          mailService: { status: 'UNHEALTHY', url: this.mailServiceUrl, latency: 0, error: 'Diagnostic failed' },
-          smsService: { status: 'UNHEALTHY', url: this.smsServiceUrl, latency: 0, error: 'Diagnostic failed' },
+          inMemoryStore: {
+            status: 'UNHEALTHY',
+            invoiceCount: 0,
+            receiptCount: 0,
+            invoiceCounter: 0,
+            receiptCounter: 0,
+            maxCapacity: this.maxInMemoryItems,
+            utilizationPercent: 0,
+          },
+          mailService: {
+            status: 'UNHEALTHY',
+            url: this.mailServiceUrl,
+            latency: 0,
+            error: 'Diagnostic failed',
+          },
+          smsService: {
+            status: 'UNHEALTHY',
+            url: this.smsServiceUrl,
+            latency: 0,
+            error: 'Diagnostic failed',
+          },
           jwtConfig: { status: 'UNHEALTHY', secretConfigured: false, secretLength: 0 },
           overall: 'UNHEALTHY',
         },
         errorAnalysis: { totalErrors: 0, errorTypes: {}, criticalErrors: [], recentErrors: [] },
         performance: {
-          invoiceCreationRate: 0, invoiceCount: 0, receiptCount: 0,
+          invoiceCreationRate: 0,
+          invoiceCount: 0,
+          receiptCount: 0,
           memoryUsage: { rss: '0MB', heapTotal: '0MB', heapUsed: '0MB', heapUtilizationPercent: 0 },
-          uptime: 0, pendingInvoices: 0, overdueInvoices: 0,
+          uptime: 0,
+          pendingInvoices: 0,
+          overdueInvoices: 0,
         },
         recommendations: [`Diagnostic scan failed: ${(error as Error).message}`],
         duration: Date.now() - this.startTime,
@@ -275,8 +297,12 @@ export class InvoiceDoctor {
 
       errorTypes['MissingEmail'] = allInvoices.filter((i) => !i.userEmail).length;
       errorTypes['MissingPhone'] = allInvoices.filter((i) => !i.userPhone).length;
-      errorTypes['OverdueInvoices'] = allInvoices.filter((i) => i.status === InvoiceStatus.OVERDUE).length;
-      errorTypes['CancelledInvoices'] = allInvoices.filter((i) => i.status === InvoiceStatus.CANCELLED).length;
+      errorTypes['OverdueInvoices'] = allInvoices.filter(
+        (i) => i.status === InvoiceStatus.OVERDUE,
+      ).length;
+      errorTypes['CancelledInvoices'] = allInvoices.filter(
+        (i) => i.status === InvoiceStatus.CANCELLED,
+      ).length;
       errorTypes['ZeroTotal'] = allInvoices.filter((i) => i.total <= 0).length;
 
       const criticalErrors: string[] = [];
@@ -321,7 +347,8 @@ export class InvoiceDoctor {
           rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)}MB`,
           heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)}MB`,
           heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)}MB`,
-          heapUtilizationPercent: Math.round((memUsage.heapUsed / memUsage.heapTotal) * 10000) / 100,
+          heapUtilizationPercent:
+            Math.round((memUsage.heapUsed / memUsage.heapTotal) * 10000) / 100,
         },
         uptime: Math.round(uptime),
         pendingInvoices: allInvoices.filter((i) => i.status === InvoiceStatus.ISSUED).length,
@@ -339,57 +366,55 @@ export class InvoiceDoctor {
   private generateRecommendations(
     diagnostics: InvoiceDiagnostics,
     _errorAnalysis: InvoiceErrorAnalysis,
-    performance: InvoicePerformanceReport
+    performance: InvoicePerformanceReport,
   ): string[] {
     const recommendations: string[] = [];
 
     // In-memory store warnings
     if (diagnostics.inMemoryStore.status === 'UNHEALTHY') {
       recommendations.push(
-        `CRITICAL: In-memory store at ${diagnostics.inMemoryStore.utilizationPercent}% capacity (${diagnostics.inMemoryStore.invoiceCount + diagnostics.inMemoryStore.receiptCount}/${diagnostics.inMemoryStore.maxCapacity}). Data will be lost on restart. Migrate to persistent storage (PostgreSQL) immediately.`
+        `CRITICAL: In-memory store at ${diagnostics.inMemoryStore.utilizationPercent}% capacity (${diagnostics.inMemoryStore.invoiceCount + diagnostics.inMemoryStore.receiptCount}/${diagnostics.inMemoryStore.maxCapacity}). Data will be lost on restart. Migrate to persistent storage (PostgreSQL) immediately.`,
       );
     } else if (diagnostics.inMemoryStore.status === 'DEGRADED') {
       recommendations.push(
-        `WARNING: In-memory store at ${diagnostics.inMemoryStore.utilizationPercent}% capacity. Consider migrating to persistent storage (PostgreSQL) soon.`
+        `WARNING: In-memory store at ${diagnostics.inMemoryStore.utilizationPercent}% capacity. Consider migrating to persistent storage (PostgreSQL) soon.`,
       );
     } else {
       recommendations.push(
-        'INFO: In-memory store is temporary. For production, migrate to PostgreSQL via Prisma (see users-service pattern).'
+        'INFO: In-memory store is temporary. For production, migrate to PostgreSQL via Prisma (see users-service pattern).',
       );
     }
 
     // Service health warnings
     if (diagnostics.mailService.status === 'UNHEALTHY') {
       recommendations.push(
-        `CRITICAL: Mail service unreachable at ${diagnostics.mailService.url}. Invoice emails will fail. Ensure mail-service is running.`
+        `CRITICAL: Mail service unreachable at ${diagnostics.mailService.url}. Invoice emails will fail. Ensure mail-service is running.`,
       );
     }
     if (diagnostics.smsService.status === 'UNHEALTHY') {
       recommendations.push(
-        `WARNING: SMS service unreachable at ${diagnostics.smsService.url}. SMS notifications will fail. Ensure sms-service is running.`
+        `WARNING: SMS service unreachable at ${diagnostics.smsService.url}. SMS notifications will fail. Ensure sms-service is running.`,
       );
     }
 
     // JWT warnings
     if (!diagnostics.jwtConfig.secretConfigured) {
-      recommendations.push(
-        'CRITICAL: JWT_SECRET not configured. Authentication will fail.'
-      );
+      recommendations.push('CRITICAL: JWT_SECRET not configured. Authentication will fail.');
     } else if (diagnostics.jwtConfig.secretLength < 32) {
       recommendations.push(
-        `WARNING: JWT_SECRET is only ${diagnostics.jwtConfig.secretLength} characters. Use at least 32 characters for production.`
+        `WARNING: JWT_SECRET is only ${diagnostics.jwtConfig.secretLength} characters. Use at least 32 characters for production.`,
       );
     }
 
     // Performance
     if (performance.memoryUsage.heapUtilizationPercent > 80) {
       recommendations.push(
-        `WARNING: Heap utilization at ${performance.memoryUsage.heapUtilizationPercent}%. Monitor for memory leaks.`
+        `WARNING: Heap utilization at ${performance.memoryUsage.heapUtilizationPercent}%. Monitor for memory leaks.`,
       );
     }
     if (performance.overdueInvoices > 0) {
       recommendations.push(
-        `INFO: ${performance.overdueInvoices} overdue invoices found. Consider implementing automated reminders.`
+        `INFO: ${performance.overdueInvoices} overdue invoices found. Consider implementing automated reminders.`,
       );
     }
 

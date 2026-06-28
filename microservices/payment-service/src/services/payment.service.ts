@@ -140,7 +140,7 @@ class PaymentService {
       }
 
       if (payment.status !== PaymentStatus.PENDING) {
-        throw new Error(Payment cannot be processed. Current status: );
+        throw new Error('Payment cannot be processed. Current status: ' + payment.status);
       }
 
       // Update status to processing
@@ -185,12 +185,11 @@ class PaymentService {
           // Process other payment methods via our payment gateway
           // In a real implementation, you would get payment details from the payment record
           // For now, we'll simulate with basic data
-          const paymentData = {
-            // These would come from the payment record or request in a real implementation
+          const paymentData: Record<string, unknown> = {
             payerId: 'paypal_payer_123',
             paymentToken: 'paypal_token_abc',
             phoneNumber: '+34600000000',
-            paymentToken: 'applepay_token_xyz',
+            applePayToken: 'applepay_token_xyz',
             orderId: 'order_123',
             customerData: { email: 'customer@example.com' },
             iban: 'ES9121000418450200051332',
@@ -210,15 +209,21 @@ class PaymentService {
             payment.completedAt = new Date();
             
             // Add gateway-specific metadata
-            if (gatewayResult.settlementDate) {
-              payment.metadata = { ...payment.metadata, settlementDate: gatewayResult.settlementDate };
+            const result = gatewayResult as {
+              success: boolean;
+              transactionId?: string;
+              settlementDate?: string;
+              provider?: string;
+            };
+            if (result.settlementDate) {
+              payment.metadata = { ...payment.metadata, settlementDate: result.settlementDate };
             }
             
-            span.addEvent(Payment completed successfully via );
+            span.addEvent('Payment completed successfully via ' + (result.provider || 'gateway'));
           } else {
             payment.status = PaymentStatus.FAILED;
             payment.errorMessage = gatewayResult.errorMessage || 'Payment gateway error';
-            span.addEvent(Payment failed via );
+            span.addEvent('Payment failed via ' + ((gatewayResult as { provider?: string }).provider || 'gateway'));
           }
         }
       } catch (gatewayError) {
@@ -226,8 +231,8 @@ class PaymentService {
         payment.status = PaymentStatus.FAILED;
         payment.errorMessage = gatewayError instanceof Error ? gatewayError.message : 'Payment processing error';
         span.addEvent('Payment failed due to gateway error');
-        span.recordException(gatewayError);
-        span.setStatus({ code: 'ERROR', message: gatewayError instanceof Error ? gatewayError.message : 'Unknown error' });
+        span.recordException(gatewayError as Error);
+        span.setStatus({ code: 2, message: gatewayError instanceof Error ? gatewayError.message : 'Unknown error' });
         
         logger.error({ 
           message: 'Payment gateway processing failed', 
@@ -273,7 +278,7 @@ class PaymentService {
       }
 
       if (payment.status !== PaymentStatus.COMPLETED) {
-        throw new Error(Only completed payments can be refunded. Current status: );
+        throw new Error('Only completed payments can be refunded. Current status: ' + payment.status);
       }
 
       // Attempt to refund via Stripe if it was a card payment
@@ -460,7 +465,7 @@ class PaymentService {
   }
 
   generateTransactionId(): string {
-    return 	xn__;
+    return 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
   private simulateProcessing(): Promise<void> {

@@ -29,18 +29,21 @@ export async function listReceiptsHandler(req: Request, res: Response): Promise<
     const paginationValidation = validatePagination(req.query);
 
     if (!paginationValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', paginationValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const { page, limit } = paginationValidation.data;
     const result = await receiptService.findAll(userId, page, limit);
 
-    res.status(200).json(
-      paginatedResponse(result.items, result.total, result.page, result.limit)
-    );
+    res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to list receipts', error });
     res.status(500).json(errorResponse('LIST_RECEIPTS_FAILED', (error as Error).message));
@@ -52,16 +55,23 @@ export async function getReceiptHandler(req: Request, res: Response): Promise<vo
     const validation = validateReceiptId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const receipt = await receiptService.findOne(req.params.id);
 
     if (!receipt) {
-      res.status(404).json(errorResponse('RECEIPT_NOT_FOUND', `Receipt with id ${req.params.id} not found`));
+      res
+        .status(404)
+        .json(errorResponse('RECEIPT_NOT_FOUND', `Receipt with id ${req.params.id} not found`));
       return;
     }
 
@@ -77,16 +87,23 @@ export async function getReceiptPDFHandler(req: Request, res: Response): Promise
     const validation = validateReceiptId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const receipt = await receiptService.findOne(req.params.id);
 
     if (!receipt) {
-      res.status(404).json(errorResponse('RECEIPT_NOT_FOUND', `Receipt with id ${req.params.id} not found`));
+      res
+        .status(404)
+        .json(errorResponse('RECEIPT_NOT_FOUND', `Receipt with id ${req.params.id} not found`));
       return;
     }
 
@@ -107,16 +124,28 @@ export async function getReceiptByPaymentHandler(req: Request, res: Response): P
     const validation = validatePaymentId(req.params.paymentId);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const receipt = await receiptService.findByPaymentId(req.params.paymentId);
 
     if (!receipt) {
-      res.status(404).json(errorResponse('RECEIPT_NOT_FOUND', `Receipt for payment ${req.params.paymentId} not found`));
+      res
+        .status(404)
+        .json(
+          errorResponse(
+            'RECEIPT_NOT_FOUND',
+            `Receipt for payment ${req.params.paymentId} not found`,
+          ),
+        );
       return;
     }
 

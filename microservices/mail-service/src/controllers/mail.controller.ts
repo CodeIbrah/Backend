@@ -8,7 +8,14 @@ export async function sendMailHandler(req: Request, res: Response): Promise<void
   try {
     const validation = validateSendMail(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -25,7 +32,14 @@ export async function listMailsHandler(req: Request, res: Response): Promise<voi
   try {
     const validation = validatePagination(req.query);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 

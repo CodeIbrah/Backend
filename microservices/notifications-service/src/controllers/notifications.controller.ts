@@ -16,9 +16,14 @@ export async function sendNotificationHandler(req: Request, res: Response): Prom
     const validation = validateSendNotification(req.body);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -39,18 +44,28 @@ export async function listNotificationsHandler(req: Request, res: Response): Pro
     const paginationValidation = validatePagination(req.query);
 
     if (!paginationValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', paginationValidation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const userIdValidation = validateUserId(req.query.userId as string);
 
     if (!userIdValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', userIdValidation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            userIdValidation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -58,9 +73,9 @@ export async function listNotificationsHandler(req: Request, res: Response): Pro
     const userId = userIdValidation.data;
     const result = await notificationsService.findAll(userId, page, limit);
 
-    res.status(200).json(
-      paginatedResponse(result.notifications, result.total, result.page, result.limit)
-    );
+    res
+      .status(200)
+      .json(paginatedResponse(result.notifications, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to list notifications', error });
     res.status(500).json(errorResponse('LIST_NOTIFICATIONS_FAILED', (error as Error).message));
@@ -72,16 +87,28 @@ export async function getNotificationHandler(req: Request, res: Response): Promi
     const validation = validateNotificationId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const notification = await notificationsService.findOne(req.params.id);
 
     if (!notification) {
-      res.status(404).json(errorResponse('NOTIFICATION_NOT_FOUND', `Notification with id ${req.params.id} not found`));
+      res
+        .status(404)
+        .json(
+          errorResponse(
+            'NOTIFICATION_NOT_FOUND',
+            `Notification with id ${req.params.id} not found`,
+          ),
+        );
       return;
     }
 
@@ -97,9 +124,14 @@ export async function deleteNotificationHandler(req: Request, res: Response): Pr
     const validation = validateNotificationId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -119,9 +151,14 @@ export async function sendBulkNotificationsHandler(req: Request, res: Response):
     const validation = validateBulkNotifications(req.body);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e: z.ZodIssue) => e.message).join(', '),
+          ),
+        );
       return;
     }
 

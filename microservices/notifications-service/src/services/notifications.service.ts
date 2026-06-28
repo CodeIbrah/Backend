@@ -1,6 +1,6 @@
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
-import { notificationQueue, processNotificationJob } from '../utils/queue';
+import { getNotificationQueue, processNotificationJob } from '../utils/queue';
 
 export type NotificationType = 'EMAIL' | 'SMS' | 'PUSH' | 'IN_APP';
 export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED';
@@ -49,17 +49,29 @@ class NotificationsService {
 
       this.store.set(notification.id, notification);
 
-      await notificationQueue.add('send-notification', {
+      const q = getNotificationQueue();
+      if (q) {
+        await q.add('send-notification', {
+          notificationId: notification.id,
+          userId,
+          type,
+          message,
+        });
+        span.addEvent('Notification queued');
+      } else {
+        // Redis not available — skip queue, process inline
+        notification.status = 'SENT';
+        span.addEvent('Notification sent directly (no Redis)');
+      }
+
+      span.setAttribute('notificationId', notification.id);
+
+      logger.info({
+        message: 'Notification queued',
         notificationId: notification.id,
         userId,
         type,
-        message,
       });
-
-      span.setAttribute('notificationId', notification.id);
-      span.addEvent('Notification queued successfully');
-
-      logger.info({ message: 'Notification queued', notificationId: notification.id, userId, type });
 
       return notification;
     } catch (error) {
@@ -80,9 +92,7 @@ class NotificationsService {
       span.setAttribute('page', page);
       span.setAttribute('limit', limit);
 
-      const allNotifications = Array.from(this.store.values()).filter(
-        (n) => n.userId === userId
-      );
+      const allNotifications = Array.from(this.store.values()).filter((n) => n.userId === userId);
       const total = allNotifications.length;
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -175,12 +185,17 @@ class NotificationsService {
         this.store.set(notification.id, notification);
         notifications.push(notification);
 
-        await notificationQueue.add('send-notification', {
-          notificationId: notification.id,
-          userId: input.userId,
-          type: input.type,
-          message: input.message,
-        });
+        const q = getNotificationQueue();
+        if (q) {
+          await q.add('send-notification', {
+            notificationId: notification.id,
+            userId: input.userId,
+            type: input.type,
+            message: input.message,
+          });
+        } else {
+          notification.status = 'SENT';
+        }
       }
 
       span.setAttribute('createdCount', notifications.length);

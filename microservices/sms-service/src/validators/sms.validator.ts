@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const sendSmsSchema = z.object({
   to: z.string().min(1, 'Recipient phone is required').max(20, 'Phone too long'),
-  message: z.string().min(1, 'Message is required').max(1600, 'Message exceeds 1600 characters (max for concatenated SMS)'),
+  message: z
+    .string()
+    .min(1, 'Message is required')
+    .max(1600, 'Message exceeds 1600 characters (max for concatenated SMS)'),
 });
 
 export const paginationSchema = z.object({

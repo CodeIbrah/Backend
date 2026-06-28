@@ -24,7 +24,12 @@ interface AuditLogEntry {
 
 const auditLogs: AuditLogEntry[] = [];
 
-function logAuditAction(req: Request, action: string, targetId: string, details: Record<string, any>): void {
+function logAuditAction(
+  req: Request,
+  action: string,
+  targetId: string,
+  details: Record<string, any>,
+): void {
   const user = (req as Request & { user?: { id: string; email: string; role: string } }).user;
   const entry: AuditLogEntry = {
     timestamp: new Date().toISOString(),
@@ -49,18 +54,28 @@ export async function getAllPaymentsHandler(req: Request, res: Response): Promis
     const paginationValidation = validatePagination(req.query);
 
     if (!paginationValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', paginationValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const filtersValidation = validatePaymentFilters(req.query);
 
     if (!filtersValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', filtersValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            filtersValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -68,9 +83,7 @@ export async function getAllPaymentsHandler(req: Request, res: Response): Promis
     const filters = filtersValidation.success ? filtersValidation.data : {};
     const result = await adminService.getAllPayments(page, limit, filters);
 
-    res.status(200).json(
-      paginatedResponse(result.items, result.total, result.page, result.limit)
-    );
+    res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to get all payments', error });
     res.status(500).json(errorResponse('GET_ALL_PAYMENTS_FAILED', (error as Error).message));
@@ -82,9 +95,14 @@ export async function getAdminPaymentHandler(req: Request, res: Response): Promi
     const validation = validatePaymentId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -92,7 +110,9 @@ export async function getAdminPaymentHandler(req: Request, res: Response): Promi
     const payment = await paymentService.findOne(req.params.id);
 
     if (!payment) {
-      res.status(404).json(errorResponse('PAYMENT_NOT_FOUND', `Payment with id ${req.params.id} not found`));
+      res
+        .status(404)
+        .json(errorResponse('PAYMENT_NOT_FOUND', `Payment with id ${req.params.id} not found`));
       return;
     }
 
@@ -119,19 +139,28 @@ export async function exportPaymentsHandler(req: Request, res: Response): Promis
     const filtersValidation = validatePaymentFilters(req.query);
 
     if (!filtersValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', filtersValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            filtersValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const filters = filtersValidation.success ? filtersValidation.data : {};
     const payments = await adminService.exportPayments(filters);
 
-    const csvHeader = 'ID,User ID,Amount,Currency,Method,Status,Description,Transaction ID,Created At\n';
-    const csvRows = payments.map((p) =>
-      `${p.id},${p.userId},${p.amount},${p.currency},${p.method},${p.status},"${p.description.replace(/"/g, '""')}",${p.transactionId || ''},${p.createdAt.toISOString()}`
-    ).join('\n');
+    const csvHeader =
+      'ID,User ID,Amount,Currency,Method,Status,Description,Transaction ID,Created At\n';
+    const csvRows = payments
+      .map(
+        (p) =>
+          `${p.id},${p.userId},${p.amount},${p.currency},${p.method},${p.status},"${p.description.replace(/"/g, '""')}",${p.transactionId || ''},${p.createdAt.toISOString()}`,
+      )
+      .join('\n');
 
     const csv = csvHeader + csvRows;
 
@@ -149,18 +178,28 @@ export async function getAllInvoicesHandler(req: Request, res: Response): Promis
     const paginationValidation = validatePagination(req.query);
 
     if (!paginationValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', paginationValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const filtersValidation = validateInvoiceFilters(req.query);
 
     if (!filtersValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', filtersValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            filtersValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -168,9 +207,7 @@ export async function getAllInvoicesHandler(req: Request, res: Response): Promis
     const filters = filtersValidation.success ? filtersValidation.data : {};
     const result = await adminService.getAllInvoices(page, limit, filters);
 
-    res.status(200).json(
-      paginatedResponse(result.items, result.total, result.page, result.limit)
-    );
+    res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to get all invoices', error });
     res.status(500).json(errorResponse('GET_ALL_INVOICES_FAILED', (error as Error).message));
@@ -194,7 +231,8 @@ export async function getInvoiceStatsHandler(req: Request, res: Response): Promi
 
     for (const invoice of invoices) {
       statusBreakdown[invoice.status] = (statusBreakdown[invoice.status] || 0) + 1;
-      currencyBreakdown[invoice.currency] = (currencyBreakdown[invoice.currency] || 0) + invoice.total;
+      currencyBreakdown[invoice.currency] =
+        (currencyBreakdown[invoice.currency] || 0) + invoice.total;
     }
 
     const stats = {
@@ -220,9 +258,14 @@ export async function getRevenueReportHandler(req: Request, res: Response): Prom
     const validation = validateRevenueReport(req.query);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -241,9 +284,14 @@ export async function forceCompletePaymentHandler(req: Request, res: Response): 
     const validation = validatePaymentId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -267,18 +315,28 @@ export async function forceRefundPaymentHandler(req: Request, res: Response): Pr
     const idValidation = validatePaymentId(req.params.id);
 
     if (!idValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', idValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            idValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const refundValidation = validateRefundPayment(req.body);
 
     if (!refundValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', refundValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            refundValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 

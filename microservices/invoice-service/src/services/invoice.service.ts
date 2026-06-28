@@ -1,5 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Invoice, Receipt, InvoiceStatus, Currency, InvoiceChannel, CreateInvoiceInput, PaginatedResult, InvoiceFilters, MailPayload, SmsPayload } from '../types';
+import {
+  Invoice,
+  Receipt,
+  InvoiceStatus,
+  Currency,
+  InvoiceChannel,
+  CreateInvoiceInput,
+  PaginatedResult,
+  InvoiceFilters,
+  MailPayload,
+  SmsPayload,
+} from '../types';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
 
@@ -27,7 +38,9 @@ class InvoiceService {
       const discount = data.discount || 0;
       const total = subtotal + tax - discount;
       const now = new Date();
-      const dueDate = data.dueDate ? new Date(data.dueDate) : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const dueDate = data.dueDate
+        ? new Date(data.dueDate)
+        : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       const invoice: Invoice = {
         id: uuidv4(),
@@ -71,7 +84,11 @@ class InvoiceService {
     } catch (error) {
       span.recordException(error as Error);
       span.setStatus({ code: 2, message: (error as Error).message });
-      logger.error({ message: 'Failed to create invoice from payment', error, userId: data.userId });
+      logger.error({
+        message: 'Failed to create invoice from payment',
+        error,
+        userId: data.userId,
+      });
       throw error;
     } finally {
       span.end();
@@ -135,8 +152,10 @@ class InvoiceService {
   async sendInvoice(invoice: Invoice): Promise<void> {
     const span = tracer.startSpan('invoice.send');
     try {
-      const shouldEmail = invoice.channel === InvoiceChannel.EMAIL || invoice.channel === InvoiceChannel.BOTH;
-      const shouldSms = invoice.channel === InvoiceChannel.SMS || invoice.channel === InvoiceChannel.BOTH;
+      const shouldEmail =
+        invoice.channel === InvoiceChannel.EMAIL || invoice.channel === InvoiceChannel.BOTH;
+      const shouldSms =
+        invoice.channel === InvoiceChannel.SMS || invoice.channel === InvoiceChannel.BOTH;
 
       const results = await Promise.allSettled([
         shouldEmail && invoice.userEmail ? this.sendEmail(invoice) : Promise.resolve(),
@@ -145,7 +164,11 @@ class InvoiceService {
 
       for (const result of results) {
         if (result.status === 'rejected') {
-          logger.error({ message: 'Failed to send via channel', error: result.reason, invoiceId: invoice.id });
+          logger.error({
+            message: 'Failed to send via channel',
+            error: result.reason,
+            invoiceId: invoice.id,
+          });
         }
       }
 
@@ -181,7 +204,11 @@ class InvoiceService {
 
       for (const result of results) {
         if (result.status === 'rejected') {
-          logger.error({ message: 'Failed to send receipt via channel', error: result.reason, receiptId: receipt.id });
+          logger.error({
+            message: 'Failed to send receipt via channel',
+            error: result.reason,
+            receiptId: receipt.id,
+          });
         }
       }
 
@@ -236,11 +263,16 @@ class InvoiceService {
     return null;
   }
 
-  async findByFilters(filters: InvoiceFilters, page = 1, limit = 10): Promise<PaginatedResult<Invoice>> {
+  async findByFilters(
+    filters: InvoiceFilters,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedResult<Invoice>> {
     let invoices = Array.from(this.invoiceStore.values());
     if (filters.userId) invoices = invoices.filter((i) => i.userId === filters.userId);
     if (filters.status) invoices = invoices.filter((i) => i.status === filters.status);
-    if (filters.dateFrom) invoices = invoices.filter((i) => i.createdAt >= new Date(filters.dateFrom!));
+    if (filters.dateFrom)
+      invoices = invoices.filter((i) => i.createdAt >= new Date(filters.dateFrom!));
     if (filters.dateTo) invoices = invoices.filter((i) => i.createdAt <= new Date(filters.dateTo!));
     const total = invoices.length;
     const start = (page - 1) * limit;
@@ -272,7 +304,12 @@ class InvoiceService {
       }
       logger.info({ message: 'Invoice email sent', invoiceId: invoice.id });
     } catch (error) {
-      logger.error({ message: 'Failed to send invoice email', error, invoiceId: invoice.id, mailServiceUrl: MAIL_SERVICE_URL });
+      logger.error({
+        message: 'Failed to send invoice email',
+        error,
+        invoiceId: invoice.id,
+        mailServiceUrl: MAIL_SERVICE_URL,
+      });
       throw error;
     }
   }
@@ -293,7 +330,12 @@ class InvoiceService {
       }
       logger.info({ message: 'Invoice SMS sent', invoiceId: invoice.id });
     } catch (error) {
-      logger.error({ message: 'Failed to send invoice SMS', error, invoiceId: invoice.id, smsServiceUrl: SMS_SERVICE_URL });
+      logger.error({
+        message: 'Failed to send invoice SMS',
+        error,
+        invoiceId: invoice.id,
+        smsServiceUrl: SMS_SERVICE_URL,
+      });
       throw error;
     }
   }
@@ -315,7 +357,12 @@ class InvoiceService {
       }
       logger.info({ message: 'Receipt email sent', receiptId: receipt.id });
     } catch (error) {
-      logger.error({ message: 'Failed to send receipt email', error, receiptId: receipt.id, mailServiceUrl: MAIL_SERVICE_URL });
+      logger.error({
+        message: 'Failed to send receipt email',
+        error,
+        receiptId: receipt.id,
+        mailServiceUrl: MAIL_SERVICE_URL,
+      });
       throw error;
     }
   }
@@ -336,14 +383,22 @@ class InvoiceService {
       }
       logger.info({ message: 'Receipt SMS sent', receiptId: receipt.id });
     } catch (error) {
-      logger.error({ message: 'Failed to send receipt SMS', error, receiptId: receipt.id, smsServiceUrl: SMS_SERVICE_URL });
+      logger.error({
+        message: 'Failed to send receipt SMS',
+        error,
+        receiptId: receipt.id,
+        smsServiceUrl: SMS_SERVICE_URL,
+      });
       throw error;
     }
   }
 
   private formatInvoiceEmailBody(invoice: Invoice): string {
     const itemsHtml = invoice.items
-      .map((i) => `<tr><td>${i.description}</td><td>${i.quantity}</td><td>${i.unitPrice.toFixed(2)}</td><td>${i.total.toFixed(2)}</td></tr>`)
+      .map(
+        (i) =>
+          `<tr><td>${i.description}</td><td>${i.quantity}</td><td>${i.unitPrice.toFixed(2)}</td><td>${i.total.toFixed(2)}</td></tr>`,
+      )
       .join('');
     return `
       <h2>Invoice ${invoice.invoiceNumber}</h2>

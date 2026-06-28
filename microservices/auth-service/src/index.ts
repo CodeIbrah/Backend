@@ -18,12 +18,14 @@ const PORT = parseInt(process.env.PORT || '3001', 10);
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
 
 app.use(helmet());
-app.use(cors({
-  origin: ALLOWED_ORIGINS,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Request-ID'],
-}));
+app.use(
+  cors({
+    origin: ALLOWED_ORIGINS,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Request-ID'],
+  }),
+);
 app.use(compression());
 
 app.use(
@@ -33,7 +35,7 @@ app.use(
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Too many requests, please try again later.',
-  })
+  }),
 );
 
 app.use(express.json());
@@ -55,7 +57,7 @@ app.get('/health', (_req: Request, res: Response) => {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-    })
+    }),
   );
 });
 

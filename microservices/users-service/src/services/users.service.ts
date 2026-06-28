@@ -1,23 +1,23 @@
-import { prisma, Prisma } from '@backend/shared-prisma';
+import { prisma, Prisma, Role } from '@backend/shared-prisma';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
 
 export interface CreateUserInput {
   email: string;
   name: string;
-  role?: string;
+  role?: Role;
 }
 
 export interface UpdateUserInput {
   email?: string;
   name?: string;
-  role?: string;
+  role?: Role;
   isActive?: boolean;
 }
 
 export interface UserFilters {
   search?: string;
-  role?: string;
+  role?: Role;
   isActive?: boolean;
 }
 
@@ -32,8 +32,18 @@ class UsersService {
   async findAll(
     page = 1,
     limit = 10,
-    filters?: UserFilters
-  ): Promise<PaginatedResult<{ id: string; email: string; name: string | null; role: string; isActive: boolean; createdAt: string; updatedAt: string }>> {
+    filters?: UserFilters,
+  ): Promise<
+    PaginatedResult<{
+      id: string;
+      email: string;
+      name: string | null;
+      role: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    }>
+  > {
     const span = tracer.startSpan('users.findAll');
 
     try {
@@ -74,7 +84,7 @@ class UsersService {
       span.addEvent('Users retrieved successfully');
 
       return {
-        items: items.map((u) => ({
+        items: items.map((u: { id: string; email: string; name: string | null; role: string; isActive: boolean; createdAt: Date; updatedAt: Date }) => ({
           ...u,
           createdAt: u.createdAt.toISOString(),
           updatedAt: u.updatedAt.toISOString(),
@@ -93,7 +103,17 @@ class UsersService {
     }
   }
 
-  async findOne(id: string): Promise<{ id: string; email: string; name: string | null; role: string; isActive: boolean; createdAt: string; updatedAt: string } | null> {
+  async findOne(
+    id: string,
+  ): Promise<{
+    id: string;
+    email: string;
+    name: string | null;
+    role: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+  } | null> {
     const span = tracer.startSpan('users.findOne');
 
     try {

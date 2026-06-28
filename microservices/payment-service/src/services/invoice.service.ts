@@ -33,7 +33,9 @@ class InvoiceService {
       const total = subtotal + tax - discount;
 
       const now = new Date();
-      const dueDate = data.dueDate ? new Date(data.dueDate) : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const dueDate = data.dueDate
+        ? new Date(data.dueDate)
+        : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       const invoice: Invoice = {
         id: uuidv4(),
@@ -81,11 +83,7 @@ class InvoiceService {
     }
   }
 
-  async findAll(
-    userId: string,
-    page = 1,
-    limit = 10
-  ): Promise<PaginatedResult<Invoice>> {
+  async findAll(userId: string, page = 1, limit = 10): Promise<PaginatedResult<Invoice>> {
     const span = tracer.startSpan('invoice.findAll');
 
     try {
@@ -93,9 +91,7 @@ class InvoiceService {
       span.setAttribute('page', page);
       span.setAttribute('limit', limit);
 
-      const userInvoices = Array.from(this.store.values()).filter(
-        (i) => i.userId === userId
-      );
+      const userInvoices = Array.from(this.store.values()).filter((i) => i.userId === userId);
       const total = userInvoices.length;
       const start = (page - 1) * limit;
       const end = start + limit;
@@ -147,9 +143,7 @@ class InvoiceService {
     try {
       span.setAttribute('invoiceNumber', number);
 
-      const invoice = Array.from(this.store.values()).find(
-        (i) => i.invoiceNumber === number
-      );
+      const invoice = Array.from(this.store.values()).find((i) => i.invoiceNumber === number);
 
       if (invoice) {
         span.addEvent('Invoice found by number');
@@ -243,7 +237,11 @@ class InvoiceService {
     }
   }
 
-  async findByFilters(filters: InvoiceFilters, page = 1, limit = 10): Promise<PaginatedResult<Invoice>> {
+  async findByFilters(
+    filters: InvoiceFilters,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedResult<Invoice>> {
     const span = tracer.startSpan('invoice.findByFilters');
 
     try {

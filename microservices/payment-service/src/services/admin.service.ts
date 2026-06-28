@@ -20,7 +20,7 @@ class AdminService {
   async getAllPayments(
     page = 1,
     limit = 10,
-    filters: PaymentFilters = {}
+    filters: PaymentFilters = {},
   ): Promise<PaginatedResult<Payment>> {
     const span = tracer.startSpan('admin.getAllPayments');
 
@@ -47,7 +47,7 @@ class AdminService {
   async getAllInvoices(
     page = 1,
     limit = 10,
-    filters: InvoiceFilters = {}
+    filters: InvoiceFilters = {},
   ): Promise<PaginatedResult<Invoice>> {
     const span = tracer.startSpan('admin.getAllInvoices');
 
@@ -97,7 +97,8 @@ class AdminService {
         paymentsByMethod[payment.method] = (paymentsByMethod[payment.method] || 0) + 1;
 
         if (payment.status === PaymentStatus.COMPLETED) {
-          revenueByCurrency[payment.currency] = (revenueByCurrency[payment.currency] || 0) + payment.amount;
+          revenueByCurrency[payment.currency] =
+            (revenueByCurrency[payment.currency] || 0) + payment.amount;
         }
       }
 
@@ -140,16 +141,12 @@ class AdminService {
       const from = new Date(dateFrom);
       const to = new Date(dateTo);
 
-      const filteredPayments = payments.filter(
-        (p) => p.createdAt >= from && p.createdAt <= to
-      );
+      const filteredPayments = payments.filter((p) => p.createdAt >= from && p.createdAt <= to);
 
       const completedPayments = filteredPayments.filter(
-        (p) => p.status === PaymentStatus.COMPLETED
+        (p) => p.status === PaymentStatus.COMPLETED,
       );
-      const refundedPayments = filteredPayments.filter(
-        (p) => p.status === PaymentStatus.REFUNDED
-      );
+      const refundedPayments = filteredPayments.filter((p) => p.status === PaymentStatus.REFUNDED);
 
       const totalRevenue = completedPayments.reduce((sum, p) => sum + p.amount, 0);
       const totalRefunds = refundedPayments.reduce((sum, p) => sum + p.amount, 0);
@@ -162,7 +159,8 @@ class AdminService {
       const revenueByMethod: Record<string, number> = {};
 
       for (const payment of completedPayments) {
-        revenueByCurrency[payment.currency] = (revenueByCurrency[payment.currency] || 0) + payment.amount;
+        revenueByCurrency[payment.currency] =
+          (revenueByCurrency[payment.currency] || 0) + payment.amount;
         revenueByMethod[payment.method] = (revenueByMethod[payment.method] || 0) + payment.amount;
       }
 
@@ -228,7 +226,11 @@ class AdminService {
       payment.transactionId = paymentService.generateTransactionId();
       payment.completedAt = new Date();
       payment.updatedAt = new Date();
-      payment.metadata = { ...payment.metadata, forceCompletedBy: 'admin', forceCompletedAt: new Date().toISOString() };
+      payment.metadata = {
+        ...payment.metadata,
+        forceCompletedBy: 'admin',
+        forceCompletedAt: new Date().toISOString(),
+      };
 
       span.addEvent('Payment force completed');
 
@@ -262,7 +264,9 @@ class AdminService {
       }
 
       if (payment.status !== PaymentStatus.COMPLETED) {
-        throw new Error(`Only completed payments can be refunded. Current status: ${payment.status}`);
+        throw new Error(
+          `Only completed payments can be refunded. Current status: ${payment.status}`,
+        );
       }
 
       payment.status = PaymentStatus.REFUNDED;
@@ -293,7 +297,9 @@ class AdminService {
     }
   }
 
-  private calculateDailyRevenue(payments: Payment[]): Array<{ date: string; amount: number; count: number }> {
+  private calculateDailyRevenue(
+    payments: Payment[],
+  ): Array<{ date: string; amount: number; count: number }> {
     const dailyMap = new Map<string, { amount: number; count: number }>();
 
     for (const payment of payments) {
@@ -315,7 +321,7 @@ class AdminService {
   private calculateDailyBreakdown(
     payments: Payment[],
     from: Date,
-    to: Date
+    to: Date,
   ): Array<{ date: string; revenue: number; refunds: number; net: number; count: number }> {
     const dailyMap = new Map<string, { revenue: number; refunds: number; count: number }>();
 

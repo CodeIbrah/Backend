@@ -25,9 +25,14 @@ export async function createPaymentHandler(req: Request, res: Response): Promise
     const validation = validateCreatePayment(req.body);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -56,18 +61,21 @@ export async function listPaymentsHandler(req: Request, res: Response): Promise<
     const paginationValidation = validatePagination(req.query);
 
     if (!paginationValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', paginationValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            paginationValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const { page, limit } = paginationValidation.data;
     const result = await paymentService.findAll(userId, page, limit);
 
-    res.status(200).json(
-      paginatedResponse(result.items, result.total, result.page, result.limit)
-    );
+    res.status(200).json(paginatedResponse(result.items, result.total, result.page, result.limit));
   } catch (error) {
     logger.error({ message: 'Failed to list payments', error });
     res.status(500).json(errorResponse('LIST_PAYMENTS_FAILED', (error as Error).message));
@@ -79,16 +87,23 @@ export async function getPaymentHandler(req: Request, res: Response): Promise<vo
     const validation = validatePaymentId(req.params.id);
 
     if (!validation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', validation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const payment = await paymentService.findOne(req.params.id);
 
     if (!payment) {
-      res.status(404).json(errorResponse('PAYMENT_NOT_FOUND', `Payment with id ${req.params.id} not found`));
+      res
+        .status(404)
+        .json(errorResponse('PAYMENT_NOT_FOUND', `Payment with id ${req.params.id} not found`));
       return;
     }
 
@@ -104,18 +119,28 @@ export async function processPaymentHandler(req: Request, res: Response): Promis
     const idValidation = validatePaymentId(req.params.id);
 
     if (!idValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', idValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            idValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const processValidation = validateProcessPayment(req.body);
 
     if (!processValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', processValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            processValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -145,18 +170,28 @@ export async function refundPaymentHandler(req: Request, res: Response): Promise
     const idValidation = validatePaymentId(req.params.id);
 
     if (!idValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', idValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            idValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
     const refundValidation = validateRefundPayment(req.body);
 
     if (!refundValidation.success) {
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', refundValidation.error.errors.map((e) => e.message).join(', '))
-      );
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            refundValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 

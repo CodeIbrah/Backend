@@ -3,22 +3,63 @@ import Redis from 'ioredis';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
 
-const redisConnection = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379', 10),
-  password: process.env.REDIS_PASSWORD || undefined,
-  maxRetriesPerRequest: null,
-});
+let _redis: Redis | null = null;
+let _redisFailed = false;
 
-export const notificationQueue = new Queue('notifications', {
-  connection: redisConnection,
-});
+function getRedis(): Redis | null {
+  if (_redisFailed) return null;
+  if (!_redis) {
+    const host = process.env.REDIS_HOST || 'localhost';
+    const port = parseInt(process.env.REDIS_PORT || '6379', 10);
+    const password = process.env.REDIS_PASSWORD || undefined;
+    _redis = new Redis({
+      host,
+      port,
+      password,
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > 3) {
+          _redisFailed = true;
+          logger.error('Redis unavailable after 3 retries — notifications queue disabled');
+          _redis?.disconnect();
+          _redis = null;
+          return null; // stop retrying
+        }
+        return Math.min(times * 500, 2000);
+      },
+      lazyConnect: true,
+    });
+    _redis.on('error', (err: Error) => {
+      if (!_redisFailed) {
+        logger.error(`Redis connection error: ${err.message}`);
+      }
+    });
+    _redis.connect().catch(() => {
+      _redisFailed = true;
+      logger.warn('Redis not available — notifications queue will be disabled');
+    });
+  }
+  return _redis;
+}
 
 interface NotificationJobData {
   notificationId: string;
   userId: string;
   type: string;
   message: string;
+}
+
+let _queue: Queue<NotificationJobData> | null = null;
+
+export function getNotificationQueue(): Queue<NotificationJobData> | null {
+  const conn = getRedis();
+  if (!conn) return null;
+  if (!_queue) {
+    _queue = new Queue<NotificationJobData>('notifications', {
+      connection: conn,
+    });
+  }
+  return _queue;
 }
 
 async function handleNotificationJob(job: Job<NotificationJobData>): Promise<void> {
@@ -53,15 +94,17 @@ async function handleNotificationJob(job: Job<NotificationJobData>): Promise<voi
   }
 }
 
-export async function processNotificationJob(): Promise<Worker> {
-  const worker = new Worker<NotificationJobData>(
-    'notifications',
-    handleNotificationJob,
-    {
-      connection: redisConnection,
-      concurrency: 5,
-    }
-  );
+export async function processNotificationJob(): Promise<Worker | null> {
+  const conn = getRedis();
+  if (!conn) {
+    logger.warn('BullMQ worker not started — Redis unavailable');
+    return null;
+  }
+
+  const worker = new Worker<NotificationJobData>('notifications', handleNotificationJob, {
+    connection: conn,
+    concurrency: 5,
+  });
 
   worker.on('completed', (job) => {
     logger.info({ message: 'Notification job completed', jobId: job.id });
@@ -72,8 +115,9 @@ export async function processNotificationJob(): Promise<Worker> {
   });
 
   worker.on('error', (err) => {
-    logger.error({ message: 'Worker error', error: err.message });
+    logger.debug(`Worker connection error: ${err.message}`);
   });
 
+  logger.info('BullMQ notification worker started');
   return worker;
 }

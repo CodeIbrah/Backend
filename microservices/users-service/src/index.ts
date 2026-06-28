@@ -19,12 +19,14 @@ const PORT = parseInt(process.env.PORT || '3002', 10);
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:5173').split(',');
 
 app.use(helmet());
-app.use(cors({
-  origin: ALLOWED_ORIGINS,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Request-ID'],
-}));
+app.use(
+  cors({
+    origin: ALLOWED_ORIGINS,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Request-ID'],
+  }),
+);
 app.use(compression());
 
 app.use(
@@ -34,7 +36,7 @@ app.use(
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Too many requests, please try again later.',
-  })
+  }),
 );
 
 app.use(express.json());
@@ -59,7 +61,7 @@ app.get('/health', async (_req: Request, res: Response) => {
         database: 'connected',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-      })
+      }),
     );
   } catch {
     res.status(503).json(
@@ -69,7 +71,7 @@ app.get('/health', async (_req: Request, res: Response) => {
         database: 'disconnected',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-      })
+      }),
     );
   }
 });

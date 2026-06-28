@@ -9,7 +9,7 @@ export const sendMailSchema = z.object({
       z.object({
         filename: z.string().min(1).max(255),
         content: z.string().min(1),
-      })
+      }),
     )
     .max(10, 'Max 10 attachments allowed')
     .optional(),

@@ -65,14 +65,17 @@ export function generateInvoicePDF(invoice: Invoice): Promise<Buffer> {
       doc.fontSize(24).font('Helvetica-Bold').text('INVOICE', { align: 'center' });
       doc.moveDown(0.5);
 
-  doc.fontSize(12).font('Helvetica');
-  doc.text(`Invoice Number: ${sanitizePdfText(invoice.invoiceNumber)}`, 50, doc.y);
-  doc.text(`Date: ${invoice.issuedAt.toISOString().split('T')[0]}`, 50, doc.y);
-  doc.text(`Due Date: ${invoice.dueDate.toISOString().split('T')[0]}`, 50, doc.y);
-  doc.text(`Status: ${sanitizePdfText(invoice.status)}`, 50, doc.y);
-  doc.moveDown(0.5);
+      doc.fontSize(12).font('Helvetica');
+      doc.text(`Invoice Number: ${sanitizePdfText(invoice.invoiceNumber)}`, 50, doc.y);
+      doc.text(`Date: ${invoice.issuedAt.toISOString().split('T')[0]}`, 50, doc.y);
+      doc.text(`Due Date: ${invoice.dueDate.toISOString().split('T')[0]}`, 50, doc.y);
+      doc.text(`Status: ${sanitizePdfText(invoice.status)}`, 50, doc.y);
+      doc.moveDown(0.5);
 
-  doc.fontSize(12).font('Helvetica-Bold').text(`Bill To: User ${sanitizePdfText(invoice.userId)}`, 50, doc.y);
+      doc
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .text(`Bill To: User ${sanitizePdfText(invoice.userId)}`, 50, doc.y);
       doc.moveDown(0.5);
 
       let y = doc.y + 10;
@@ -84,14 +87,23 @@ export function generateInvoicePDF(invoice: Invoice): Promise<Buffer> {
 
       doc.fontSize(11).font('Helvetica');
       doc.text(`Subtotal:`, 350, y, { width: 100, align: 'right' });
-      doc.text(formatCurrency(invoice.subtotal, invoice.currency), 460, y, { width: 70, align: 'right' });
+      doc.text(formatCurrency(invoice.subtotal, invoice.currency), 460, y, {
+        width: 70,
+        align: 'right',
+      });
       y += 16;
       doc.text(`Tax:`, 350, y, { width: 100, align: 'right' });
-      doc.text(formatCurrency(invoice.tax, invoice.currency), 460, y, { width: 70, align: 'right' });
+      doc.text(formatCurrency(invoice.tax, invoice.currency), 460, y, {
+        width: 70,
+        align: 'right',
+      });
       y += 16;
       if (invoice.discount > 0) {
         doc.text(`Discount:`, 350, y, { width: 100, align: 'right' });
-        doc.text(`-${formatCurrency(invoice.discount, invoice.currency)}`, 460, y, { width: 70, align: 'right' });
+        doc.text(`-${formatCurrency(invoice.discount, invoice.currency)}`, 460, y, {
+          width: 70,
+          align: 'right',
+        });
         y += 16;
       }
       y += 5;
@@ -99,7 +111,10 @@ export function generateInvoicePDF(invoice: Invoice): Promise<Buffer> {
       y += 8;
       doc.fontSize(14).font('Helvetica-Bold');
       doc.text(`Total:`, 350, y, { width: 100, align: 'right' });
-      doc.text(formatCurrency(invoice.total, invoice.currency), 460, y, { width: 70, align: 'right' });
+      doc.text(formatCurrency(invoice.total, invoice.currency), 460, y, {
+        width: 70,
+        align: 'right',
+      });
 
       if (invoice.notes) {
         y += 30;
@@ -138,7 +153,10 @@ export function generateReceiptPDF(receipt: Receipt): Promise<Buffer> {
       doc.text(`Status: ${sanitizePdfText(receipt.status)}`, 50, doc.y);
       doc.moveDown(0.5);
 
-      doc.fontSize(12).font('Helvetica-Bold').text(`Paid By: User ${sanitizePdfText(receipt.userId)}`, 50, doc.y);
+      doc
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .text(`Paid By: User ${sanitizePdfText(receipt.userId)}`, 50, doc.y);
       doc.moveDown(1);
 
       doc.fontSize(11).font('Helvetica');
@@ -154,7 +172,10 @@ export function generateReceiptPDF(receipt: Receipt): Promise<Buffer> {
 
       doc.fontSize(14).font('Helvetica-Bold');
       doc.text(`Amount Paid:`, 350, y + 10, { width: 100, align: 'right' });
-      doc.text(formatCurrency(receipt.amount, receipt.currency), 460, y + 10, { width: 70, align: 'right' });
+      doc.text(formatCurrency(receipt.amount, receipt.currency), 460, y + 10, {
+        width: 70,
+        align: 'right',
+      });
 
       doc.moveDown(2);
       doc.fontSize(10).font('Helvetica').text('Thank you for your payment!', { align: 'center' });

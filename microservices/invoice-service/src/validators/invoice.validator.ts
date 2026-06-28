@@ -16,7 +16,7 @@ export const createInvoiceFromPaymentSchema = z.object({
         description: z.string().min(1, 'Item description is required'),
         quantity: z.number().int().positive('Quantity must be positive'),
         unitPrice: z.number().positive('Unit price must be positive'),
-      })
+      }),
     )
     .min(1, 'At least one item is required'),
   tax: z.number().min(0).default(0),
@@ -53,7 +53,7 @@ export const paymentWebhookSchema = z.object({
         description: z.string().min(1),
         quantity: z.number().int().positive(),
         unitPrice: z.number().positive(),
-      })
+      }),
     )
     .optional(),
 });

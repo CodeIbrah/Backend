@@ -8,7 +8,14 @@ export async function sendSmsHandler(req: Request, res: Response): Promise<void>
   try {
     const validation = validateSendSms(req.body);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 
@@ -25,7 +32,14 @@ export async function listSmsHandler(req: Request, res: Response): Promise<void>
   try {
     const validation = validatePagination(req.query);
     if (!validation.success) {
-      res.status(400).json(errorResponse('VALIDATION_ERROR', validation.error.issues.map((e) => e.message).join(', ')));
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            validation.error.issues.map((e) => e.message).join(', '),
+          ),
+        );
       return;
     }
 

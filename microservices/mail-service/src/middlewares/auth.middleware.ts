@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { errorResponse } from '../utils/response';
 import { logger } from '../logging/logger';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET: string = process.env.JWT_SECRET ?? '';
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
@@ -21,7 +21,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   const token = authHeader.substring(7);
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role?: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as unknown as { userId: string; role?: string };
     (req as AuthenticatedRequest).user = decoded;
     next();
   } catch (err) {

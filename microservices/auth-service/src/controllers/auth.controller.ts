@@ -11,9 +11,7 @@ export async function verifyTokenHandler(req: Request, res: Response): Promise<v
 
     if (!validation.success) {
       const errorMsg = validation.error.issues.map((e) => e.message).join(', ');
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', errorMsg)
-      );
+      res.status(400).json(errorResponse('VALIDATION_ERROR', errorMsg));
       return;
     }
 
@@ -29,7 +27,7 @@ export async function verifyTokenHandler(req: Request, res: Response): Promise<v
         roles: decoded.roles,
         permissions: decoded.permissions,
         expiresAt: decoded.exp,
-      })
+      }),
     );
   } catch (error) {
     logger.error({ message: 'Token verification failed', error });
@@ -43,9 +41,7 @@ export async function validatePermissionHandler(req: Request, res: Response): Pr
 
     if (!validation.success) {
       const errorMsg = validation.error.issues.map((e) => e.message).join(', ');
-      res.status(400).json(
-        errorResponse('VALIDATION_ERROR', errorMsg)
-      );
+      res.status(400).json(errorResponse('VALIDATION_ERROR', errorMsg));
       return;
     }
 
@@ -58,7 +54,7 @@ export async function validatePermissionHandler(req: Request, res: Response): Pr
         resource,
         action,
         hasPermission,
-      })
+      }),
     );
   } catch (error) {
     logger.error({ message: 'Permission validation failed', error });
@@ -72,6 +68,6 @@ export async function healthHandler(_req: Request, res: Response): Promise<void>
       service: 'auth-service',
       status: 'healthy',
       timestamp: new Date().toISOString(),
-    })
+    }),
   );
 }

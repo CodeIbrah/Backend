@@ -1,9 +1,5 @@
 import { Router } from 'express';
-import {
-  sendMailHandler,
-  listMailsHandler,
-  getMailHandler,
-} from '../controllers/mail.controller';
+import { sendMailHandler, listMailsHandler, getMailHandler } from '../controllers/mail.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();

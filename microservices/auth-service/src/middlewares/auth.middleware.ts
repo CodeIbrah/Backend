@@ -7,7 +7,7 @@ interface AuthenticatedRequest extends Request {
   user?: { userId: string; email: string; role: string };
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET: string = process.env.JWT_SECRET ?? '';
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
@@ -30,8 +30,12 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string; role: string };
-    (req as AuthenticatedRequest).user = decoded;
+    const payload = jwt.verify(token, JWT_SECRET) as unknown as {
+      userId: string;
+      email: string;
+      role: string;
+    };
+    (req as AuthenticatedRequest).user = payload;
     next();
   } catch (err) {
     logger.warn(`Invalid token: ${(err as Error).message}`);

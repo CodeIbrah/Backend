@@ -51,7 +51,7 @@ export async function verifyToken(token: string): Promise<DecodedToken> {
 export async function validatePermission(
   userId: string,
   resource: string,
-  action?: string
+  action?: string,
 ): Promise<boolean> {
   const span = tracer.startSpan('auth.validatePermission');
 

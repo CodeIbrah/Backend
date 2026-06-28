@@ -56,7 +56,7 @@ export class PaymentGatewayService {
         span.addEvent('PayPal payment processed successfully');
         return {
           success: true,
-          transactionId: paypal__,
+          transactionId: 'paypal__' + Date.now(),
           status: 'COMPLETED',
           amount,
           currency
@@ -73,8 +73,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing PayPal payment', 
@@ -127,7 +127,7 @@ export class PaymentGatewayService {
         span.addEvent('Bizum payment processed successfully');
         return {
           success: true,
-          transactionId: izum__,
+          transactionId: 'bizum__' + Date.now(),
           status: 'COMPLETED',
           amount,
           currency
@@ -144,8 +144,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing Bizum payment', 
@@ -197,7 +197,7 @@ export class PaymentGatewayService {
         span.addEvent('Apple Pay payment processed successfully');
         return {
           success: true,
-          transactionId: pplepay__,
+          transactionId: 'applepay__' + Date.now(),
           status: 'COMPLETED',
           amount,
           currency
@@ -214,8 +214,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing Apple Pay payment', 
@@ -265,7 +265,7 @@ export class PaymentGatewayService {
         span.addEvent('Google Pay payment processed successfully');
         return {
           success: true,
-          transactionId: googlepay__,
+          transactionId: 'googlepay__' + Date.now(),
           status: 'COMPLETED',
           amount,
           currency
@@ -282,8 +282,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing Google Pay payment', 
@@ -332,7 +332,7 @@ export class PaymentGatewayService {
         span.addEvent('Klarna payment processed successfully');
         return {
           success: true,
-          transactionId: klarna__,
+          transactionId: 'klarna__' + Date.now(),
           status: 'COMPLETED',
           amount,
           currency
@@ -349,8 +349,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing Klarna payment', 
@@ -373,8 +373,8 @@ export class PaymentGatewayService {
     amount: number,
     currency: Currency,
     iban: string,
-    bic?: string,
-    mandateId: string
+    mandateId: string,
+    bic?: string
   ) {
     const span = tracer.startSpan('sepa.processPayment');
     
@@ -407,7 +407,7 @@ export class PaymentGatewayService {
         span.addEvent('SEPA payment processed successfully');
         return {
           success: true,
-          transactionId: sepa__,
+          transactionId: 'sepa__' + Date.now(),
           status: 'PENDING', // SEPA payments are initially pending
           amount,
           currency,
@@ -425,8 +425,8 @@ export class PaymentGatewayService {
         };
       }
     } catch (error) {
-      span.recordException(error);
-      span.setStatus({ code: 'ERROR', message: error instanceof Error ? error.message : 'Unknown error' });
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: error instanceof Error ? error.message : 'Unknown error' });
       
       logger.error({ 
         message: 'Error processing SEPA payment', 
@@ -500,7 +500,7 @@ export class PaymentGatewayService {
         );
       
       default:
-        throw new Error(Unsupported payment method: );
+        throw new Error('Unsupported payment method: ' + method);
     }
   }
 
