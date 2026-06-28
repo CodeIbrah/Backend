@@ -74,7 +74,9 @@ export class SocialAuthService {
       this.providers.set(provider.name, provider);
       this.logger.log(`Social provider registered: ${provider.displayName}`);
     } else {
-      this.logger.warn(`Social provider NOT configured: ${provider.displayName} (missing env vars)`);
+      this.logger.warn(
+        `Social provider NOT configured: ${provider.displayName} (missing env vars)`,
+      );
     }
   }
 
@@ -171,8 +173,12 @@ export class SocialAuthService {
       await this.prisma.socialAccount.update({
         where: { id: existingAccount.id },
         data: {
-          accessToken: this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
-          refreshToken: this.cipher.encryptToString(tokenResult.refreshToken) ?? (tokenResult.refreshToken ?? existingAccount.refreshToken),
+          accessToken:
+            this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
+          refreshToken:
+            this.cipher.encryptToString(tokenResult.refreshToken) ??
+            tokenResult.refreshToken ??
+            existingAccount.refreshToken,
           tokenExpiresAt: tokenResult.expiresIn
             ? new Date(Date.now() + tokenResult.expiresIn * 1000)
             : null,
@@ -254,14 +260,16 @@ export class SocialAuthService {
         email: profile.email,
         name: profile.name,
         avatarUrl: profile.avatarUrl,
-        accessToken: this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
-        refreshToken: this.cipher.encryptToString(tokenResult.refreshToken) ?? tokenResult.refreshToken ?? null,
+        accessToken:
+          this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
+        refreshToken:
+          this.cipher.encryptToString(tokenResult.refreshToken) ?? tokenResult.refreshToken ?? null,
         tokenExpiresAt: tokenResult.expiresIn
           ? new Date(Date.now() + tokenResult.expiresIn * 1000)
           : null,
-          profileData: profile.raw as Prisma.InputJsonValue,
-        },
-      });
+        profileData: profile.raw as Prisma.InputJsonValue,
+      },
+    });
 
     const tokens = await this.generateTokens(userId, userRole);
 
@@ -319,14 +327,16 @@ export class SocialAuthService {
         email: profile.email,
         name: profile.name,
         avatarUrl: profile.avatarUrl,
-        accessToken: this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
-        refreshToken: this.cipher.encryptToString(tokenResult.refreshToken) ?? tokenResult.refreshToken ?? null,
+        accessToken:
+          this.cipher.encryptToString(tokenResult.accessToken) ?? tokenResult.accessToken,
+        refreshToken:
+          this.cipher.encryptToString(tokenResult.refreshToken) ?? tokenResult.refreshToken ?? null,
         tokenExpiresAt: tokenResult.expiresIn
           ? new Date(Date.now() + tokenResult.expiresIn * 1000)
           : null,
-          profileData: profile.raw as Prisma.InputJsonValue,
-        },
-      });
+        profileData: profile.raw as Prisma.InputJsonValue,
+      },
+    });
 
     await this.logActivity(userId, `${providerName}:link`);
 
@@ -405,11 +415,13 @@ export class SocialAuthService {
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
     const parsedExpiry = parseExpiry(refreshExpiresIn);
 
-    await this.prisma.refreshToken.create({
-      data: { userId, tokenHash, expiresAt: parsedExpiry },
-    }).catch((err) => {
-      this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
-    });
+    await this.prisma.refreshToken
+      .create({
+        data: { userId, tokenHash, expiresAt: parsedExpiry },
+      })
+      .catch((err) => {
+        this.logger.error(`Failed to persist refresh token: ${(err as Error).message}`);
+      });
 
     return { accessToken, refreshToken };
   }

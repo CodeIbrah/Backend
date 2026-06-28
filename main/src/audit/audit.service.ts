@@ -47,7 +47,7 @@ export class AuditService {
     if (!this._enabled) return;
 
     try {
-      const prisma = (this.prismaOrEnabled instanceof PrismaService) ? this.prismaOrEnabled : null;
+      const prisma = this.prismaOrEnabled instanceof PrismaService ? this.prismaOrEnabled : null;
       if (!prisma || !('$queryRaw' in prisma)) return;
 
       // Calculate diff if both old and new values are provided
@@ -73,7 +73,9 @@ export class AuditService {
         },
       });
 
-      this.logger.debug(`Audit logged: ${entry.action} on ${entry.entity}:${entry.entityId ?? '*'}`);
+      this.logger.debug(
+        `Audit logged: ${entry.action} on ${entry.entity}:${entry.entityId ?? '*'}`,
+      );
     } catch (err) {
       this.logger.error(`Failed to log audit entry: ${(err as Error).message}`);
     }
@@ -90,7 +92,7 @@ export class AuditService {
   }): Promise<{ entries: unknown[]; total: number }> {
     if (!this._enabled) return { entries: [], total: 0 };
 
-    const prisma = (this.prismaOrEnabled instanceof PrismaService) ? this.prismaOrEnabled : null;
+    const prisma = this.prismaOrEnabled instanceof PrismaService ? this.prismaOrEnabled : null;
     if (!prisma) return { entries: [], total: 0 };
 
     const where: Record<string, unknown> = {};

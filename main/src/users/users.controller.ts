@@ -11,13 +11,7 @@ import {
   HttpStatus,
   ForbiddenException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -37,10 +31,7 @@ export class UsersController {
   @ApiOperation({ summary: 'List all users (paginated)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async findAll(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ): Promise<unknown> {
+  async findAll(@Query('page') page?: number, @Query('limit') limit?: number): Promise<unknown> {
     // Validate + clamp pagination to prevent DoS
     const safePage = Math.max(1, Math.floor(Number(page)) || 1);
     const safeLimit = Math.min(100, Math.max(1, Math.floor(Number(limit)) || 10));
@@ -64,10 +55,7 @@ export class UsersController {
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Update user' })
   @ApiParam({ name: 'id', type: String })
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<unknown> {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<unknown> {
     return this.usersService.update(id, updateUserDto);
   }
 

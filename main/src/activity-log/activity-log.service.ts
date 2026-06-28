@@ -223,10 +223,7 @@ export class ActivityLogService {
     return { activities, total };
   }
 
-  async getActivitiesByType(
-    type: ActivityType,
-    limit: number = 50,
-  ): Promise<ActivityLog[]> {
+  async getActivitiesByType(type: ActivityType, limit: number = 50): Promise<ActivityLog[]> {
     return this.prisma.activityLog.findMany({
       where: { type },
       take: limit,
@@ -243,9 +240,7 @@ export class ActivityLogService {
     });
   }
 
-  async getRecentCriticalActivities(
-    limit: number = 20,
-  ): Promise<ActivityLog[]> {
+  async getRecentCriticalActivities(limit: number = 20): Promise<ActivityLog[]> {
     return this.prisma.activityLog.findMany({
       where: {
         severity: {
@@ -311,9 +306,7 @@ export class ActivityLogService {
     };
   }
 
-  async exportActivities(
-    filters?: QueryActivityDto,
-  ): Promise<ActivityLog[]> {
+  async exportActivities(filters?: QueryActivityDto): Promise<ActivityLog[]> {
     const where = this.buildWhereClause({
       type: filters?.type,
       severity: filters?.severity,

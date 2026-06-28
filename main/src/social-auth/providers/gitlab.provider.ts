@@ -38,7 +38,9 @@ export class GitLabProvider implements SocialProvider {
     return `${this.baseUrl}/oauth/authorize?${params.toString()}`;
   }
 
-  async exchangeCode(code: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  async exchangeCode(
+    code: string,
+  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
     const resp = await fetch(`${this.baseUrl}/oauth/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -62,10 +64,16 @@ export class GitLabProvider implements SocialProvider {
       expires_in?: number;
       created_at?: number;
     };
-    return { accessToken: data.access_token, refreshToken: data.refresh_token, expiresIn: data.expires_in };
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+    };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn?: number }> {
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; expiresIn?: number }> {
     const resp = await fetch(`${this.baseUrl}/oauth/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

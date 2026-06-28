@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Response } from 'express';
@@ -28,10 +23,7 @@ export class ActivityLogInterceptor implements NestInterceptor {
     private readonly options?: { logGetRequests?: boolean },
   ) {}
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<unknown> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const response = context.switchToHttp().getResponse<Response>();
 
@@ -40,13 +32,14 @@ export class ActivityLogInterceptor implements NestInterceptor {
     const userId = request.user?.sub;
     const ipAddress: string | undefined =
       request.ip ||
-      (Array.isArray(request.headers['x-forwarded-for']) ? request.headers['x-forwarded-for'][0] : request.headers['x-forwarded-for']) ||
+      (Array.isArray(request.headers['x-forwarded-for'])
+        ? request.headers['x-forwarded-for'][0]
+        : request.headers['x-forwarded-for']) ||
       request.socket?.remoteAddress;
     const userAgent = request.headers['user-agent'] as string | undefined;
     const traceId = (request.headers['x-trace-id'] as string | undefined) || request.id;
 
-    const shouldLog =
-      this.options?.logGetRequests || method !== 'GET';
+    const shouldLog = this.options?.logGetRequests || method !== 'GET';
 
     if (!shouldLog) {
       return next.handle();

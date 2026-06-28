@@ -23,8 +23,8 @@ export class ReportsController {
   @Post('generate')
   @ApiOperation({ summary: 'Generate a new report (admin only)' })
   @ApiResponse({ status: 201, description: 'Report generated' })
-  async generateReport(@Body() dto: GenerateReportDto): Promise<{ filename: string }> {
-    const filename = await this.reportsService.generateReport(dto.type, dto.data);
+  generateReport(@Body() dto: GenerateReportDto): { filename: string } {
+    const filename = this.reportsService.generateReport(dto.type, dto.data);
     return { filename };
   }
 

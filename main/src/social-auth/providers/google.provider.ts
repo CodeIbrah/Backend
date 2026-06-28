@@ -38,7 +38,9 @@ export class GoogleProvider implements SocialProvider {
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 
-  async exchangeCode(code: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  async exchangeCode(
+    code: string,
+  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
     const resp = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -56,11 +58,21 @@ export class GoogleProvider implements SocialProvider {
       throw new Error(`Google token exchange failed: ${resp.status} ${body}`);
     }
 
-    const data = (await resp.json()) as { access_token: string; refresh_token?: string; expires_in?: number };
-    return { accessToken: data.access_token, refreshToken: data.refresh_token, expiresIn: data.expires_in };
+    const data = (await resp.json()) as {
+      access_token: string;
+      refresh_token?: string;
+      expires_in?: number;
+    };
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+    };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn?: number }> {
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; expiresIn?: number }> {
     const resp = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -25,9 +25,7 @@ export class HealthController {
   @ApiResponse({ status: 503, description: 'Health check failed' })
   @HealthCheck()
   check(): Promise<HealthCheckResult> {
-    return this.health.check([
-      (): Promise<HealthIndicatorResult> => this.pingDatabase('database'),
-    ]);
+    return this.health.check([(): Promise<HealthIndicatorResult> => this.pingDatabase('database')]);
   }
 
   /**
@@ -38,9 +36,7 @@ export class HealthController {
   @ApiOperation({ summary: 'Readiness probe for K8s' })
   @HealthCheck()
   ready(): Promise<HealthCheckResult> {
-    return this.health.check([
-      (): Promise<HealthIndicatorResult> => this.pingDatabase('database'),
-    ]);
+    return this.health.check([(): Promise<HealthIndicatorResult> => this.pingDatabase('database')]);
   }
 
   /**

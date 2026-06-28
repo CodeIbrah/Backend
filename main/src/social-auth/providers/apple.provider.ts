@@ -20,10 +20,10 @@ export class AppleProvider implements SocialProvider {
   private readonly redirectUri: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.clientId = this.configService.get<string>('APPLE_CLIENT_ID', '');         // Service ID / Bundle ID
+    this.clientId = this.configService.get<string>('APPLE_CLIENT_ID', ''); // Service ID / Bundle ID
     this.teamId = this.configService.get<string>('APPLE_TEAM_ID', '');
     this.keyId = this.configService.get<string>('APPLE_KEY_ID', '');
-    this.privateKey = this.configService.get<string>('APPLE_PRIVATE_KEY', '');      // .p8 file content
+    this.privateKey = this.configService.get<string>('APPLE_PRIVATE_KEY', ''); // .p8 file content
     this.redirectUri = this.configService.get<string>(
       'APPLE_REDIRECT_URI',
       'http://localhost:3000/api/v1/auth/social/apple/callback',
@@ -46,7 +46,9 @@ export class AppleProvider implements SocialProvider {
     return `https://appleid.apple.com/auth/authorize?${params.toString()}`;
   }
 
-  async exchangeCode(code: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
+  async exchangeCode(
+    code: string,
+  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
     // Apple requires a client_secret generated from the private key
     const clientSecret = this.generateClientSecret();
 
@@ -73,10 +75,16 @@ export class AppleProvider implements SocialProvider {
       expires_in?: number;
       id_token?: string;
     };
-    return { accessToken: data.access_token, refreshToken: data.refresh_token, expiresIn: data.expires_in };
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+    };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn?: number }> {
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; expiresIn?: number }> {
     const clientSecret = this.generateClientSecret();
 
     const resp = await fetch('https://appleid.apple.com/auth/token', {
@@ -130,9 +138,13 @@ export class AppleProvider implements SocialProvider {
     // return token;
 
     if (!this.privateKey) {
-      throw new Error('Apple client_secret generation requires APPLE_PRIVATE_KEY. Install jsonwebtoken and implement the JWT signing logic.');
+      throw new Error(
+        'Apple client_secret generation requires APPLE_PRIVATE_KEY. Install jsonwebtoken and implement the JWT signing logic.',
+      );
     }
-    throw new Error('Apple client_secret generation requires the `jsonwebtoken` package. Run: npm install jsonwebtoken');
+    throw new Error(
+      'Apple client_secret generation requires the `jsonwebtoken` package. Run: npm install jsonwebtoken',
+    );
   }
 
   /**
@@ -143,7 +155,10 @@ export class AppleProvider implements SocialProvider {
     try {
       const parts = idToken.split('.');
       if (parts.length !== 3) throw new Error('Invalid id_token format');
-      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8')) as { sub: string; email?: string };
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8')) as {
+        sub: string;
+        email?: string;
+      };
       return { sub: payload.sub, email: payload.email };
     } catch {
       throw new Error('Failed to decode Apple id_token');

@@ -23,11 +23,13 @@ import { AuditModule } from './audit/audit.module';
 import { GrpcModule } from './grpc/grpc.module';
 import { SocialAuthModule } from './social-auth/social-auth.module';
 import { CipherModule } from './cipher/cipher.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
     // --- Core ---
     AppConfigModule,
+    PrismaModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -46,11 +48,13 @@ import { CipherModule } from './cipher/cipher.module';
             winston.format.timestamp(),
             winston.format.ms(),
             winston.format.colorize(),
-            winston.format.printf(({ timestamp, level, message, context, ...meta }: Record<string, unknown>) => {
-              const ctx = context ? `[${String(context)}]` : '';
-              const metaStr = Object.keys(meta).length > 1 ? ` ${JSON.stringify(meta)}` : '';
-              return `${String(timestamp)} [${String(level)}] ${ctx} ${String(message)}${metaStr}`;
-            }),
+            winston.format.printf(
+              ({ timestamp, level, message, context, ...meta }: Record<string, unknown>) => {
+                const ctx = context ? `[${String(context)}]` : '';
+                const metaStr = Object.keys(meta).length > 1 ? ` ${JSON.stringify(meta)}` : '';
+                return `${String(timestamp)} [${String(level)}] ${ctx} ${String(message)}${metaStr}`;
+              },
+            ),
           ),
         }),
       ],
