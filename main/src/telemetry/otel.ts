@@ -11,8 +11,8 @@ export async function initOpenTelemetry(): Promise<void> {
     const { NodeSDK: NodeSDKClass } = (await import('@opentelemetry/sdk-node')) as {
       NodeSDK: typeof NodeSDK;
     };
-    // @ts-expect-error - optional dependency
     const { getNodeAutoInstrumentations } =
+      // @ts-expect-error - optional dependency
       (await import('@opentelemetry/auto-instrumentations-node')) as {
         getNodeAutoInstrumentations: () => unknown;
       };
