@@ -22,9 +22,7 @@ Return JSON with: rootCause, severity (low|medium|high|critical), description, c
       model: this.model,
       max_tokens: 1024,
       system: this.buildSystemPrompt(),
-      messages: [
-        { role: 'user', content: prompt },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     });
 
     const content = response.content[0];
@@ -52,9 +50,7 @@ Return JSON with: description, code (string with fix), explanation, priority (lo
       model: this.model,
       max_tokens: 2048,
       system: this.buildSystemPrompt(),
-      messages: [
-        { role: 'user', content: prompt },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     });
 
     const content = response.content[0];
@@ -81,9 +77,7 @@ Return JSON with: health (healthy|degraded|unhealthy), issues (array of strings)
       model: this.model,
       max_tokens: 1024,
       system: this.buildSystemPrompt(),
-      messages: [
-        { role: 'user', content: prompt },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     });
 
     const content = response.content[0];

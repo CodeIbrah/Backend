@@ -20,7 +20,7 @@ enum Role {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String
+  password  String?  // null for social-auth-only users
   name      String?
   role      Role     @default(USER)
   isActive  Boolean  @default(true)
@@ -31,6 +31,8 @@ model User {
   incidents       Incident[]
   auditLogs       AuditLog[]
   activityLogs    ActivityLog[]
+  socialAccounts  SocialAccount[]
+  refreshTokens   RefreshToken[]
   payments        Payment[]
   invoices        Invoice[]
   receipts        Receipt[]
@@ -40,6 +42,46 @@ model User {
   @@index([role])
   @@index([isActive, createdAt(sort: Desc)])
   @@map("users")
+}
+
+// ============================================
+// SOCIAL AUTH
+// ============================================
+
+model SocialAccount {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String   // google | meta | microsoft | github | gitlab | apple
+  providerAccountId String   // unique ID from the provider
+  email             String?
+  name              String?
+  avatarUrl         String?
+  accessToken       String?  // stored for token refresh — never returned by controllers
+  refreshToken      String?
+  tokenExpiresAt    DateTime?
+  profileData       Json?    // raw profile snapshot from provider
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([provider])
+  @@map("social_accounts")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
 }
 
 // ============================================

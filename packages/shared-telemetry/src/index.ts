@@ -8,7 +8,4 @@ export {
   recordServiceCall,
 } from './telemetry';
 
-export {
-  correlationIdMiddleware,
-  metricsMiddleware,
-} from './middleware';
+export { correlationIdMiddleware, metricsMiddleware } from './middleware';

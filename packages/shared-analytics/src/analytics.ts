@@ -1,12 +1,12 @@
 export enum AnalyticsEvent {
-  LOGIN = "LOGIN",
-  REGISTER = "REGISTER",
-  FAILED_AUTH = "FAILED_AUTH",
-  ENDPOINT_CALL = "ENDPOINT_CALL",
-  USER_ACTIVITY = "USER_ACTIVITY",
-  API_LATENCY = "API_LATENCY",
-  ERROR = "ERROR",
-  SERVICE_CALL = "SERVICE_CALL",
+  LOGIN = 'LOGIN',
+  REGISTER = 'REGISTER',
+  FAILED_AUTH = 'FAILED_AUTH',
+  ENDPOINT_CALL = 'ENDPOINT_CALL',
+  USER_ACTIVITY = 'USER_ACTIVITY',
+  API_LATENCY = 'API_LATENCY',
+  ERROR = 'ERROR',
+  SERVICE_CALL = 'SERVICE_CALL',
 }
 
 export interface AnalyticsEventData {
@@ -93,10 +93,10 @@ export class AnalyticsService {
 
   async getUsage(): Promise<AnalyticsUsage> {
     const endpointCalls = this.buffer.filter(
-      (e) => e.event === AnalyticsEvent.ENDPOINT_CALL
+      (e) => e.event === AnalyticsEvent.ENDPOINT_CALL,
     ).length;
     const userActivities = this.buffer.filter(
-      (e) => e.event === AnalyticsEvent.USER_ACTIVITY
+      (e) => e.event === AnalyticsEvent.USER_ACTIVITY,
     ).length;
 
     return {
@@ -108,9 +108,7 @@ export class AnalyticsService {
 
   async getErrors(): Promise<AnalyticsErrors> {
     const errors = this.buffer.filter(
-      (e) =>
-        e.event === AnalyticsEvent.ERROR ||
-        e.event === AnalyticsEvent.FAILED_AUTH
+      (e) => e.event === AnalyticsEvent.ERROR || e.event === AnalyticsEvent.FAILED_AUTH,
     );
 
     const errorsByType: Record<string, number> = {};
@@ -127,12 +125,8 @@ export class AnalyticsService {
   }
 
   async getPerformance(): Promise<AnalyticsPerformance> {
-    const latencyEvents = this.buffer.filter(
-      (e) => e.event === AnalyticsEvent.API_LATENCY
-    );
-    const latencies = latencyEvents
-      .map((e) => e.data?.latency ?? 0)
-      .sort((a, b) => a - b);
+    const latencyEvents = this.buffer.filter((e) => e.event === AnalyticsEvent.API_LATENCY);
+    const latencies = latencyEvents.map((e) => e.data?.latency ?? 0).sort((a, b) => a - b);
 
     const total = latencies.length || 1;
 

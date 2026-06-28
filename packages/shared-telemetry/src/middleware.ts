@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { recordHttpRequest } from './telemetry';
 
 export function correlationIdMiddleware(req: Request, res: Response, next: NextFunction): void {
-  const correlationId = req.headers['x-correlation-id'] as string | undefined || randomUUID();
+  const correlationId = (req.headers['x-correlation-id'] as string | undefined) || randomUUID();
   res.setHeader('X-Correlation-ID', correlationId);
   req.headers['x-correlation-id'] = correlationId;
   next();

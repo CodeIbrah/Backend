@@ -4,6 +4,9 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "prisma": {
+    "schema": "schema.prisma"
+  },
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate deploy",

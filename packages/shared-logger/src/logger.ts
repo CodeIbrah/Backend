@@ -20,7 +20,7 @@ export function formatLogEntry(
   traceId?: string,
   service?: string,
   context?: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): LogEntry {
   const entry: LogEntry = {
     timestamp: new Date().toISOString(),
@@ -71,7 +71,7 @@ export function createLogger(serviceName: string): winston.Logger {
       info.service = serviceName;
       return info;
     })(),
-    format.json()
+    format.json(),
   );
 
   const consoleTransport = new transports.Console({
@@ -106,7 +106,7 @@ export function requestLogger(): morgan.FormatFn {
               message: 'HTTP Request',
               context: 'request',
               raw: trimmed,
-            })
+            }),
           );
         }
       },

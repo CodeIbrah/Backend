@@ -4,10 +4,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function sanitizeInput(input: string): string {
-  return input
-    .replace(/[<>]/g, '')
-    .trim()
-    .replace(/\s+/g, ' ');
+  return input.replace(/[<>]/g, '').trim().replace(/\s+/g, ' ');
 }
 
 export function validateUUID(uuid: string): boolean {

@@ -46,10 +46,7 @@ export function initializeTelemetry(serviceName?: string): void {
     resource,
     traceExporter,
     metricReader: promExporter,
-    instrumentations: [
-      new HttpInstrumentation(),
-      new ExpressInstrumentation(),
-    ],
+    instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()],
   });
 
   sdk.start();
@@ -116,10 +113,7 @@ export function recordHttpRequest(
       'histogram',
     ) as Histogram;
   }
-  httpDurationHistogram[key].observe(
-    { method, path, status_code: statusCode },
-    durationMs / 1000,
-  );
+  httpDurationHistogram[key].observe({ method, path, status_code: statusCode }, durationMs / 1000);
 }
 
 export function recordServiceCall(

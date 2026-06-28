@@ -1,4 +1,4 @@
-export { AnalyticsService, AnalyticsEvent } from "./analytics";
+export { AnalyticsService, AnalyticsEvent } from './analytics';
 export type {
   AnalyticsEventData,
   AnalyticsServiceConfig,
@@ -6,4 +6,4 @@ export type {
   AnalyticsUsage,
   AnalyticsErrors,
   AnalyticsPerformance,
-} from "./analytics";
+} from './analytics';

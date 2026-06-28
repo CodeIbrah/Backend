@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma, Role } from '@prisma/client';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -7,9 +7,7 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development'
-      ? ['query', 'error', 'warn']
-      : ['error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
 if (process.env.NODE_ENV !== 'production') {
@@ -35,5 +33,18 @@ export async function disconnectPrisma() {
   }
 }
 
-export { PrismaClient };
-export type { User, Payment, Invoice, Receipt, Notification, ActivityLog, AnalyticsEvent, AuditLog, ErrorLog, Incident, PaymentLedger } from '@prisma/client';
+export { PrismaClient, Prisma };
+export { Role };
+export type {
+  User,
+  Payment,
+  Invoice,
+  Receipt,
+  Notification,
+  ActivityLog,
+  AnalyticsEvent,
+  AuditLog,
+  ErrorLog,
+  Incident,
+  PaymentLedger,
+} from '@prisma/client';

@@ -22,19 +22,31 @@ export class LocalProvider extends BaseAIProvider {
       confidence = 0.8;
       relatedErrors.push('TypeError: Cannot read properties of undefined');
       relatedErrors.push('ReferenceError: variable is not defined');
-    } else if (errorLower.includes('connection') || errorLower.includes('network') || errorLower.includes('econnrefused')) {
+    } else if (
+      errorLower.includes('connection') ||
+      errorLower.includes('network') ||
+      errorLower.includes('econnrefused')
+    ) {
       rootCause = 'Network or connection failure';
       severity = 'high';
       description = 'Unable to establish connection to a remote service or database.';
       confidence = 0.75;
       relatedErrors.push('ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND');
-    } else if (errorLower.includes('permission') || errorLower.includes('access denied') || errorLower.includes('eacces')) {
+    } else if (
+      errorLower.includes('permission') ||
+      errorLower.includes('access denied') ||
+      errorLower.includes('eacces')
+    ) {
       rootCause = 'Permission denied';
       severity = 'medium';
       description = 'Insufficient permissions to perform the requested operation.';
       confidence = 0.85;
       relatedErrors.push('EACCES', 'EPERM', 'Unauthorized');
-    } else if (errorLower.includes('memory') || errorLower.includes('heap') || errorLower.includes('oom')) {
+    } else if (
+      errorLower.includes('memory') ||
+      errorLower.includes('heap') ||
+      errorLower.includes('oom')
+    ) {
       rootCause = 'Out of memory';
       severity = 'critical';
       description = 'Process has exceeded available memory limits.';
@@ -63,7 +75,8 @@ export class LocalProvider extends BaseAIProvider {
     if (errorLower.includes('null') || errorLower.includes('undefined')) {
       description = 'Add null/undefined checks before accessing properties.';
       code = `if (value != null) {\n  // Safe to access properties\n  const result = value.property;\n}`;
-      explanation = 'Use optional chaining or explicit null checks to prevent null reference errors.';
+      explanation =
+        'Use optional chaining or explicit null checks to prevent null reference errors.';
       priority = 'high';
     } else if (errorLower.includes('connection') || errorLower.includes('network')) {
       description = 'Implement retry logic with exponential backoff.';
