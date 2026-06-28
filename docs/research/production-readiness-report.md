@@ -38,15 +38,15 @@ Conclusión: útil como catálogo de patrones y como referencia de estructura, p
 
 ### 2.3 Arquitectura real vs arquitectura declarada
 
-| Declarada | Real |
-|-----------|------|
-| Monolito NestJS para core | ✅ Implementado con Prisma |
-| Microservicios independientes | ⚠️ Usan `Map` en memoria, sin DB |
-| Nginx API gateway | ✅ Configurado |
-| PostgreSQL + Prisma como data layer | ✅ Solo en monolito |
-| Redis/BullMQ para jobs | ⚠️ Wiring ambiguo |
-| Observability stack completa | ⚠️ Endpoints existen, métricas huecas |
-| AI doctor con análisis de errores | ⚠️ Scaffold, no end-to-end |
+| Declarada                           | Real                                  |
+| ----------------------------------- | ------------------------------------- |
+| Monolito NestJS para core           | ✅ Implementado con Prisma            |
+| Microservicios independientes       | ⚠️ Usan `Map` en memoria, sin DB      |
+| Nginx API gateway                   | ✅ Configurado                        |
+| PostgreSQL + Prisma como data layer | ✅ Solo en monolito                   |
+| Redis/BullMQ para jobs              | ⚠️ Wiring ambiguo                     |
+| Observability stack completa        | ⚠️ Endpoints existen, métricas huecas |
+| AI doctor con análisis de errores   | ⚠️ Scaffold, no end-to-end            |
 
 ## 3. Evidencia estructural
 
@@ -65,6 +65,7 @@ Conclusión: útil como catálogo de patrones y como referencia de estructura, p
 Escala: **Crítica** → **Alta** → **Media** → **Baja**
 
 ### G1 — Persistencia falsa en microservicios críticos
+
 **Severidad: Crítica**
 
 Evidencia: `payment.service.ts`, `invoice.service.ts`, `receipt.service.ts`, `notifications.service.ts`, `users.service.ts` usan `private store = new Map<string, ...>();`.
@@ -74,6 +75,7 @@ Impacto: Datos desaparecen al reiniciar. No hay consistencia transaccional ni es
 Remediación: Migrar a PostgreSQL + Prisma/Drizzle. Definir migraciones, constraints, idempotency keys.
 
 ### G2 — Payment processing simulado y no determinista
+
 **Severidad: Crítica**
 
 Evidencia: `Math.random() > 0.1` para éxito/fallo. `setTimeout(resolve, Math.random() * 500 + 100)` para latencia. `forceCompletePayment` muta estado local.
@@ -83,6 +85,7 @@ Impacto: No existe integración real con proveedor. No hay idempotencia, concili
 Remediación: Adapters explícitos (sandbox/mock deterministic, provider real). Idempotency keys, recibos persistentes, webhooks firmados, ledger.
 
 ### G3 — Health checks superficiales
+
 **Severidad: Alta**
 
 Evidencia: `this.health.check([])` sin probes. Microservicios responden `status: healthy` sin verificar Redis, DB, queue.
@@ -92,6 +95,7 @@ Impacto: Falsos positivos operativos.
 Remediación: Health shallow + Readiness deep con DB ping, Redis ping, queue ping.
 
 ### G4 — Observabilidad declarada pero parcialmente hueca
+
 **Severidad: Alta**
 
 Evidencia: `const metricsRegistry = new Registry();` sin métricas HTTP registradas. Alert rules esperan métricas que no se emiten.
@@ -101,6 +105,7 @@ Impacto: Prometheus scrapea endpoints vacíos. Alertas no disparan.
 Remediación: Instrumentar HTTP request count, duration histogram, error count, queue depth, DB latency.
 
 ### G5 — Falta de control de cache real para lecturas costosas
+
 **Severidad: Alta**
 
 Evidencia: Redis se usa para BullMQ, no como cache de queries analíticas. Analytics consulta en caliente desde DB.
@@ -110,6 +115,7 @@ Impacto: CPU y memoria en agregaciones repetidas.
 Remediación: Cache TTL, pre-aggregations, materialized views.
 
 ### G6 — Bottlenecks por escaneo y agregación en memoria
+
 **Severidad: Alta**
 
 Evidencia: `analytics.service.ts` hace `findMany` de 24h y calcula en Node. Percentiles ordenan arrays completos en memoria.
@@ -119,6 +125,7 @@ Impacto: O(n) u O(n log n) por request. Alto consumo de memoria.
 Remediación: Mover agregaciones a SQL con `GROUP BY`, `date_trunc`. Jobs async para exports.
 
 ### G7 — Índices incompletos para filtros compuestos
+
 **Severidad: Media-Alta**
 
 Evidencia: Índices simples en Prisma. Queries combinan `type + timestamp`, `service + timestamp`, `severity + createdAt`.
@@ -126,6 +133,7 @@ Evidencia: Índices simples en Prisma. Queries combinan `type + timestamp`, `ser
 Remediación: Índices compuestos: `(type, timestamp desc)`, `(service, timestamp desc)`, GIN para JSON.
 
 ### G8 — No hay worker wiring claro para algunos BullMQ processors
+
 **Severidad: Alta**
 
 Evidencia: `AnalyticsService.flush()` encola jobs pero no se observa wiring robusto de Worker conectado.
@@ -135,6 +143,7 @@ Impacto: Riesgo de jobs encolados sin procesamiento.
 Remediación: Centralizar contratos de queue/job name. Tests de integración.
 
 ### G9 — Seguridad parcial e inconsistente
+
 **Severidad: Alta**
 
 Evidencia: Defaults peligrosos en Docker Compose. `/metrics` sin protección en microservicios. Frontend guarda tokens en `localStorage`.
@@ -142,6 +151,7 @@ Evidencia: Defaults peligrosos en Docker Compose. `/metrics` sin protección en 
 Remediación: Perfiles local/dev/prod fail-closed. Proteger `/metrics`. Refresh token en cookie httpOnly.
 
 ### G10 — Contradicciones de tooling y documentación
+
 **Severidad: Media**
 
 Evidencia: README declara pnpm + Turborepo; root usa npm workspaces. `shared-analytics` tiene comentario "Stub".
@@ -149,6 +159,7 @@ Evidencia: README declara pnpm + Turborepo; root usa npm workspaces. `shared-ana
 Remediación: Documentar qué es scaffold, qué es demo, qué está production-ready.
 
 ### G11 — Sync filesystem I/O en endpoints de reportes
+
 **Severidad: Media**
 
 Evidencia: `fs.existsSync`, `fs.writeFileSync`, `fs.readdirSync` en request path.
@@ -156,6 +167,7 @@ Evidencia: `fs.existsSync`, `fs.writeFileSync`, `fs.readdirSync` en request path
 Remediación: Usar `fs.promises` y/o mover a jobs.
 
 ### G12 — Microservicios duplican bootstrap y middleware
+
 **Severidad: Media**
 
 Evidencia: 4 microservicios repiten setup de Express: helmet, cors, compression, rateLimit, morgan.
@@ -163,6 +175,7 @@ Evidencia: 4 microservicios repiten setup de Express: helmet, cors, compression,
 Remediación: Extraer factory común `createServiceApp()`.
 
 ### G13 — Exports y admin endpoints no preparados para volumen
+
 **Severidad: Alta**
 
 Evidencia: `findByFilters(filters, 1, 10000)`. Activity exports retornan arrays completos.
@@ -170,6 +183,7 @@ Evidencia: `findByFilters(filters, 1, 10000)`. Activity exports retornan arrays 
 Remediación: Export async por job + archivo + expiración. RBAC granular.
 
 ### G14 — Graceful shutdown incompleto
+
 **Severidad: Media**
 
 Evidencia: Payment-service tiene shutdown; auth/users/notifications no. No hay draining de queues.
@@ -177,6 +191,7 @@ Evidencia: Payment-service tiene shutdown; auth/users/notifications no. No hay d
 Remediación: Patrón común de shutdown con HTTP drain, queue pause/drain.
 
 ### G15 — Testing insuficiente
+
 **Severidad: Alta**
 
 Evidencia: Scripts Jest existen pero sin tests contractuales para persistence, queues, health deep, auth flows, payment idempotency.
@@ -185,15 +200,15 @@ Remediación: Unit + integration + contract + smoke tests por servicio.
 
 ## 5. Por qué puede ser lento
 
-| Causa | Severidad | Solución |
-|-------|-----------|----------|
-| Analytics carga 24h de datos por request | Alta | Preagregar, histogramas, percentiles DB |
-| Dashboard sin cache | Alta | Cache TTL, snapshots |
-| Filtros in-memory en microservicios | Alta | DB real con índices |
-| Sync I/O para reportes | Media | fs.promises, jobs |
-| Métricas/logging overhead sin señal | Media | Sampling, métricas útiles |
-| Índices compuestos faltantes | Media-Alta | Índices compuestos/GIN |
-| PDF generation en request path | Media | Mover a cola |
+| Causa                                    | Severidad  | Solución                                |
+| ---------------------------------------- | ---------- | --------------------------------------- |
+| Analytics carga 24h de datos por request | Alta       | Preagregar, histogramas, percentiles DB |
+| Dashboard sin cache                      | Alta       | Cache TTL, snapshots                    |
+| Filtros in-memory en microservicios      | Alta       | DB real con índices                     |
+| Sync I/O para reportes                   | Media      | fs.promises, jobs                       |
+| Métricas/logging overhead sin señal      | Media      | Sampling, métricas útiles               |
+| Índices compuestos faltantes             | Media-Alta | Índices compuestos/GIN                  |
+| PDF generation en request path           | Media      | Mover a cola                            |
 
 ## 6. Deuda técnica real
 
@@ -210,21 +225,21 @@ Remediación: Unit + integration + contract + smoke tests por servicio.
 
 ## 7. Matriz de severidad priorizada
 
-| ID | Gap | Severidad | Riesgo principal | Fix prioritario |
-|---|---|---|---|---|
-| G1 | Persistencia en memoria | Crítica | pérdida/divergencia de datos | DB real + migrations + constraints |
-| G2 | Payment simulado/random | Crítica | dinero/estado no auditable | adapter sandbox/real + ledger + idempotencia |
-| G3 | Health superficial | Alta | falsos positivos operativos | readiness deep con probes |
-| G4 | Observabilidad hueca | Alta | alertas/dashboards inútiles | métricas reales + validación rules |
-| G6 | Analytics in-memory | Alta | latencia/OOM | preagregaciones/cache/SQL |
-| G8 | Queue wiring ambiguo | Alta | jobs perdidos | contratos y tests de worker |
-| G9 | Seguridad inconsistente | Alta | exposición de endpoints/secrets | perfiles prod fail-closed |
-| G13 | Admin/export riesgoso | Alta | abuso/OOM/estado forzado | RBAC, audit, async exports |
-| G7 | Índices incompletos | Media-Alta | scans caros | índices compuestos/GIN |
-| G11 | Sync FS I/O | Media | bloqueo event loop | fs.promises/jobs |
-| G12 | Bootstrap duplicado | Media | drift de seguridad | app factory común |
-| G14 | Shutdown inconsistente | Media | cortes en deploy | graceful shutdown común |
-| G10 | Docs/tooling contradictorio | Media | onboarding erróneo | readiness matrix honesta |
+| ID  | Gap                         | Severidad  | Riesgo principal                | Fix prioritario                              |
+| --- | --------------------------- | ---------- | ------------------------------- | -------------------------------------------- |
+| G1  | Persistencia en memoria     | Crítica    | pérdida/divergencia de datos    | DB real + migrations + constraints           |
+| G2  | Payment simulado/random     | Crítica    | dinero/estado no auditable      | adapter sandbox/real + ledger + idempotencia |
+| G3  | Health superficial          | Alta       | falsos positivos operativos     | readiness deep con probes                    |
+| G4  | Observabilidad hueca        | Alta       | alertas/dashboards inútiles     | métricas reales + validación rules           |
+| G6  | Analytics in-memory         | Alta       | latencia/OOM                    | preagregaciones/cache/SQL                    |
+| G8  | Queue wiring ambiguo        | Alta       | jobs perdidos                   | contratos y tests de worker                  |
+| G9  | Seguridad inconsistente     | Alta       | exposición de endpoints/secrets | perfiles prod fail-closed                    |
+| G13 | Admin/export riesgoso       | Alta       | abuso/OOM/estado forzado        | RBAC, audit, async exports                   |
+| G7  | Índices incompletos         | Media-Alta | scans caros                     | índices compuestos/GIN                       |
+| G11 | Sync FS I/O                 | Media      | bloqueo event loop              | fs.promises/jobs                             |
+| G12 | Bootstrap duplicado         | Media      | drift de seguridad              | app factory común                            |
+| G14 | Shutdown inconsistente      | Media      | cortes en deploy                | graceful shutdown común                      |
+| G10 | Docs/tooling contradictorio | Media      | onboarding erróneo              | readiness matrix honesta                     |
 
 ## 8. Recomendación final
 

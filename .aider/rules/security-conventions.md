@@ -1,6 +1,7 @@
 # Security Conventions — backend-template
 
 ## Mandatory Rules
+
 1. All user input validated via class-validator DTOs
 2. Every authenticated endpoint uses @UseGuards(JwtAuthGuard)
 3. Admin-only endpoints add @Roles('ADMIN') + RolesGuard

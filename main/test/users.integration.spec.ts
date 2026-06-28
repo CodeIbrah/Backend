@@ -29,17 +29,13 @@ describe('UsersController (integration)', () => {
 
   describe('GET /api/v1/users', () => {
     it('should reject without auth token', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/users')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/users').expect(401);
     });
   });
 
   describe('GET /api/v1/users/:id', () => {
     it('should reject without auth token', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/users/some-id')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/users/some-id').expect(401);
     });
   });
 });

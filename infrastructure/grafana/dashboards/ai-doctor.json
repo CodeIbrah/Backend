@@ -73,9 +73,7 @@
           "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "blue", "value": null }
-            ]
+            "steps": [{ "color": "blue", "value": null }]
           }
         }
       }
@@ -100,9 +98,7 @@
           "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "purple", "value": null }
-            ]
+            "steps": [{ "color": "purple", "value": null }]
           }
         }
       }

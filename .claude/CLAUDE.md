@@ -76,3 +76,4 @@ Invoke via: read `skills/<name>.skill.md`
 - Services throw NestJS HTTP exceptions (NotFoundException, etc.)
 - Guards for auth, decorators for metadata
 - Global ValidationPipe with whitelist + forbidNonWhitelisted
+```

@@ -206,14 +206,22 @@ export class FixSuggestionAgent {
 
   private generateDetailedExplanation(analysis: Analysis): string {
     const explanations: Record<string, string> = {
-      TypeError: 'A type error occurs when an operation is performed on a value of inappropriate type. This often happens when null/undefined values are accessed without checks, or when function arguments have unexpected types.',
-      ReferenceError: 'A reference error occurs when code tries to access a variable that has not been declared. This can happen due to typos, scope issues, or missing imports.',
-      NetworkError: 'Network errors indicate connectivity problems between services. Common causes include DNS failures, service downtime, firewall rules, or network congestion.',
-      DatabaseError: 'Database errors can stem from connection pool exhaustion, slow queries, deadlocks, or schema mismatches. Check connection configuration and query performance.',
-      MemoryError: 'Memory errors indicate the process is running out of heap space. This can be caused by memory leaks, large data processing, or insufficient heap allocation.',
-      TimeoutError: 'Timeout errors occur when operations take longer than configured limits. This can indicate slow downstream services, database bottlenecks, or insufficient resources.',
-      ValidationError: 'Validation errors mean input data does not meet expected criteria. Add input validation at API boundaries and provide clear error messages to clients.',
-      AuthenticationError: 'Authentication errors indicate issues with credentials or tokens. Check token expiration, refresh logic, and authentication middleware configuration.',
+      TypeError:
+        'A type error occurs when an operation is performed on a value of inappropriate type. This often happens when null/undefined values are accessed without checks, or when function arguments have unexpected types.',
+      ReferenceError:
+        'A reference error occurs when code tries to access a variable that has not been declared. This can happen due to typos, scope issues, or missing imports.',
+      NetworkError:
+        'Network errors indicate connectivity problems between services. Common causes include DNS failures, service downtime, firewall rules, or network congestion.',
+      DatabaseError:
+        'Database errors can stem from connection pool exhaustion, slow queries, deadlocks, or schema mismatches. Check connection configuration and query performance.',
+      MemoryError:
+        'Memory errors indicate the process is running out of heap space. This can be caused by memory leaks, large data processing, or insufficient heap allocation.',
+      TimeoutError:
+        'Timeout errors occur when operations take longer than configured limits. This can indicate slow downstream services, database bottlenecks, or insufficient resources.',
+      ValidationError:
+        'Validation errors mean input data does not meet expected criteria. Add input validation at API boundaries and provide clear error messages to clients.',
+      AuthenticationError:
+        'Authentication errors indicate issues with credentials or tokens. Check token expiration, refresh logic, and authentication middleware configuration.',
     };
 
     for (const pattern of analysis.patterns) {

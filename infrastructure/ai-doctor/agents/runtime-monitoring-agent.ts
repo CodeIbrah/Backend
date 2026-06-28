@@ -139,10 +139,8 @@ export class RuntimeMonitoringAgent {
       return false;
     }
 
-    const recentAvg =
-      recent.reduce((sum, m) => sum + m.heapUsed, 0) / recent.length;
-    const olderAvg =
-      older.reduce((sum, m) => sum + m.heapUsed, 0) / older.length;
+    const recentAvg = recent.reduce((sum, m) => sum + m.heapUsed, 0) / recent.length;
+    const olderAvg = older.reduce((sum, m) => sum + m.heapUsed, 0) / older.length;
 
     const growthRate = olderAvg > 0 ? (recentAvg - olderAvg) / olderAvg : 0;
     const isLeaking = growthRate > 0.1;
@@ -269,9 +267,7 @@ export class RuntimeMonitoringAgent {
     logger.debug('Checking for queue congestion');
 
     try {
-      const pendingHandles = process._getActiveHandles
-        ? process._getActiveHandles().length
-        : 0;
+      const pendingHandles = process._getActiveHandles ? process._getActiveHandles().length : 0;
 
       const isCongested = pendingHandles > 100;
 

@@ -68,10 +68,7 @@ describe('App (e2e)', () => {
     });
 
     it('POST /api/v1/auth/register should reject duplicate email', () => {
-      return request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send(testUser)
-        .expect(409);
+      return request(app.getHttpServer()).post('/api/v1/auth/register').send(testUser).expect(409);
     });
 
     let accessToken: string;
@@ -107,9 +104,7 @@ describe('App (e2e)', () => {
     });
 
     it('GET /api/v1/auth/profile should reject without token', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/auth/profile')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/auth/profile').expect(401);
     });
 
     it('POST /api/v1/auth/refresh should return new tokens', () => {
@@ -132,9 +127,7 @@ describe('App (e2e)', () => {
 
   describe('Ops (protected)', () => {
     it('GET /api/v1/ops should reject without token', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/ops')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/ops').expect(401);
     });
   });
 });

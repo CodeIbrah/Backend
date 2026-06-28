@@ -30,16 +30,16 @@ Se realizó una auditoría de seguridad exhaustiva sobre **~300 categorías de v
 
 ### Vulnerabilidades Encontradas y Corregidas
 
-| # | Vulnerabilidad | Severidad | Estado |
-|---|---|---|---|
-| 1 | RolesGuard usa `user.roles` pero JWT Strategy retorna `user.role` | **CRITICAL** | ✅ Corregido |
-| 2 | IDOR: cualquier usuario autenticado podía ver perfiles ajenos vía `GET /users/:id` | **CRITICAL** | ✅ Corregido |
-| 3 | Refresh token reutilizable infinitamente sin rotación ni revocación | **HIGH** | ✅ Corregido |
-| 4 | Logout no invalidaba JWTs — tokens seguían funcionando | **HIGH** | ✅ Corregido |
-| 5 | Usuario desactivado/eliminado seguía operando hasta expiry del token | **HIGH** | ✅ Corregido |
-| 6 | Paginación sin límite superior permitía DoS por consultas enormes | **HIGH** | ✅ Corregido |
-| 7 | CORS default `*` permitía cualquier origen | **MEDIUM** | ✅ Corregido |
-| 8 | DTOs sin `@MaxLength` permitían cadenas kilométricas | **MEDIUM** | ✅ Corregido |
+| #   | Vulnerabilidad                                                                     | Severidad    | Estado       |
+| --- | ---------------------------------------------------------------------------------- | ------------ | ------------ |
+| 1   | RolesGuard usa `user.roles` pero JWT Strategy retorna `user.role`                  | **CRITICAL** | ✅ Corregido |
+| 2   | IDOR: cualquier usuario autenticado podía ver perfiles ajenos vía `GET /users/:id` | **CRITICAL** | ✅ Corregido |
+| 3   | Refresh token reutilizable infinitamente sin rotación ni revocación                | **HIGH**     | ✅ Corregido |
+| 4   | Logout no invalidaba JWTs — tokens seguían funcionando                             | **HIGH**     | ✅ Corregido |
+| 5   | Usuario desactivado/eliminado seguía operando hasta expiry del token               | **HIGH**     | ✅ Corregido |
+| 6   | Paginación sin límite superior permitía DoS por consultas enormes                  | **HIGH**     | ✅ Corregido |
+| 7   | CORS default `*` permitía cualquier origen                                         | **MEDIUM**   | ✅ Corregido |
+| 8   | DTOs sin `@MaxLength` permitían cadenas kilométricas                               | **MEDIUM**   | ✅ Corregido |
 
 ### Nuevas Capacidades Implementadas
 
@@ -62,6 +62,7 @@ Se realizó una auditoría de seguridad exhaustiva sobre **~300 categorías de v
 **Problema:** El proyecto contenía módulos no utilizados, dependencias muertas y artefactos compilados.
 
 **Acciones:**
+
 - Eliminados: `frontend/`, `payments/`, `invoices/`, `ai-doctor/`, `analytics/`, `queue/`
 - Eliminadas dependencias: `@nestjs/axios`, `axios`, `bullmq`, `@nestjs/typeorm`, `stripe`
 - Eliminados artefactos compilados (`.js`, `.d.ts`, `.js.map`)
@@ -132,30 +133,30 @@ Ver secciones 4-6 para detalle de cada fix.
 
 ### Categorías Evaluadas
 
-| Categoría | Items | Hallazgos |
-|---|---|---|
-| Autenticación | 12 | 3 HIGH |
-| Autorización | 8 | 2 CRITICAL |
-| Race Conditions | 8 | 0 (no aplica) |
-| Validaciones | 16 | 2 MEDIUM |
-| Permisos | 5 | 1 HIGH |
-| Caché | 4 | 0 |
-| Microservicios | 7 | 0 (no aplica) |
-| Eventos | 5 | 0 (no aplica) |
-| Archivos | 6 | 0 (no aplica) |
-| Paginación | 5 | 1 HIGH |
-| Filtros | 4 | 0 |
-| Búsquedas | 4 | 0 |
-| Estados | 5 | 0 (no aplica) |
-| Datos | 5 | 0 |
-| Concurrencia | 4 | 0 |
-| API | 4 | 0 |
-| Logs | 4 | 0 |
-| Memoria | 5 | 0 |
-| Process | 4 | 0 |
-| Scripts Node | 8 | 0 (no aplica) |
-| Base de Datos | 6 | 0 |
-| Negocio | 11 | 0 (no aplica) |
+| Categoría       | Items | Hallazgos     |
+| --------------- | ----- | ------------- |
+| Autenticación   | 12    | 3 HIGH        |
+| Autorización    | 8     | 2 CRITICAL    |
+| Race Conditions | 8     | 0 (no aplica) |
+| Validaciones    | 16    | 2 MEDIUM      |
+| Permisos        | 5     | 1 HIGH        |
+| Caché           | 4     | 0             |
+| Microservicios  | 7     | 0 (no aplica) |
+| Eventos         | 5     | 0 (no aplica) |
+| Archivos        | 6     | 0 (no aplica) |
+| Paginación      | 5     | 1 HIGH        |
+| Filtros         | 4     | 0             |
+| Búsquedas       | 4     | 0             |
+| Estados         | 5     | 0 (no aplica) |
+| Datos           | 5     | 0             |
+| Concurrencia    | 4     | 0             |
+| API             | 4     | 0             |
+| Logs            | 4     | 0             |
+| Memoria         | 5     | 0             |
+| Process         | 4     | 0             |
+| Scripts Node    | 8     | 0 (no aplica) |
+| Base de Datos   | 6     | 0             |
+| Negocio         | 11    | 0 (no aplica) |
 
 ---
 
@@ -164,10 +165,12 @@ Ver secciones 4-6 para detalle de cada fix.
 ### 🔴 H1 — RolesGuard usa `user.roles` pero JWT Strategy retorna `user.role`
 
 **Archivos:**
+
 - `common/guards/roles.guard.ts:26`
 - `auth/strategies/jwt.strategy.ts:19`
 
 **Problema:**
+
 ```typescript
 // jwt.strategy.ts — validate() retorna:
 { id: payload.sub, email: payload.email, role: payload.role }
@@ -181,6 +184,7 @@ user.roles?.includes(role)
 **Impacto:** Ningún endpoint de administración funcionaba. Todos los usuarios (incluyendo admins legítimos) recibían 403 Forbidden en endpoints con `@Roles('ADMIN')`.
 
 **Solución:**
+
 ```typescript
 // jwt.strategy.ts — ahora retorna también roles como array:
 { id: user.id, role: user.role, roles: [user.role] }
@@ -201,6 +205,7 @@ const hasRole = userRole !== undefined && requiredRoles.includes(userRole);
 **Impacto:** Exposición de email, nombre, rol y fechas de todos los usuarios del sistema.
 
 **Solución:**
+
 ```typescript
 @Get(':id')
 async findOne(
@@ -271,12 +276,14 @@ Logout → logout(userId)
 **Problema:** `logout()` solo actualizaba `updatedAt` del usuario y logueaba la actividad. Los access y refresh tokens existentes seguían siendo válidos hasta su expiración.
 
 **Solución:** `logout()` ahora ejecuta:
+
 ```typescript
 await this.prisma.refreshToken.updateMany({
   where: { userId, revokedAt: null },
   data: { revokedAt: new Date() },
 });
 ```
+
 Esto invalida inmediatamente todos los refresh tokens del usuario. Los access tokens (corta duración: 7d) siguen siendo válidos hasta su expiry natural; para invalidación completa se requiere reducir `JWT_EXPIRES_IN` a 15 minutos.
 
 ---
@@ -288,6 +295,7 @@ Esto invalida inmediatamente todos los refresh tokens del usuario. Los access to
 **Problema:** `JwtStrategy.validate()` solo verificaba la firma del JWT y devolvía el payload. Nunca consultaba la DB. Un usuario con `isActive=false` o eliminado podía usar sus tokens hasta 7 días.
 
 **Solución:**
+
 ```typescript
 async validate(payload: { sub: string; role?: string }) {
   const user = await this.prisma.user.findUnique({
@@ -314,6 +322,7 @@ Cada request verifica `isActive` en DB. Penalty de ~1-3ms por request (consulta 
 **Problema:** `limit` no tenía ceiling. Un atacante podía pedir `limit=9999999` y saturar la DB con full table scans.
 
 **Solución:**
+
 ```typescript
 const safePage = Math.max(1, Math.floor(Number(page)) || 1);
 const safeLimit = Math.min(100, Math.max(1, Math.floor(Number(limit)) || 10));
@@ -334,14 +343,16 @@ const safeLimit = Math.min(100, Math.max(1, Math.floor(Number(limit)) || 10));
 **Problema:** Si no se configuraba `CORS_ORIGIN`, el valor default era `*` — cualquier sitio web podía hacer peticiones autenticadas desde el navegador.
 
 **Solución:**
+
 ```typescript
 const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
-app.use(cors({
-  origin: corsOrigin === '*'
-    ? ['http://localhost:3000']
-    : corsOrigin.split(',').map((o) => o.trim()),
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin:
+      corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
+    credentials: true,
+  }),
+);
 ```
 
 Default ahora es `http://localhost:3000`. Soporta múltiples orígenes separados por coma.
@@ -362,38 +373,38 @@ Default ahora es `http://localhost:3000`. Soporta múltiples orígenes separados
 
 ### AUTENTICACIÓN — Sin vulnerabilidades
 
-| Item | Resultado | Razón |
-|---|---|---|
-| Login con null | ✅ No vulnerable | `@IsNotEmpty()` + `@IsEmail()` en DTO |
-| Login con strings vacíos | ✅ No vulnerable | Misma validación |
-| Mayúsculas en login | ✅ No vulnerable | bcrypt es case-sensitive |
-| Emails duplicados | ✅ No vulnerable | `@unique` en Prisma |
-| Password reset | N/A | No implementado |
-| Cambio de email | N/A | No implementado |
-| MFA | N/A | No implementado |
+| Item                     | Resultado        | Razón                                 |
+| ------------------------ | ---------------- | ------------------------------------- |
+| Login con null           | ✅ No vulnerable | `@IsNotEmpty()` + `@IsEmail()` en DTO |
+| Login con strings vacíos | ✅ No vulnerable | Misma validación                      |
+| Mayúsculas en login      | ✅ No vulnerable | bcrypt es case-sensitive              |
+| Emails duplicados        | ✅ No vulnerable | `@unique` en Prisma                   |
+| Password reset           | N/A              | No implementado                       |
+| Cambio de email          | N/A              | No implementado                       |
+| MFA                      | N/A              | No implementado                       |
 
 ### VALIDACIONES — Sin vulnerabilidades explotables
 
-| Item | Resultado | Razón |
-|---|---|---|
+| Item                        | Resultado        | Razón                                          |
+| --------------------------- | ---------------- | ---------------------------------------------- |
 | Arrays/Objetos donde string | ✅ No vulnerable | `whitelist=true` + `forbidNonWhitelisted=true` |
-| JSON malformado | ✅ No vulnerable | NestJS parsea automáticamente |
-| UUID inválidos | ✅ No vulnerable | `findUnique` retorna null → 404 |
+| JSON malformado             | ✅ No vulnerable | NestJS parsea automáticamente                  |
+| UUID inválidos              | ✅ No vulnerable | `findUnique` retorna null → 404                |
 
 ### LOGS — Sin exposición de secretos
 
-| Item | Resultado | Razón |
-|---|---|---|
-| JWT en logs | ✅ No detectado | Sin headers de auth en logs |
-| Contraseñas en logs | ✅ No detectado | Solo se loguea email |
-| Tokens internos | ✅ No detectado | Solo se loguean keyPath (no contenido) |
+| Item                | Resultado       | Razón                                  |
+| ------------------- | --------------- | -------------------------------------- |
+| JWT en logs         | ✅ No detectado | Sin headers de auth en logs            |
+| Contraseñas en logs | ✅ No detectado | Solo se loguea email                   |
+| Tokens internos     | ✅ No detectado | Solo se loguean keyPath (no contenido) |
 
 ### CACHÉ — Aislado por diseño
 
-| Item | Resultado | Razón |
-|---|---|---|
-| Datos de usuario A visibles para B | ✅ No vulnerable | Keys con prefijo `cache:` |
-| Caché de sesiones | ✅ No implementada | Sin sesiones cacheadas |
+| Item                               | Resultado          | Razón                     |
+| ---------------------------------- | ------------------ | ------------------------- |
+| Datos de usuario A visibles para B | ✅ No vulnerable   | Keys con prefijo `cache:` |
+| Caché de sesiones                  | ✅ No implementada | Sin sesiones cacheadas    |
 
 ### MICROSERVICIOS — No aplica
 
@@ -481,20 +492,20 @@ grpc/
 
 ### Docker
 
-| Archivo | Propósito |
-|---|---|
-| `main/Dockerfile` | Multi-stage build (alpine → distroless) |
-| `docker-compose.yml` | app + PostgreSQL 16 + Redis 7 |
+| Archivo              | Propósito                               |
+| -------------------- | --------------------------------------- |
+| `main/Dockerfile`    | Multi-stage build (alpine → distroless) |
+| `docker-compose.yml` | app + PostgreSQL 16 + Redis 7           |
 
 ### Plataformas
 
-| Plataforma | Archivos |
-|---|---|
-| **Render** | `infrastructure/deploy/render.yaml` |
-| **AWS Elastic Beanstalk** | `infrastructure/deploy/aws-elasticbeanstalk/Dockerfile` + `Dockerrun.aws.json` |
-| **Azure App Service** | `infrastructure/deploy/azure-app-service/Dockerfile` + `azure-pipelines.yml` |
-| **Google Cloud Run** | `infrastructure/deploy/google-cloud-run/Dockerfile` + `cloudbuild.yaml` + `service.yaml` |
-| **Netlify** | `infrastructure/deploy/netlify.toml` |
+| Plataforma                | Archivos                                                                                 |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| **Render**                | `infrastructure/deploy/render.yaml`                                                      |
+| **AWS Elastic Beanstalk** | `infrastructure/deploy/aws-elasticbeanstalk/Dockerfile` + `Dockerrun.aws.json`           |
+| **Azure App Service**     | `infrastructure/deploy/azure-app-service/Dockerfile` + `azure-pipelines.yml`             |
+| **Google Cloud Run**      | `infrastructure/deploy/google-cloud-run/Dockerfile` + `cloudbuild.yaml` + `service.yaml` |
+| **Netlify**               | `infrastructure/deploy/netlify.toml`                                                     |
 
 ---
 
@@ -502,15 +513,15 @@ grpc/
 
 Los siguientes errores de TypeScript existían antes de cualquier cambio y no fueron corregidos porque están fuera del alcance de la auditoría:
 
-| Archivo | Error | Línea |
-|---|---|---|
-| `auth/dto/login.dto.ts` | TS2564 — Propiedad sin inicializador | 9, 15 |
-| `auth/dto/register.dto.ts` | TS2564 — Propiedad sin inicializador | 9, 16 |
-| `common/dto/response.dto.ts` | TS2564 — Propiedad sin inicializador | 5, 13 |
-| `common/filters/global-exception.filter.ts` | TS2322 — Type `{}` no asignable a `string \| string[]` | 29 |
-| `main.ts` | TS2349 — cors import no invocable (ESM) | 68 |
-| `main.ts` | TS2349 — csurf import no invocable (ESM) | 78 |
-| `prisma/prisma.service.ts` | TS18046 — `err` es de tipo `unknown` | 13 |
+| Archivo                                     | Error                                                  | Línea |
+| ------------------------------------------- | ------------------------------------------------------ | ----- |
+| `auth/dto/login.dto.ts`                     | TS2564 — Propiedad sin inicializador                   | 9, 15 |
+| `auth/dto/register.dto.ts`                  | TS2564 — Propiedad sin inicializador                   | 9, 16 |
+| `common/dto/response.dto.ts`                | TS2564 — Propiedad sin inicializador                   | 5, 13 |
+| `common/filters/global-exception.filter.ts` | TS2322 — Type `{}` no asignable a `string \| string[]` | 29    |
+| `main.ts`                                   | TS2349 — cors import no invocable (ESM)                | 68    |
+| `main.ts`                                   | TS2349 — csurf import no invocable (ESM)               | 78    |
+| `prisma/prisma.service.ts`                  | TS18046 — `err` es de tipo `unknown`                   | 13    |
 
 **Nota:** 0 errores nuevos fueron introducidos por los cambios.
 
@@ -526,6 +537,7 @@ Los siguientes errores de TypeScript existían antes de cualquier cambio y no fu
    - Tipar `err` en catch blocks
 
 2. **Ejecutar migración Prisma:**
+
    ```bash
    npx prisma migrate dev --name add_refresh_tokens
    ```

@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "skills": {
+    "nestjs-best-practices": {
+      "source": "kadajett/agent-nestjs-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "7f14f088a79090183152c2aa556f708b2f5b7d0dacfb0ad339df2d498ba52aa3"
+    },
+    "nodejs-backend-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "autoskills-registry",
+      "computedHash": "710a5e6f83c46e8f6c43356df55c143a7375c4414559a581654ce51709138c55"
+    },
+    "nodejs-best-practices": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "7361ab02fb6b09913e3bdd9cf61c629ed6c17de9485e6a781054e5d437ccfc29"
+    },
+    "nodejs-express-server": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "autoskills-registry",
+      "computedHash": "b15b3e6dda23d3f3c230285a122de9df3aabae6408dc2bd52038445e60ba745e"
+    },
+    "prisma-cli": {
+      "source": "prisma/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "d2b4e410bb24df07e0a399cf1fd70ca6a2f696079f7e6445eb602116566d2278"
+    },
+    "prisma-client-api": {
+      "source": "prisma/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "922d6b5b4eb4387e72e409fa063f8e1bffb9037aed595cba0d3c257f418b6c18"
+    },
+    "prisma-database-setup": {
+      "source": "prisma/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "50c6cbc7090ef356c026cb76352952b83b65bee8b3f3c7ac337461f5b352e9b9"
+    },
+    "prisma-postgres": {
+      "source": "prisma/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "3adda04ae85b8593cfca45d48d5d410ddffb2797ea53f6dc9dfe34b8d71d35e9"
+    },
+    "stripe-best-practices": {
+      "source": "stripe/ai",
+      "sourceType": "autoskills-registry",
+      "computedHash": "0ca31a5a3c2631cd0419ba2e186e962773718799d2b281551c0e48195693350f"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "autoskills-registry",
+      "computedHash": "341f67c77a99b473c48207db023503509de7955af1517ce39e17b21a0127d79c"
+    },
+    "typescript-advanced-types": {
+      "source": "wshobson/agents",
+      "sourceType": "autoskills-registry",
+      "computedHash": "5ca0e177c6aaaba1889255691224daafdb7d71f317cc70bede1590d3907ded42"
+    },
+    "upgrade-stripe": {
+      "source": "stripe/ai",
+      "sourceType": "autoskills-registry",
+      "computedHash": "017906619cae467ebfac534bed0dc25d1c157dd55bfb0530fb5d38d2418b426c"
+    },
+    "zod": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "aa8a97195b07763d37494b511f48be90979fd6826c031956c831cfc58f6a24b8"
+    }
+  }
+}

@@ -73,9 +73,7 @@ export class ErrorCollector {
 
   getErrorsBySeverity(severity: string): ErrorEntry[] {
     logger.debug('Getting errors by severity', { severity });
-    return this.errors.filter(
-      (e) => e.severity === severity.toUpperCase(),
-    );
+    return this.errors.filter((e) => e.severity === severity.toUpperCase());
   }
 
   markAnalyzed(id: string): void {

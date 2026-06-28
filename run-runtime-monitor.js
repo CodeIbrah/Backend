@@ -17,8 +17,10 @@ const memPercent = ((usedMem / totalMem) * 100).toFixed(1);
 const loadAvg = os.loadavg();
 
 console.log(`  CPU: ${cpus.length} cores - ${cpus[0].model}`);
-console.log(`  Memory: ${(usedMem/1024/1024/1024).toFixed(2)}GB / ${(totalMem/1024/1024/1024).toFixed(2)}GB (${memPercent}%)`);
-console.log(`  Load Average: ${loadAvg.map(l => l.toFixed(2)).join(', ')}`);
+console.log(
+  `  Memory: ${(usedMem / 1024 / 1024 / 1024).toFixed(2)}GB / ${(totalMem / 1024 / 1024 / 1024).toFixed(2)}GB (${memPercent}%)`,
+);
+console.log(`  Load Average: ${loadAvg.map((l) => l.toFixed(2)).join(', ')}`);
 console.log(`  Platform: ${os.platform()} ${os.arch()}`);
 console.log(`  Node.js: ${process.version}`);
 console.log(`  Memory Warning: ${parseFloat(memPercent) > 80 ? 'HIGH - Risk of OOM' : 'OK'}`);
@@ -52,9 +54,11 @@ function countFiles(dir, extensions) {
           count += sub.count;
           size += sub.size;
         }
-      } else if (extensions.some(ext => item.name.endsWith(ext))) {
+      } else if (extensions.some((ext) => item.name.endsWith(ext))) {
         count++;
-        try { size += fs.statSync(fullPath).size; } catch {}
+        try {
+          size += fs.statSync(fullPath).size;
+        } catch {}
       }
     }
   } catch {}
@@ -87,7 +91,11 @@ function analyzeFile(filePath) {
       if (line.match(/async\s+\w+\s*\(|function\s+\w+\s*\(/)) funcStart = i;
       if (funcStart >= 0 && (line.match(/^\s*\}/) || line.match(/^\s*}\s*$/))) {
         if (i - funcStart > 50) {
-          issues.push({ type: 'LONG_FUNCTION', line: funcStart + 1, detail: `${i - funcStart} lines` });
+          issues.push({
+            type: 'LONG_FUNCTION',
+            line: funcStart + 1,
+            detail: `${i - funcStart} lines`,
+          });
         }
         funcStart = -1;
       }
@@ -97,7 +105,7 @@ function analyzeFile(filePath) {
     lines.forEach((line, i) => {
       const indent = line.match(/^(\s*)/)?.[1].length || 0;
       if (indent >= 12) {
-        issues.push({ type: 'DEEP_NESTING', line: i + 1, detail: `${indent/2} levels` });
+        issues.push({ type: 'DEEP_NESTING', line: i + 1, detail: `${indent / 2} levels` });
       }
     });
 
@@ -107,9 +115,13 @@ function analyzeFile(filePath) {
     }
 
     // Console.log in production code
-    const consoleLogs = lines.filter(l => l.match(/console\.(log|warn|error)/)).length;
+    const consoleLogs = lines.filter((l) => l.match(/console\.(log|warn|error)/)).length;
     if (consoleLogs > 5) {
-      issues.push({ type: 'EXCESSIVE_CONSOLE', line: 1, detail: `${consoleLogs} console statements` });
+      issues.push({
+        type: 'EXCESSIVE_CONSOLE',
+        line: 1,
+        detail: `${consoleLogs} console statements`,
+      });
     }
 
     return issues;
@@ -120,15 +132,15 @@ function analyzeFile(filePath) {
 
 const allIssues = [];
 const dirsToScan = ['main/src', 'microservices', 'packages', 'infrastructure/ai-doctor'];
-dirsToScan.forEach(dir => {
+dirsToScan.forEach((dir) => {
   const fullPath = path.join(basePath, dir);
   try {
     const items = fs.readdirSync(fullPath, { withFileTypes: true, recursive: true });
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.isFile() && item.name.endsWith('.ts')) {
         const filePath = path.join(fullPath, item.name);
         const issues = analyzeFile(filePath);
-        issues.forEach(issue => {
+        issues.forEach((issue) => {
           allIssues.push({ file: path.relative(basePath, filePath), ...issue });
         });
       }
@@ -136,10 +148,10 @@ dirsToScan.forEach(dir => {
   } catch {}
 });
 
-const longFunctions = allIssues.filter(i => i.type === 'LONG_FUNCTION');
-const deepNesting = allIssues.filter(i => i.type === 'DEEP_NESTING');
-const largeFiles = allIssues.filter(i => i.type === 'LARGE_FILE');
-const excessiveConsole = allIssues.filter(i => i.type === 'EXCESSIVE_CONSOLE');
+const longFunctions = allIssues.filter((i) => i.type === 'LONG_FUNCTION');
+const deepNesting = allIssues.filter((i) => i.type === 'DEEP_NESTING');
+const largeFiles = allIssues.filter((i) => i.type === 'LARGE_FILE');
+const excessiveConsole = allIssues.filter((i) => i.type === 'EXCESSIVE_CONSOLE');
 
 console.log(`  Long functions (>50 lines): ${longFunctions.length}`);
 console.log(`  Deep nesting (>3 levels): ${deepNesting.length}`);
@@ -154,7 +166,7 @@ function scanForBottlenecks(dir) {
   const bottlenecks = [];
   try {
     const items = fs.readdirSync(dir, { withFileTypes: true, recursive: true });
-    items.forEach(item => {
+    items.forEach((item) => {
       if (!item.isFile() || !item.name.endsWith('.ts')) return;
       const filePath = path.join(dir, item.name);
       try {
@@ -163,16 +175,34 @@ function scanForBottlenecks(dir) {
 
         lines.forEach((line, i) => {
           // Synchronous file operations
-          if (line.match(/readFileSync|writeFileSync|existsSync|statSync/) && !line.includes('test')) {
-            bottlenecks.push({ file: path.relative(basePath, filePath), line: i + 1, type: 'SYNC_FS', detail: 'Synchronous file I/O blocks event loop' });
+          if (
+            line.match(/readFileSync|writeFileSync|existsSync|statSync/) &&
+            !line.includes('test')
+          ) {
+            bottlenecks.push({
+              file: path.relative(basePath, filePath),
+              line: i + 1,
+              type: 'SYNC_FS',
+              detail: 'Synchronous file I/O blocks event loop',
+            });
           }
           // In-memory stores without limits
           if (line.match(/new Map\(\)|new Set\(\)/) && !line.includes('test')) {
-            bottlenecks.push({ file: path.relative(basePath, filePath), line: i + 1, type: 'UNBOUNDED_CACHE', detail: 'Unbounded Map/Set can cause memory leaks' });
+            bottlenecks.push({
+              file: path.relative(basePath, filePath),
+              line: i + 1,
+              type: 'UNBOUNDED_CACHE',
+              detail: 'Unbounded Map/Set can cause memory leaks',
+            });
           }
           // JSON.stringify on large objects
           if (line.match(/JSON\.stringify/)) {
-            bottlenecks.push({ file: path.relative(basePath, filePath), line: i + 1, type: 'JSON_PARSE', detail: 'JSON.stringify can block event loop on large objects' });
+            bottlenecks.push({
+              file: path.relative(basePath, filePath),
+              line: i + 1,
+              type: 'JSON_PARSE',
+              detail: 'JSON.stringify can block event loop on large objects',
+            });
           }
         });
       } catch {}
@@ -182,9 +212,9 @@ function scanForBottlenecks(dir) {
 }
 
 const bottlenecks = scanForBottlenecks(basePath);
-const syncFs = bottlenecks.filter(b => b.type === 'SYNC_FS');
-const unboundedCache = bottlenecks.filter(b => b.type === 'UNBOUNDED_CACHE');
-const jsonParse = bottlenecks.filter(b => b.type === 'JSON_PARSE');
+const syncFs = bottlenecks.filter((b) => b.type === 'SYNC_FS');
+const unboundedCache = bottlenecks.filter((b) => b.type === 'UNBOUNDED_CACHE');
+const jsonParse = bottlenecks.filter((b) => b.type === 'JSON_PARSE');
 
 console.log(`  Synchronous file I/O: ${syncFs.length} (blocks event loop)`);
 console.log(`  Unbounded caches: ${unboundedCache.length} (memory leak risk)`);
@@ -198,11 +228,16 @@ const services = [
   { name: 'Main Monolith', port: 3000, dir: 'main', type: 'NestJS' },
   { name: 'Auth Service', port: 3001, dir: 'microservices/auth-service', type: 'Express' },
   { name: 'Users Service', port: 3002, dir: 'microservices/users-service', type: 'Express' },
-  { name: 'Notifications Service', port: 3003, dir: 'microservices/notifications-service', type: 'Express' },
+  {
+    name: 'Notifications Service',
+    port: 3003,
+    dir: 'microservices/notifications-service',
+    type: 'Express',
+  },
   { name: 'Payment Service', port: 3004, dir: 'microservices/payment-service', type: 'Express' },
 ];
 
-services.forEach(svc => {
+services.forEach((svc) => {
   const pkgPath = path.join(basePath, svc.dir, 'package.json');
   try {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
@@ -222,10 +257,14 @@ console.log('  RUNTIME MONITORING SUMMARY');
 console.log('='.repeat(70));
 console.log('');
 console.log('  System Health:');
-console.log(`  - CPU Load: ${loadAvg[0].toFixed(2)} (1m) / ${loadAvg[1].toFixed(2)} (5m) / ${loadAvg[2].toFixed(2)} (15m)`);
+console.log(
+  `  - CPU Load: ${loadAvg[0].toFixed(2)} (1m) / ${loadAvg[1].toFixed(2)} (5m) / ${loadAvg[2].toFixed(2)} (15m)`,
+);
 console.log(`  - Memory: ${memPercent}% used (${parseFloat(memPercent) > 80 ? 'WARNING' : 'OK'})`);
 console.log(`  - Process RSS: ${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`);
-console.log(`  - Heap: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB / ${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+console.log(
+  `  - Heap: ${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB / ${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+);
 console.log('');
 console.log('  Code Quality:');
 console.log(`  - Total TypeScript files: ${tsFiles.count}`);
@@ -240,14 +279,17 @@ console.log(`  - JSON operations: ${jsonParse.length} (monitor for large payload
 console.log('');
 console.log('  Services:');
 console.log(`  - Active: ${services.length} services configured`);
-console.log(`  - Ports: ${services.map(s => s.port).join(', ')}`);
+console.log(`  - Ports: ${services.map((s) => s.port).join(', ')}`);
 console.log('');
 console.log('  Recommendations:');
-if (parseFloat(memPercent) > 80) console.log('  [!] System memory is high - consider closing apps or adding RAM');
+if (parseFloat(memPercent) > 80)
+  console.log('  [!] System memory is high - consider closing apps or adding RAM');
 if (syncFs.length > 0) console.log('  [!] Replace synchronous file operations with async versions');
 if (unboundedCache.length > 0) console.log('  [!] Add size limits or TTL to in-memory caches');
-if (longFunctions.length > 0) console.log('  [!] Refactor long functions into smaller, focused units');
-if (deepNesting.length > 0) console.log('  [!] Reduce nesting depth with early returns or guard clauses');
+if (longFunctions.length > 0)
+  console.log('  [!] Refactor long functions into smaller, focused units');
+if (deepNesting.length > 0)
+  console.log('  [!] Reduce nesting depth with early returns or guard clauses');
 console.log('  [i] All services configured and ready for deployment');
 console.log('');
 console.log('='.repeat(70));

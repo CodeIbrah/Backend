@@ -2,8 +2,12 @@
   "name": "@backend/main",
   "version": "1.0.0",
   "private": true,
+  "prisma": {
+    "schema": "../packages/shared-prisma/schema.prisma"
+  },
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "del /f/q tsconfig.tsbuildinfo 2>nul & nest start --watch",
+    "prebuild": "del /f/q tsconfig.tsbuildinfo 2>nul",
     "build": "nest build",
     "start": "node dist/main",
     "lint": "eslint \"src/**/*.ts\"",

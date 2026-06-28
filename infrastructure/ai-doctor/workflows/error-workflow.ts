@@ -241,10 +241,22 @@ export class ErrorWorkflow {
       { name: 'classify', status: 'PENDING', startedAt: null, completedAt: null, error: null },
       { name: 'diagnose', status: 'PENDING', startedAt: null, completedAt: null, error: null },
       { name: 'suggestFix', status: 'PENDING', startedAt: null, completedAt: null, error: null },
-      { name: 'createIncident', status: 'PENDING', startedAt: null, completedAt: null, error: null },
+      {
+        name: 'createIncident',
+        status: 'PENDING',
+        startedAt: null,
+        completedAt: null,
+        error: null,
+      },
       { name: 'alert', status: 'PENDING', startedAt: null, completedAt: null, error: null },
       { name: 'saveHistory', status: 'PENDING', startedAt: null, completedAt: null, error: null },
-      { name: 'generateReport', status: 'PENDING', startedAt: null, completedAt: null, error: null },
+      {
+        name: 'generateReport',
+        status: 'PENDING',
+        startedAt: null,
+        completedAt: null,
+        error: null,
+      },
     ];
   }
 

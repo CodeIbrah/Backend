@@ -74,6 +74,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 **Purpose:** Analyze captured errors to understand root causes, classify severity, and detect patterns.
 
 **Responsibilities:**
+
 - Read and parse application logs (Winston, Loki)
 - Analyze stack traces to identify failure points
 - Detect recurring error patterns across time windows
@@ -84,6 +85,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 - Maintain error signature database for pattern matching
 
 **Example Analysis Output:**
+
 ```json
 {
   "errorId": "err-20260521-001",
@@ -111,6 +113,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 **Purpose:** Generate actionable fixes, patches, and refactoring recommendations based on error analysis.
 
 **Responsibilities:**
+
 - Generate code fixes based on error analysis results
 - Explain the problem in human-readable terms
 - Generate unified diff patches for quick application
@@ -121,6 +124,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 - Provide rollback strategies for risky fixes
 
 **Example Fix Suggestion:**
+
 ```json
 {
   "fixId": "fix-20260521-001",
@@ -139,6 +143,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 **Purpose:** Continuously monitor system health, detect anomalies, and trigger recovery actions.
 
 **Responsibilities:**
+
 - Monitor CPU utilization and detect spikes
 - Track RAM usage and identify memory leaks
 - Monitor heap memory and garbage collection patterns
@@ -151,6 +156,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 - Trigger auto-recovery actions when thresholds exceeded
 
 **Monitored Metrics:**
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    MONITORED METRICS                        │
@@ -169,6 +175,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 ```
 
 **Example Alert:**
+
 ```json
 {
   "alertId": "alert-20260521-001",
@@ -189,6 +196,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 **Purpose:** Manage incident lifecycle from detection through resolution, including reporting and alerting.
 
 **Responsibilities:**
+
 - Create detailed incident reports with full context
 - Generate incident timelines from correlated events
 - Group related errors into single incidents (deduplication)
@@ -200,6 +208,7 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 - Escalate incidents based on severity and SLA
 
 **Example Incident Report:**
+
 ```json
 {
   "incidentId": "INC-20260521-001",
@@ -242,19 +251,19 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 
 **Step-by-step:**
 
-| Step | Action | Agent | Tool |
-|------|--------|-------|------|
-| 1 | **capture** | Error Collector | Winston, OpenTelemetry |
-| 2 | **log** | Error Collector | Winston, Loki |
-| 3 | **trace** | Error Collector | Jaeger, OpenTelemetry |
-| 4 | **analyze** | Error Analysis Agent | Stack trace parser |
-| 5 | **classify** | Error Analysis Agent | Pattern matcher |
-| 6 | **diagnose** | Error Analysis Agent | Root cause analyzer |
-| 7 | **suggestFix** | Fix Suggestion Agent | Code analyzer |
-| 8 | **createIncident** | Incident Response Agent | Incident manager |
-| 9 | **alert** | Incident Response Agent | Alert Service |
-| 10 | **saveHistory** | All Agents | Knowledge Base |
-| 11 | **generateReport** | Incident Response Agent | Report generator |
+| Step | Action             | Agent                   | Tool                   |
+| ---- | ------------------ | ----------------------- | ---------------------- |
+| 1    | **capture**        | Error Collector         | Winston, OpenTelemetry |
+| 2    | **log**            | Error Collector         | Winston, Loki          |
+| 3    | **trace**          | Error Collector         | Jaeger, OpenTelemetry  |
+| 4    | **analyze**        | Error Analysis Agent    | Stack trace parser     |
+| 5    | **classify**       | Error Analysis Agent    | Pattern matcher        |
+| 6    | **diagnose**       | Error Analysis Agent    | Root cause analyzer    |
+| 7    | **suggestFix**     | Fix Suggestion Agent    | Code analyzer          |
+| 8    | **createIncident** | Incident Response Agent | Incident manager       |
+| 9    | **alert**          | Incident Response Agent | Alert Service          |
+| 10   | **saveHistory**    | All Agents              | Knowledge Base         |
+| 11   | **generateReport** | Incident Response Agent | Report generator       |
 
 ### 3.2 Monitoring Workflow
 
@@ -270,12 +279,12 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 
 **Step-by-step:**
 
-| Step | Action | Agent | Action |
-|------|--------|-------|--------|
-| 1 | **monitor** | Runtime Monitoring Agent | Collect metrics continuously |
-| 2 | **detect** | Runtime Monitoring Agent | Compare against thresholds/baselines |
-| 3 | **alert** | Runtime Monitoring Agent | Send to Incident Response Agent |
-| 4 | **recover** | Runtime Monitoring Agent | Trigger auto-recovery if configured |
+| Step | Action      | Agent                    | Action                               |
+| ---- | ----------- | ------------------------ | ------------------------------------ |
+| 1    | **monitor** | Runtime Monitoring Agent | Collect metrics continuously         |
+| 2    | **detect**  | Runtime Monitoring Agent | Compare against thresholds/baselines |
+| 3    | **alert**   | Runtime Monitoring Agent | Send to Incident Response Agent      |
+| 4    | **recover** | Runtime Monitoring Agent | Trigger auto-recovery if configured  |
 
 ### 3.3 Analysis Workflow
 
@@ -292,12 +301,12 @@ Error Collector ──▶ Error Analysis ──▶ Fix Suggestion ──▶ Inci
 
 **Step-by-step:**
 
-| Step | Action | Agent | Output |
-|------|--------|-------|--------|
-| 1 | **collect** | Error Analysis Agent | Raw error data |
-| 2 | **analyze** | Error Analysis Agent | Pattern + root cause |
-| 3 | **suggest** | Fix Suggestion Agent | Fix recommendations |
-| 4 | **learn** | All Agents | Knowledge Base update |
+| Step | Action      | Agent                | Output                |
+| ---- | ----------- | -------------------- | --------------------- |
+| 1    | **collect** | Error Analysis Agent | Raw error data        |
+| 2    | **analyze** | Error Analysis Agent | Pattern + root cause  |
+| 3    | **suggest** | Fix Suggestion Agent | Fix recommendations   |
+| 4    | **learn**   | All Agents           | Knowledge Base update |
 
 ---
 
@@ -483,6 +492,7 @@ interface SimilarErrorSearch {
 ```
 
 **Example:**
+
 ```
 Query: "TypeError: Cannot read properties of undefined (reading 'map')"
 Results:
@@ -511,13 +521,13 @@ Results:
 
 **Pipeline Stages:**
 
-| Stage | Description | Output |
-|-------|-------------|--------|
-| Raw Error Event | Winston log entry, uncaught exception, rejected promise | Raw error object |
-| Parse & Filter | Extract stack trace, filter noise, remove duplicates | Parsed error |
-| Normalize & Dedup | Standardize format, check KB for similar errors | Normalized error |
-| Enrich with Context | Add correlation ID, service info, metrics, traces | Enriched error |
-| Store in KB | Persist to Knowledge Base, update patterns | Stored record |
+| Stage               | Description                                             | Output           |
+| ------------------- | ------------------------------------------------------- | ---------------- |
+| Raw Error Event     | Winston log entry, uncaught exception, rejected promise | Raw error object |
+| Parse & Filter      | Extract stack trace, filter noise, remove duplicates    | Parsed error     |
+| Normalize & Dedup   | Standardize format, check KB for similar errors         | Normalized error |
+| Enrich with Context | Add correlation ID, service info, metrics, traces       | Enriched error   |
+| Store in KB         | Persist to Knowledge Base, update patterns              | Stored record    |
 
 ### 7.2 Diagnostic Pipeline
 
@@ -583,15 +593,15 @@ Results:
 
 ### Tool Responsibilities
 
-| Tool | Purpose | Used By |
-|------|---------|---------|
-| **Winston** | Structured application logging | All agents, Error Collector |
+| Tool              | Purpose                                  | Used By                            |
+| ----------------- | ---------------------------------------- | ---------------------------------- |
+| **Winston**       | Structured application logging           | All agents, Error Collector        |
 | **OpenTelemetry** | Distributed tracing, context propagation | Error Analysis, Runtime Monitoring |
-| **Prometheus** | Metrics collection, alerting rules | Runtime Monitoring Agent |
-| **Loki** | Log aggregation, log querying | Error Analysis Agent |
-| **Jaeger** | Distributed trace visualization | Error Analysis Agent |
-| **BullMQ** | Job queue management, async processing | Runtime Monitoring, Auto Recovery |
-| **Prisma** | Database ORM, query optimization | All agents (Knowledge Base) |
+| **Prometheus**    | Metrics collection, alerting rules       | Runtime Monitoring Agent           |
+| **Loki**          | Log aggregation, log querying            | Error Analysis Agent               |
+| **Jaeger**        | Distributed trace visualization          | Error Analysis Agent               |
+| **BullMQ**        | Job queue management, async processing   | Runtime Monitoring, Auto Recovery  |
+| **Prisma**        | Database ORM, query optimization         | All agents (Knowledge Base)        |
 
 ---
 
@@ -670,6 +680,7 @@ Results:
 ```
 
 **Example Correlated Log Entry:**
+
 ```json
 {
   "timestamp": "2026-05-21T10:15:32.123Z",
@@ -911,37 +922,43 @@ Confidence: 0.94
 # Incident Report: INC-20260521-001
 
 ## Summary
+
 Database connection pool exhaustion caused cascading failures across
 user-service, order-service, and payment-service from 10:14 to 10:47 UTC.
 
 ## Impact
+
 - Duration: 33 minutes
 - Affected Services: 3
 - Failed Requests: 1,247
 - Error Rate Peak: 89%
 
 ## Timeline
-| Time (UTC) | Event |
-|------------|-------|
-| 10:14:00 | Connection pool usage exceeds 80% |
-| 10:14:30 | Slow query detected (5.2s) |
-| 10:15:00 | Connection pool at 100% |
-| 10:15:32 | First connection timeout error |
-| 10:15:35 | Incident auto-created |
-| 10:18:00 | Root cause identified |
-| 10:22:00 | Fix deployed (connection cleanup) |
-| 10:30:00 | Error rate declining |
-| 10:47:00 | All services recovered |
+
+| Time (UTC) | Event                             |
+| ---------- | --------------------------------- |
+| 10:14:00   | Connection pool usage exceeds 80% |
+| 10:14:30   | Slow query detected (5.2s)        |
+| 10:15:00   | Connection pool at 100%           |
+| 10:15:32   | First connection timeout error    |
+| 10:15:35   | Incident auto-created             |
+| 10:18:00   | Root cause identified             |
+| 10:22:00   | Fix deployed (connection cleanup) |
+| 10:30:00   | Error rate declining              |
+| 10:47:00   | All services recovered            |
 
 ## Root Cause
+
 Unclosed database connections in error paths within user-service
 caused connection pool exhaustion.
 
 ## Resolution
+
 Applied fix: Ensure connection release in finally blocks
 Commit: abc123def
 
 ## Lessons Learned
+
 - Add connection pool monitoring alerts at 70% threshold
 - Implement connection timeout with automatic cleanup
 - Add integration test for error path connection handling
@@ -1063,7 +1080,7 @@ interface AgentConfig {
     suggestionTimeout: '5min';
     maxPatchSize: 500;
     requireTests: true;
-    confidenceThreshold: 0.80;
+    confidenceThreshold: 0.8;
     autoApplyLowRisk: false;
   };
   runtimeMonitoring: {

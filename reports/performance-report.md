@@ -6,37 +6,37 @@
 
 ## Infrastructure Status
 
-| Service | Status | Port |
-|---------|--------|------|
-| PostgreSQL 16 | Healthy | 5432 |
-| Redis 7 | Healthy | 6379 |
-| Jaeger | Running | 16686, 4317-4318 |
-| Main API (NestJS) | Running | 3010 |
+| Service           | Status  | Port             |
+| ----------------- | ------- | ---------------- |
+| PostgreSQL 16     | Healthy | 5432             |
+| Redis 7           | Healthy | 6379             |
+| Jaeger            | Running | 16686, 4317-4318 |
+| Main API (NestJS) | Running | 3010             |
 
 ## Endpoint Test Results
 
-| Status | Method | Endpoint | Response Time | Notes |
-|--------|--------|----------|---------------|-------|
-| PASS | GET | /api/v1/health | 45ms | Health check OK |
-| PASS | GET | /api/v1/ops | 8ms | Operations status OK |
-| PASS | POST | /api/v1/auth/register | 1801ms | User registered (bcrypt hashing) |
-| PASS | POST | /api/v1/auth/login | 102ms | Login successful |
-| PASS* | GET | /api/v1/users | 9ms | 401 - Auth required (expected) |
-| PASS* | GET | /api/v1/analytics/overview | 4ms | 401 - Auth required (expected) |
-| PASS | GET | /api/v1/reports | 9ms | Reports endpoint OK |
-| PASS* | GET | /api/v1/activity-log | 5ms | 401 - Auth required (expected) |
+| Status | Method | Endpoint                   | Response Time | Notes                            |
+| ------ | ------ | -------------------------- | ------------- | -------------------------------- |
+| PASS   | GET    | /api/v1/health             | 45ms          | Health check OK                  |
+| PASS   | GET    | /api/v1/ops                | 8ms           | Operations status OK             |
+| PASS   | POST   | /api/v1/auth/register      | 1801ms        | User registered (bcrypt hashing) |
+| PASS   | POST   | /api/v1/auth/login         | 102ms         | Login successful                 |
+| PASS\* | GET    | /api/v1/users              | 9ms           | 401 - Auth required (expected)   |
+| PASS\* | GET    | /api/v1/analytics/overview | 4ms           | 401 - Auth required (expected)   |
+| PASS   | GET    | /api/v1/reports            | 9ms           | Reports endpoint OK              |
+| PASS\* | GET    | /api/v1/activity-log       | 5ms           | 401 - Auth required (expected)   |
 
 **Total: 5/8 direct passes, 8/8 expected behavior**
 
 ## Performance Metrics
 
-| Metric | Value |
-|--------|-------|
-| Health Check | 45ms |
-| Login | 102ms |
-| Registration | 1801ms (includes bcrypt hashing) |
-| Public Endpoints | 4-9ms |
-| Protected Endpoints | 4-9ms (auth check) |
+| Metric              | Value                            |
+| ------------------- | -------------------------------- |
+| Health Check        | 45ms                             |
+| Login               | 102ms                            |
+| Registration        | 1801ms (includes bcrypt hashing) |
+| Public Endpoints    | 4-9ms                            |
+| Protected Endpoints | 4-9ms (auth check)               |
 
 ## Security Fixes Applied
 

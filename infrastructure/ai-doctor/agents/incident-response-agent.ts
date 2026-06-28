@@ -309,10 +309,7 @@ export class IncidentResponseAgent {
     logger.info('Alerts sent', { incidentId: incident.id });
   }
 
-  async run(
-    errors: ErrorEntry[],
-    analyses: Analysis[],
-  ): Promise<AgentResult> {
+  async run(errors: ErrorEntry[], analyses: Analysis[]): Promise<AgentResult> {
     logger.info('Starting IncidentResponseAgent', {
       errorCount: errors.length,
       analysisCount: analyses.length,
@@ -382,13 +379,17 @@ export class IncidentResponseAgent {
   }
 
   private generateTitle(error: ErrorEntry): string {
-    const prefix = error.severity === 'CRITICAL' ? '[CRITICAL]' :
-      error.severity === 'HIGH' ? '[HIGH]' :
-        error.severity === 'MEDIUM' ? '[MEDIUM]' : '[LOW]';
+    const prefix =
+      error.severity === 'CRITICAL'
+        ? '[CRITICAL]'
+        : error.severity === 'HIGH'
+          ? '[HIGH]'
+          : error.severity === 'MEDIUM'
+            ? '[MEDIUM]'
+            : '[LOW]';
 
-    const message = error.message.length > 80
-      ? error.message.substring(0, 80) + '...'
-      : error.message;
+    const message =
+      error.message.length > 80 ? error.message.substring(0, 80) + '...' : error.message;
 
     return `${prefix} ${message} in ${error.service}`;
   }

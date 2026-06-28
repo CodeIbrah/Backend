@@ -63,10 +63,7 @@ describe('AuthController (integration)', () => {
 
   describe('POST /api/v1/auth/login', () => {
     it('should reject missing credentials', () => {
-      return request(app.getHttpServer())
-        .post('/api/v1/auth/login')
-        .send({})
-        .expect(400);
+      return request(app.getHttpServer()).post('/api/v1/auth/login').send({}).expect(400);
     });
 
     it('should reject wrong password', () => {
@@ -79,9 +76,7 @@ describe('AuthController (integration)', () => {
 
   describe('GET /api/v1/health', () => {
     it('should return health status', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/health')
-        .expect(200);
+      return request(app.getHttpServer()).get('/api/v1/health').expect(200);
     });
   });
 });

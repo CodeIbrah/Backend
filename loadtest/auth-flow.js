@@ -20,9 +20,15 @@ export default function () {
   const password = 'TestPass123!';
 
   group('register', () => {
-    const res = http.post(`${BASE_URL}/auth/register`, JSON.stringify({
-      email, password, name: `Load Test User ${__VU}`,
-    }), { headers: { 'Content-Type': 'application/json' } });
+    const res = http.post(
+      `${BASE_URL}/auth/register`,
+      JSON.stringify({
+        email,
+        password,
+        name: `Load Test User ${__VU}`,
+      }),
+      { headers: { 'Content-Type': 'application/json' } },
+    );
     check(res, {
       'register status is 201': (r) => r.status === 201,
       'register returns tokens': (r) => JSON.parse(r.body).tokens !== undefined,
@@ -30,9 +36,14 @@ export default function () {
   });
 
   group('login', () => {
-    const res = http.post(`${BASE_URL}/auth/login`, JSON.stringify({
-      email, password,
-    }), { headers: { 'Content-Type': 'application/json' } });
+    const res = http.post(
+      `${BASE_URL}/auth/login`,
+      JSON.stringify({
+        email,
+        password,
+      }),
+      { headers: { 'Content-Type': 'application/json' } },
+    );
     check(res, {
       'login status is 200': (r) => r.status === 200,
       'login returns tokens': (r) => JSON.parse(r.body).tokens !== undefined,

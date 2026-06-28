@@ -4,7 +4,7 @@ const client = new Client({
   port: 5432,
   database: 'backend_db',
   user: 'postgres',
-  password: 'postgres'
+  password: 'postgres',
 });
 client.connect((err) => {
   if (err) {

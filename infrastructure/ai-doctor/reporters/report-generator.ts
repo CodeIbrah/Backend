@@ -95,8 +95,8 @@ export class ReportGenerator {
     lines.push('| --- | --- | --- | --- |');
 
     for (const check of result.checks) {
-      const statusIcon = check.status === 'HEALTHY' ? 'OK' :
-        check.status === 'DEGRADED' ? 'WARN' : 'FAIL';
+      const statusIcon =
+        check.status === 'HEALTHY' ? 'OK' : check.status === 'DEGRADED' ? 'WARN' : 'FAIL';
       lines.push(`| ${check.service} | ${statusIcon} | ${check.latency}ms | ${check.message} |`);
     }
 
@@ -294,13 +294,17 @@ export class ReportGenerator {
     }
 
     if (openCount > 5) {
-      recommendations.push(`High number of open incidents (${openCount}) - consider increasing team capacity`);
+      recommendations.push(
+        `High number of open incidents (${openCount}) - consider increasing team capacity`,
+      );
     }
 
     const patterns = this.countAllPatterns(incidents);
     const topPattern = Object.entries(patterns).sort((a, b) => b[1] - a[1])[0];
     if (topPattern && topPattern[1] > 3) {
-      recommendations.push(`Most frequent pattern "${topPattern[0]}" (${topPattern[1]} occurrences) - prioritize root cause fix`);
+      recommendations.push(
+        `Most frequent pattern "${topPattern[0]}" (${topPattern[1]} occurrences) - prioritize root cause fix`,
+      );
     }
 
     recommendations.push('Review and update error handling patterns across services');

@@ -60,7 +60,10 @@ export class FixSuggester {
       return this.generateNullCheckPatch(error);
     }
 
-    if (rootCause.toLowerCase().includes('connection') || rootCause.toLowerCase().includes('network')) {
+    if (
+      rootCause.toLowerCase().includes('connection') ||
+      rootCause.toLowerCase().includes('network')
+    ) {
       return this.generateRetryPatch(error);
     }
 
@@ -117,9 +120,10 @@ export class FixSuggester {
   }
 
   private generateDiagnosis(analysis: Analysis): string {
-    const patternSummary = analysis.patterns.length > 0
-      ? `Detected patterns: ${analysis.patterns.join(', ')}`
-      : 'No specific patterns detected';
+    const patternSummary =
+      analysis.patterns.length > 0
+        ? `Detected patterns: ${analysis.patterns.join(', ')}`
+        : 'No specific patterns detected';
 
     return `Error ${analysis.errorId}: ${analysis.rootCause}. ${patternSummary}. Confidence: ${(analysis.confidence * 100).toFixed(0)}%`;
   }

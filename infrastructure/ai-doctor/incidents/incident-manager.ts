@@ -140,7 +140,9 @@ export class IncidentManager {
     }
 
     if (incident.status !== 'RESOLVED') {
-      throw new Error(`Cannot close incident with status: ${incident.status}. Must be RESOLVED first.`);
+      throw new Error(
+        `Cannot close incident with status: ${incident.status}. Must be RESOLVED first.`,
+      );
     }
 
     const closedIncident: Incident = {
@@ -231,17 +233,13 @@ export class IncidentManager {
   getIncidentsByService(service: string): Incident[] {
     logger.debug('Getting incidents by service', { service });
 
-    return Array.from(this.incidents.values()).filter(
-      (i) => i.metadata.service === service,
-    );
+    return Array.from(this.incidents.values()).filter((i) => i.metadata.service === service);
   }
 
   getIncidentsByTag(tag: string): Incident[] {
     logger.debug('Getting incidents by tag', { tag });
 
-    return Array.from(this.incidents.values()).filter(
-      (i) => i.tags.includes(tag),
-    );
+    return Array.from(this.incidents.values()).filter((i) => i.tags.includes(tag));
   }
 
   getStats(): {

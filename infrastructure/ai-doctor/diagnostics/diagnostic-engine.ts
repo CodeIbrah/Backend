@@ -96,19 +96,21 @@ export class DiagnosticEngine {
     try {
       const latency = Date.now() - startTime;
 
-      const status = latency < this.latencyThresholds.healthy
-        ? 'HEALTHY'
-        : latency < this.latencyThresholds.degraded
-          ? 'DEGRADED'
-          : 'UNHEALTHY';
+      const status =
+        latency < this.latencyThresholds.healthy
+          ? 'HEALTHY'
+          : latency < this.latencyThresholds.degraded
+            ? 'DEGRADED'
+            : 'UNHEALTHY';
 
       return {
         service: 'database',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'Database connection healthy'
-          : `Database latency ${latency}ms exceeds threshold`,
+        message:
+          status === 'HEALTHY'
+            ? 'Database connection healthy'
+            : `Database latency ${latency}ms exceeds threshold`,
         timestamp: new Date(),
         metadata: { latency },
       };
@@ -134,19 +136,21 @@ export class DiagnosticEngine {
     try {
       const latency = Date.now() - startTime;
 
-      const status = latency < this.latencyThresholds.healthy
-        ? 'HEALTHY'
-        : latency < this.latencyThresholds.degraded
-          ? 'DEGRADED'
-          : 'UNHEALTHY';
+      const status =
+        latency < this.latencyThresholds.healthy
+          ? 'HEALTHY'
+          : latency < this.latencyThresholds.degraded
+            ? 'DEGRADED'
+            : 'UNHEALTHY';
 
       return {
         service: 'redis',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'Redis connection healthy'
-          : `Redis latency ${latency}ms exceeds threshold`,
+        message:
+          status === 'HEALTHY'
+            ? 'Redis connection healthy'
+            : `Redis latency ${latency}ms exceeds threshold`,
         timestamp: new Date(),
         metadata: { latency },
       };
@@ -174,19 +178,21 @@ export class DiagnosticEngine {
       const pendingJobs = 0;
       const failedJobs = 0;
 
-      const status = pendingJobs > 1000 || failedJobs > 100
-        ? 'UNHEALTHY'
-        : pendingJobs > 500
-          ? 'DEGRADED'
-          : 'HEALTHY';
+      const status =
+        pendingJobs > 1000 || failedJobs > 100
+          ? 'UNHEALTHY'
+          : pendingJobs > 500
+            ? 'DEGRADED'
+            : 'HEALTHY';
 
       return {
         service: 'queues',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'Queue system healthy'
-          : `Queue congestion detected: ${pendingJobs} pending, ${failedJobs} failed`,
+        message:
+          status === 'HEALTHY'
+            ? 'Queue system healthy'
+            : `Queue congestion detected: ${pendingJobs} pending, ${failedJobs} failed`,
         timestamp: new Date(),
         metadata: { pendingJobs, failedJobs },
       };
@@ -213,17 +219,16 @@ export class DiagnosticEngine {
       const latency = Date.now() - startTime;
       const uptime = process.uptime();
 
-      const status = uptime < 60
-        ? 'DEGRADED'
-        : 'HEALTHY';
+      const status = uptime < 60 ? 'DEGRADED' : 'HEALTHY';
 
       return {
         service: 'services',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'All services healthy'
-          : `Service recently restarted (uptime: ${uptime.toFixed(0)}s)`,
+        message:
+          status === 'HEALTHY'
+            ? 'All services healthy'
+            : `Service recently restarted (uptime: ${uptime.toFixed(0)}s)`,
         timestamp: new Date(),
         metadata: { uptime },
       };
@@ -251,19 +256,17 @@ export class DiagnosticEngine {
       const heapUsedPercent = memUsage.heapUsed / memUsage.heapTotal;
       const latency = Date.now() - startTime;
 
-      const status = heapUsedPercent > 0.9
-        ? 'UNHEALTHY'
-        : heapUsedPercent > 0.7
-          ? 'DEGRADED'
-          : 'HEALTHY';
+      const status =
+        heapUsedPercent > 0.9 ? 'UNHEALTHY' : heapUsedPercent > 0.7 ? 'DEGRADED' : 'HEALTHY';
 
       return {
         service: 'memory',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'Memory usage healthy'
-          : `Heap usage at ${(heapUsedPercent * 100).toFixed(1)}%`,
+        message:
+          status === 'HEALTHY'
+            ? 'Memory usage healthy'
+            : `Heap usage at ${(heapUsedPercent * 100).toFixed(1)}%`,
         timestamp: new Date(),
         metadata: {
           heapUsed: memUsage.heapUsed,
@@ -297,19 +300,13 @@ export class DiagnosticEngine {
       const cpuUsage = (loadAvg[0] / cpuCount) * 100;
       const latency = Date.now() - startTime;
 
-      const status = cpuUsage > 90
-        ? 'UNHEALTHY'
-        : cpuUsage > 70
-          ? 'DEGRADED'
-          : 'HEALTHY';
+      const status = cpuUsage > 90 ? 'UNHEALTHY' : cpuUsage > 70 ? 'DEGRADED' : 'HEALTHY';
 
       return {
         service: 'cpu',
         status,
         latency,
-        message: status === 'HEALTHY'
-          ? 'CPU usage healthy'
-          : `CPU load at ${cpuUsage.toFixed(1)}%`,
+        message: status === 'HEALTHY' ? 'CPU usage healthy' : `CPU load at ${cpuUsage.toFixed(1)}%`,
         timestamp: new Date(),
         metadata: {
           cpuUsage,
@@ -361,8 +358,10 @@ export class DiagnosticEngine {
 
   private getRecommendation(check: HealthCheck): string {
     const recommendations: Record<string, string> = {
-      database: 'Check database connection pool, verify credentials, and ensure database server is running',
-      redis: 'Verify Redis server is running, check connection configuration, and review memory usage',
+      database:
+        'Check database connection pool, verify credentials, and ensure database server is running',
+      redis:
+        'Verify Redis server is running, check connection configuration, and review memory usage',
       queues: 'Clear stuck jobs, check worker processes, and review queue configuration',
       services: 'Restart affected services, check logs for errors, and verify dependencies',
       memory: 'Profile memory usage, check for memory leaks, and consider increasing heap size',

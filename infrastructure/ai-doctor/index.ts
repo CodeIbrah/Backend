@@ -1,10 +1,6 @@
 export { ErrorCollector, ErrorEntry } from './collectors/error-collector';
 
-export {
-  ErrorAnalyzer,
-  Analysis,
-  ParsedStack,
-} from './analyzers/error-analyzer';
+export { ErrorAnalyzer, Analysis, ParsedStack } from './analyzers/error-analyzer';
 
 export { FixSuggester, FixSuggestion } from './analyzers/fix-suggester';
 
@@ -38,19 +34,11 @@ export {
   IncidentData,
 } from './agents/incident-response-agent';
 
-export {
-  DiagnosticEngine,
-  HealthCheck,
-  DiagnosticResult,
-} from './diagnostics/diagnostic-engine';
+export { DiagnosticEngine, HealthCheck, DiagnosticResult } from './diagnostics/diagnostic-engine';
 
 export { ReportGenerator } from './reporters/report-generator';
 
-export {
-  ErrorWorkflow,
-  WorkflowStep,
-  WorkflowResult,
-} from './workflows/error-workflow';
+export { ErrorWorkflow, WorkflowStep, WorkflowResult } from './workflows/error-workflow';
 
 export {
   KnowledgeBase,
@@ -72,14 +60,6 @@ export {
   IncidentData as ManagedIncidentData,
 } from './incidents/incident-manager';
 
-export {
-  AlertService,
-  AlertConfig,
-  AlertResult,
-} from './integrations/alert-service';
+export { AlertService, AlertConfig, AlertResult } from './integrations/alert-service';
 
-export {
-  AutoRecovery,
-  RecoveryAction,
-  RecoveryResult,
-} from './integrations/auto-recovery';
+export { AutoRecovery, RecoveryAction, RecoveryResult } from './integrations/auto-recovery';

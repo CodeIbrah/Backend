@@ -77,9 +77,7 @@ export class ErrorAnalyzer {
     const lines = stack.split('\n');
 
     for (const line of lines) {
-      const match = line.match(
-        /at\s+(?:(.+?)\s+\()?(?:(.+?):(\d+):(\d+)|native)/,
-      );
+      const match = line.match(/at\s+(?:(.+?)\s+\()?(?:(.+?):(\d+):(\d+)|native)/);
       if (match) {
         parsed.push({
           method: match[1] || '<anonymous>',
@@ -160,10 +158,7 @@ export class ErrorAnalyzer {
     return 'LOW';
   }
 
-  detectRootCause(
-    error: ErrorEntry,
-    context: Record<string, unknown>,
-  ): Promise<string> {
+  detectRootCause(error: ErrorEntry, context: Record<string, unknown>): Promise<string> {
     logger.info('Detecting root cause', { errorId: error.id });
 
     const patterns = this.detectPatterns(error);
@@ -221,10 +216,7 @@ export class ErrorAnalyzer {
     return 'Unknown root cause - insufficient context for analysis';
   }
 
-  private calculateConfidence(
-    patterns: string[],
-    parsedStack: ParsedStack[],
-  ): number {
+  private calculateConfidence(patterns: string[], parsedStack: ParsedStack[]): number {
     let confidence = 0.5;
 
     if (patterns.length > 0) confidence += 0.2;
