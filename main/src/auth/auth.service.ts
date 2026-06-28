@@ -1,4 +1,10 @@
-import { Injectable, UnauthorizedException, ConflictException, Optional } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  Optional,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -25,11 +31,7 @@ export interface AuthResponse {
 
 @Injectable()
 export class AuthService {
-  private readonly logger = {
-    log: (message: string): void => console.log(`[AuthService] ${message}`),
-    error: (message: string): void => console.error(`[AuthService] ${message}`),
-    warn: (message: string): void => console.warn(`[AuthService] ${message}`),
-  };
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private prisma: PrismaService,
@@ -257,7 +259,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_SECRET'),
-          expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '7d'),
+          expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
         },
       ),
       this.jwtService.signAsync(
@@ -287,7 +289,7 @@ export class AuthService {
         { sub: userId, role },
         {
           secret: this.configService.get<string>('JWT_SECRET'),
-          expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '7d'),
+          expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
         },
       ),
       this.jwtService.signAsync(

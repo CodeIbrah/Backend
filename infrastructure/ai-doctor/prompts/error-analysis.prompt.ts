@@ -11,34 +11,68 @@ export interface PromptContext {
   code?: string;
 }
 
+/**
+ * Strip sensitive patterns (tokens, secrets, keys) from untrusted data
+ * before it reaches a prompt template.
+ */
+const SENSITIVE_PATTERNS = [
+  /(?:sk|pk|api[_-]?key|secret|token|password|passwd|credential)[\s:=]+['"]?[a-zA-Z0-9_\-.]{16,}['"]?/gi,
+  /bearer\s+[a-zA-Z0-9_\-.]{16,}/gi,
+  /jwt\s+[a-zA-Z0-9_\-.]{16,}/gi,
+  /(?:-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----)[\s\S]*?(?:-----END\s+(?:RSA\s+)?PRIVATE\s+KEY-----)/g,
+];
+
+function sanitize(value: string, maxLength = 10_000): string {
+  let cleaned = String(value);
+  for (const pattern of SENSITIVE_PATTERNS) {
+    cleaned = cleaned.replace(pattern, '[REDACTED]');
+  }
+  return cleaned.length > maxLength ? cleaned.slice(0, maxLength) + '\n... [TRUNCATED]' : cleaned;
+}
+
+function safeStringify(obj: unknown, maxLength = 5_000): string {
+  try {
+    const raw = JSON.stringify(obj, null, 2);
+    return sanitize(raw, maxLength);
+  } catch {
+    return sanitize(String(obj), maxLength);
+  }
+}
+
 export function analyzeErrorTemplate(context: PromptContext): string {
   const { error, logs, traces } = context;
+
+  const sanitizedMsg = sanitize(error.message);
+  const sanitizedStack = sanitize(error.stack || 'No stack trace available');
+  const sanitizedContext = safeStringify(error.context);
+  const sanitizedLogs = logs ? sanitize(logs, 8_000) : '';
+  const sanitizedTraces = traces ? sanitize(traces, 8_000) : '';
 
   return `You are an expert error analysis AI. Analyze the following error and provide a detailed root cause analysis.
 
 ## Error Details
 
-**Error ID:** ${error.id}
-**Message:** ${error.message}
-**Service:** ${error.service}
-**Trace ID:** ${error.traceId}
+**Error ID:** ${sanitize(error.id)}
+**Message:** ${sanitizedMsg}
+**Service:** ${sanitize(error.service)}
+**Trace ID:** ${sanitize(error.traceId)}
 **Timestamp:** ${error.timestamp.toISOString()}
-**Severity:** ${error.severity}
+**Severity:** ${sanitize(error.severity)}
 
 ## Stack Trace
 
 \`\`\`
-${error.stack || 'No stack trace available'}
+${sanitizedStack}
 \`\`\`
 
 ## Context
 
 \`\`\`json
-${JSON.stringify(error.context, null, 2)}
+${sanitizedContext}
 \`\`\`
 
-${logs ? `## Recent Logs\n\n\`\`\`\n${logs}\n\`\`\`\n` : ''}
-${traces ? `## Additional Traces\n\n\`\`\`\n${traces}\n\`\`\`\n` : ''}
+${sanitizedLogs ? `## Recent Logs\n\n\`\`\`\n${sanitizedLogs}\n\`\`\`\n` : ''}
+${sanitizedTraces ? `## Additional Traces\n\n\`\`\`\n${sanitizedTraces}\n\`\`\`\n` : ''}
 
 ## Analysis Required
 
@@ -63,27 +97,35 @@ Format your response as structured JSON with these fields:
 export function suggestFixTemplate(context: PromptContext): string {
   const { error, analysis, code } = context;
 
+  const sanitizedMsg = sanitize(error.message);
+  const sanitizedStack = sanitize(error.stack || 'No stack trace available');
+  const sanitizedCode = code ? sanitize(code, 8_000) : '';
+
   return `You are an expert software engineer. Suggest a fix for the following error.
 
 ## Error Details
 
-**Error ID:** ${error.id}
-**Message:** ${error.message}
-**Service:** ${error.service}
+**Error ID:** ${sanitize(error.id)}
+**Message:** ${sanitizedMsg}
+**Service:** ${sanitize(error.service)}
 
 ## Root Cause Analysis
 
-${analysis ? `**Root Cause:** ${analysis.rootCause}
+${
+  analysis
+    ? `**Root Cause:** ${sanitize(analysis.rootCause)}
 **Confidence:** ${analysis.confidence * 100}%
-**Patterns:** ${analysis.patterns.join(', ')}` : 'Root cause analysis not yet available'}
+**Patterns:** ${analysis.patterns.join(', ')}`
+    : 'Root cause analysis not yet available'
+}
 
 ## Stack Trace
 
 \`\`\`
-${error.stack || 'No stack trace available'}
+${sanitizedStack}
 \`\`\`
 
-${code ? `## Relevant Code\n\n\`\`\`typescript\n${code}\n\`\`\`\n` : ''}
+${sanitizedCode ? `## Relevant Code\n\n\`\`\`typescript\n${sanitizedCode}\n\`\`\`\n` : ''}
 
 ## Fix Required
 
@@ -110,25 +152,29 @@ Format your response as structured JSON with these fields:
 export function diagnoseTemplate(context: PromptContext): string {
   const { error, metrics, services } = context;
 
+  const sanitizedMsg = sanitize(error.message);
+  const sanitizedMetrics = safeStringify(metrics || {});
+  const sanitizedServices = safeStringify(services || {});
+
   return `You are an expert system diagnostician. Diagnose the health of the system based on the following data.
 
 ## Current Error
 
-**Error ID:** ${error.id}
-**Message:** ${error.message}
-**Service:** ${error.service}
+**Error ID:** ${sanitize(error.id)}
+**Message:** ${sanitizedMsg}
+**Service:** ${sanitize(error.service)}
 **Timestamp:** ${error.timestamp.toISOString()}
 
 ## System Metrics
 
 \`\`\`json
-${JSON.stringify(metrics || {}, null, 2)}
+${sanitizedMetrics}
 \`\`\`
 
 ## Service Status
 
 \`\`\`json
-${JSON.stringify(services || {}, null, 2)}
+${sanitizedServices}
 \`\`\`
 
 ## Diagnosis Required
@@ -164,17 +210,17 @@ export function incidentSummaryTemplate(incident: {
 
 ## Incident Details
 
-**Incident ID:** ${incident.id}
-**Title:** ${incident.title}
-**Severity:** ${incident.severity}
+**Incident ID:** ${sanitize(incident.id)}
+**Title:** ${sanitize(incident.title)}
+**Severity:** ${sanitize(incident.severity)}
 
 ## Description
 
-${incident.description}
+${sanitize(incident.description)}
 
 ## Root Cause
 
-${incident.rootCause}
+${sanitize(incident.rootCause)}
 
 Please generate:
 1. A concise executive summary (2-3 sentences)

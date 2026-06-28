@@ -18,9 +18,7 @@ function metricsGuard(req: Request): boolean {
     return true;
   }
 
-  const isAllowedIp = ALLOWED_METRICS_IPS.some(
-    (allowed) => clientIp === allowed || clientIp.endsWith(allowed),
-  );
+  const isAllowedIp = ALLOWED_METRICS_IPS.some((allowed) => clientIp === allowed);
 
   return isAllowedIp;
 }

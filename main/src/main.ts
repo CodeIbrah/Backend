@@ -5,9 +5,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
 import type { RequestHandler } from 'express';
-import * as corsModule from 'cors';
+import cors from 'cors';
 import * as csurfModule from 'csurf';
-import * as compressionModule from 'compression';
+import compression from 'compression';
 import * as fs from 'fs';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
@@ -47,7 +47,6 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api/v1');
 
   // Compression (gzip/brotli)
-  const compression = compressionModule as unknown as () => RequestHandler;
   app.use(compression());
 
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
@@ -64,7 +63,6 @@ async function bootstrap(): Promise<void> {
   );
 
   const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
-  const cors = corsModule as unknown as (opts?: Record<string, unknown>) => RequestHandler;
   app.use(
     cors({
       origin:
@@ -88,29 +86,31 @@ async function bootstrap(): Promise<void> {
     );
   }
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(configService.get<string>('APP_NAME', 'Backend API'))
-    .setDescription('Enterprise Backend API')
-    .setVersion(configService.get<string>('APP_VERSION', '1.0.0'))
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    .build();
+  if (nodeEnv !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(configService.get<string>('APP_NAME', 'Backend API'))
+      .setDescription('Enterprise Backend API')
+      .setVersion(configService.get<string>('APP_VERSION', '1.0.0'))
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth',
+      )
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+  }
 
   const port = configService.get<number>('PORT', 3000);
   const httpServer = app.getHttpServer() as { close: (callback?: () => void) => void };
