@@ -27,6 +27,8 @@ module.exports = {
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/no-misused-promises': 'error',
     '@typescript-eslint/await-thenable': 'error',
+    '@typescript-eslint/require-await': 'off',
+    '@typescript-eslint/no-redundant-type-constituents': 'warn',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
     '@typescript-eslint/prefer-optional-chain': 'off',
