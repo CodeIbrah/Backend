@@ -6,8 +6,8 @@
     "schema": "../packages/shared-prisma/schema.prisma"
   },
   "scripts": {
-    "dev": "del /f/q tsconfig.tsbuildinfo 2>nul & nest start --watch",
-    "prebuild": "del /f/q tsconfig.tsbuildinfo 2>nul",
+    "dev": "node -e \"try{require('fs').unlinkSync('tsconfig.tsbuildinfo')}catch(e){}\" && nest start --watch",
+    "prebuild": "node -e \"try{require('fs').unlinkSync('tsconfig.tsbuildinfo')}catch(e){}\"",
     "build": "nest build",
     "start": "node dist/main",
     "lint": "eslint \"src/**/*.ts\"",
