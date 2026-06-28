@@ -16,16 +16,15 @@ interface RequestWithHeaders {
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  constructor(
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
-  ) {}
+  constructor(@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<RequestWithHeaders>();
     const { method, url, ip, headers } = request;
     const now = Date.now();
 
-    const correlationId = (headers['x-correlation-id'] as string | undefined) || crypto.randomUUID();
+    const correlationId =
+      (headers['x-correlation-id'] as string | undefined) || crypto.randomUUID();
     request.correlationId = correlationId;
 
     this.logger.info('Incoming request', {

@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const IV_LENGTH = 16;     // 128-bit IV for GCM
-const TAG_LENGTH = 16;    // 128-bit auth tag
+const IV_LENGTH = 16; // 128-bit IV for GCM
+const TAG_LENGTH = 16; // 128-bit auth tag
 
 export interface EncryptedPayload {
   /** Hex-encoded initialization vector */
@@ -51,10 +51,7 @@ export class CipherService {
       const iv = crypto.randomBytes(IV_LENGTH);
       const cipher = crypto.createCipheriv(ALGORITHM, this.key, iv, { authTagLength: TAG_LENGTH });
 
-      const encrypted = Buffer.concat([
-        cipher.update(plaintext, 'utf-8'),
-        cipher.final(),
-      ]);
+      const encrypted = Buffer.concat([cipher.update(plaintext, 'utf-8'), cipher.final()]);
 
       const tag = cipher.getAuthTag();
 
@@ -86,10 +83,7 @@ export class CipherService {
       });
       decipher.setAuthTag(tag);
 
-      const decrypted = Buffer.concat([
-        decipher.update(encrypted),
-        decipher.final(),
-      ]);
+      const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
 
       return decrypted.toString('utf-8');
     } catch (err) {

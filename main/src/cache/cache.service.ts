@@ -118,16 +118,14 @@ export class CacheService {
       } while (cursor !== '0');
       return deleted;
     } catch (err) {
-      this.logger.warn(`Cache invalidate error for pattern "${pattern}": ${(err as Error).message}`);
+      this.logger.warn(
+        `Cache invalidate error for pattern "${pattern}": ${(err as Error).message}`,
+      );
       return 0;
     }
   }
 
-  async getOrSet<T>(
-    key: string,
-    fallback: () => Promise<T>,
-    options?: CacheOptions,
-  ): Promise<T> {
+  async getOrSet<T>(key: string, fallback: () => Promise<T>, options?: CacheOptions): Promise<T> {
     const cached = await this.get<T>(key);
     if (cached !== null) return cached;
 

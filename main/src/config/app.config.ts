@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
+import * as path from 'path';
 
 const DEFAULT_SECRETS = [
   'change-me-in-production',
@@ -42,7 +43,7 @@ const envSchema = Joi.object({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env', path.resolve(__dirname, '../../../.env')],
       validationSchema: envSchema,
       validationOptions: {
         abortEarly: true,
@@ -62,14 +63,14 @@ export class AppConfigModule implements OnModuleInit {
       if (DEFAULT_SECRETS.includes(jwtSecret?.toLowerCase() || '')) {
         throw new Error(
           'CRITICAL: JWT_SECRET is set to a default value in production. ' +
-          'Generate a strong secret using: openssl rand -hex 32',
+            'Generate a strong secret using: openssl rand -hex 32',
         );
       }
 
       if ((jwtSecret?.length || 0) < 32) {
         throw new Error(
           'CRITICAL: JWT_SECRET must be at least 32 characters in production. ' +
-          'Generate a strong secret using: openssl rand -hex 32',
+            'Generate a strong secret using: openssl rand -hex 32',
         );
       }
     }
