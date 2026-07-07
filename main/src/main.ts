@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import helmet from 'helmet';
 import type { RequestHandler } from 'express';
+import express from 'express';
 import cors from 'cors';
 import * as csurfModule from 'csurf';
 import compression from 'compression';
@@ -33,14 +34,35 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(logger);
 
-  // ---- Security headers (HSTS included, TLS 1.2+) ----
+  // ---- Security headers (CSP, HSTS, X-Frame-Options, etc.) ----
   app.use(
     helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'", 'data:'],
+          objectSrc: ["'none'"],
+          frameAncestors: ["'none'"],
+          formAction: ["'self'"],
+          baseUri: ["'self'"],
+          upgradeInsecureRequests: [],
+        },
+      },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
       hsts: {
         maxAge: 31536000,
         includeSubDomains: true,
         preload: true,
       },
+      frameguard: { action: 'deny' },
+      noSniff: true,
+      xssFilter: true,
+      hidePoweredBy: true,
+      ieNoOpen: true,
     }),
   );
 
@@ -48,6 +70,10 @@ async function bootstrap(): Promise<void> {
 
   // Compression (gzip/brotli)
   app.use(compression());
+
+  // Body size limits (prevents DoS via large payloads)
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
   app.useGlobalInterceptors(new TransformInterceptor());
@@ -62,11 +88,11 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
+  const defaultCors = 'http://localhost:3000,http://localhost:5173';
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', defaultCors);
   app.use(
     cors({
-      origin:
-        corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
+      origin: corsOrigin === '*' ? ['http://localhost:3000'] : corsOrigin.split(',').map((o) => o.trim()),
       credentials: true,
     }),
   );
@@ -116,7 +142,10 @@ async function bootstrap(): Promise<void> {
   const httpServer = app.getHttpServer() as { close: (callback?: () => void) => void };
 
   try {
-    await app.listen(port);
+    const server = await app.listen(port);
+    // Keep-Alive: slightly longer than the reverse proxy's idle timeout
+    server.keepAliveTimeout = 61_000;
+    server.headersTimeout = 65_000;
     logger.log(`Application is running on port ${port} (${listenProtocol})`, 'Bootstrap');
   } catch (err) {
     logger.error(`Failed to start on port ${port}: ${(err as Error).message}`, 'Bootstrap');

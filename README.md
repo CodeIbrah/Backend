@@ -4,6 +4,16 @@
 
 A production-grade backend template built with NestJS and Express, featuring a hybrid architecture that combines a feature-rich monolith with independent microservices. Includes comprehensive observability, AI-powered error diagnosis, analytics, queue-based processing, and automated incident response.
 
+> ## 🚨 GUÍA DE TESTING CON POSTMAN
+>
+> **📘 [docs/postman/POSTMAN-GUIDE.md](docs/postman/POSTMAN-GUIDE.md)**
+>
+> Colección Postman completa para probar todas las APIs, flujo de autenticación JWT,
+> rate limiting (3 tiers), seguridad (CORS, CSRF, headers), cache (Redis + LRU),
+> e integración CI/CD con Newman. Incluye scripts de test automatizados.
+>
+> ⭐ **Documentación imprescindible para desarrolladores y QA**
+
 ---
 
 ## Table of Contents
@@ -204,14 +214,25 @@ The system includes comprehensive security features:
 - **Data Protection**: Encryption of sensitive data
 - **Security Audits**: Regular security audits and vulnerability scanning
 
-## Testing
+## 🚀 Testing con Postman — Guía Completa
 
-The system includes comprehensive testing:
+> **📘 [GUÍA COMPLETA DE TESTING CON POSTMAN](docs/postman/POSTMAN-GUIDE.md)**
+>
+> Documentación oficial con colección Postman, scripts de test automatizados,
+> flujo completo de autenticación JWT, pruebas de rate limiting (3 tiers),
+> pruebas de seguridad (brute force, CORS, CSRF), verificación de cache,
+> e integración CI/CD con Newman para GitHub Actions y GitLab CI.
+>
+> ⭐ **Empieza aquí**: `docs/postman/POSTMAN-GUIDE.md`
 
-- **Unit Tests**: Unit tests for individual components
-- **Integration Tests**: Integration tests for component interactions
-- **End-to-End Tests**: End-to-end tests for user flows
-- **Load Testing**: Load testing for performance evaluation
+El sistema incluye testing integral:
+
+- **API Tests (Postman)**: Colección completa con 25+ endpoints documentados
+- **Unit Tests**: Pruebas unitarias con Jest para componentes individuales
+- **Integration Tests**: Pruebas de integración con Prisma y módulos NestJS
+- **End-to-End Tests**: Flujos completos (register → login → refresh → logout)
+- **Load Testing**: Pruebas de carga con k6 y autocannon
+- **Security Testing**: Rate limiting, brute force, headers de seguridad
 
 ## Docker Setup
 

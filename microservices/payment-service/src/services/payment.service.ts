@@ -1,18 +1,13 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { 
   Payment, 
   PaymentStatus, 
-  PaymentMethod, 
-  Currency, 
   CreatePaymentInput, 
   PaginatedResult, 
   PaymentFilters,
-  Invoice
 } from '../types';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
-import { stripeService } from './stripe.service';
 import { paymentGatewayService } from './payment-gateway.service';
 
 class PaymentService {
@@ -151,80 +146,31 @@ class PaymentService {
       span.addEvent('Payment processing started');
 
       try {
-        // Process based on payment method
-        if (payment.method === PaymentMethod.CREDIT_CARD || 
-            payment.method === PaymentMethod.DEBIT_CARD) {
-          // Process card payments via Stripe
-          let stripePaymentIntent;
-          
-          // In a real implementation, you would get a payment method ID from the client
-          // For demo purposes, we'll create intent without it (test mode)
-          stripePaymentIntent = await stripeService.createPaymentIntent(
-            payment.amount,
-            payment.currency
-          );
-          
-          // Confirm the payment intent
-          const confirmedIntent = await stripeService.confirmPaymentIntent(
-            stripePaymentIntent.id
-          );
-          
-          // Update payment with Stripe details
-          payment.transactionId = confirmedIntent.id;
-          
-          if (confirmedIntent.status === 'succeeded') {
-            payment.status = PaymentStatus.COMPLETED;
-            payment.completedAt = new Date();
-            span.addEvent('Payment completed successfully via Stripe');
-          } else {
-            payment.status = PaymentStatus.FAILED;
-            payment.errorMessage = 'Payment failed in Stripe';
-            span.addEvent('Payment failed in Stripe');
+        // Build payment data from the payment record and metadata
+        const paymentData: Record<string, unknown> = { ...payment.metadata };
+
+        // Use the provider registry for ALL payment methods
+        const gatewayResult = await paymentGatewayService.processPayment(
+          payment.method,
+          payment.amount,
+          payment.currency,
+          paymentData,
+        );
+
+        if (gatewayResult.success) {
+          payment.status = PaymentStatus.COMPLETED;
+          payment.transactionId = gatewayResult.transactionId || this.generateTransactionId();
+          payment.completedAt = new Date();
+
+          if (gatewayResult.settlementDate) {
+            payment.metadata = { ...payment.metadata, settlementDate: gatewayResult.settlementDate };
           }
+
+          span.addEvent('Payment completed successfully via ' + (gatewayResult.provider || 'gateway'));
         } else {
-          // Process other payment methods via our payment gateway
-          // In a real implementation, you would get payment details from the payment record
-          // For now, we'll simulate with basic data
-          const paymentData: Record<string, unknown> = {
-            payerId: 'paypal_payer_123',
-            paymentToken: 'paypal_token_abc',
-            phoneNumber: '+34600000000',
-            applePayToken: 'applepay_token_xyz',
-            orderId: 'order_123',
-            customerData: { email: 'customer@example.com' },
-            iban: 'ES9121000418450200051332',
-            mandateId: 'mandate_456'
-          };
-
-          const gatewayResult = await paymentGatewayService.processPaymentByMethod(
-            payment.method,
-            payment.amount,
-            payment.currency,
-            paymentData
-          );
-
-          if (gatewayResult.success) {
-            payment.status = PaymentStatus.COMPLETED;
-            payment.transactionId = gatewayResult.transactionId || this.generateTransactionId();
-            payment.completedAt = new Date();
-            
-            // Add gateway-specific metadata
-            const result = gatewayResult as {
-              success: boolean;
-              transactionId?: string;
-              settlementDate?: string;
-              provider?: string;
-            };
-            if (result.settlementDate) {
-              payment.metadata = { ...payment.metadata, settlementDate: result.settlementDate };
-            }
-            
-            span.addEvent('Payment completed successfully via ' + (result.provider || 'gateway'));
-          } else {
-            payment.status = PaymentStatus.FAILED;
-            payment.errorMessage = gatewayResult.errorMessage || 'Payment gateway error';
-            span.addEvent('Payment failed via ' + ((gatewayResult as { provider?: string }).provider || 'gateway'));
-          }
+          payment.status = PaymentStatus.FAILED;
+          payment.errorMessage = gatewayResult.errorMessage || 'Payment gateway error';
+          span.addEvent('Payment failed via ' + (gatewayResult.provider || 'gateway'));
         }
       } catch (gatewayError) {
         // Handle gateway errors
@@ -233,15 +179,13 @@ class PaymentService {
         span.addEvent('Payment failed due to gateway error');
         span.recordException(gatewayError as Error);
         span.setStatus({ code: 2, message: gatewayError instanceof Error ? gatewayError.message : 'Unknown error' });
-        
+
         logger.error({ 
           message: 'Payment gateway processing failed', 
           error: gatewayError instanceof Error ? gatewayError.message : String(gatewayError),
           paymentId: id,
-          method: payment.method 
+          method: payment.method,
         });
-        
-        throw gatewayError;
       }
 
       payment.updatedAt = new Date();
@@ -252,6 +196,7 @@ class PaymentService {
         paymentId: id,
         status: payment.status,
         transactionId: payment.transactionId,
+        provider: payment.metadata?.provider,
       });
 
       return payment;
@@ -281,49 +226,48 @@ class PaymentService {
         throw new Error('Only completed payments can be refunded. Current status: ' + payment.status);
       }
 
-      // Attempt to refund via Stripe if it was a card payment
-      if ((payment.method === PaymentMethod.CREDIT_CARD || 
-           payment.method === PaymentMethod.DEBIT_CARD) && 
-          payment.transactionId) {
+      // Attempt to refund via the provider registry
+      if (payment.transactionId) {
         try {
-          // Create a refund in Stripe
-          const refund = await stripeService.refundPayment(
+          const gatewayResult = await paymentGatewayService.refundPayment(
+            payment.method,
             payment.transactionId,
-            Math.round(payment.amount * 100) // Convert to cents
-          );
-          
-          // Update payment with refund details
-          payment.status = PaymentStatus.REFUNDED;
-          payment.metadata = { 
-            ...payment.metadata, 
-            refundReason: reason, 
-            refundedAt: new Date().toISOString(),
-            stripeRefundId: refund.id
-          };
-          payment.updatedAt = new Date();
-          this.store.set(id, payment);
-          
-          span.addEvent('Payment refunded successfully via Stripe');
-          
-          logger.info({
-            message: 'Payment refunded via Stripe',
-            paymentId: id,
+            payment.amount,
             reason,
-            stripeRefundId: refund.id
-          });
-          
-          return payment;
-        } catch (stripeError) {
-          // If Stripe refund fails, we still mark as refunded in our system but log the error
-          logger.error({ 
-            message: 'Stripe refund failed, marking as refunded in system', 
-            error: stripeError instanceof Error ? stripeError.message : String(stripeError),
-            paymentId: id 
+          );
+
+          if (gatewayResult.success) {
+            payment.status = PaymentStatus.REFUNDED;
+            payment.metadata = {
+              ...payment.metadata,
+              refundReason: reason,
+              refundedAt: new Date().toISOString(),
+              refundTransactionId: gatewayResult.transactionId,
+            };
+            payment.updatedAt = new Date();
+            this.store.set(id, payment);
+
+            span.addEvent('Payment refunded successfully via provider');
+
+            logger.info({
+              message: 'Payment refunded',
+              paymentId: id,
+              reason,
+              refundTxnId: gatewayResult.transactionId,
+            });
+
+            return payment;
+          }
+        } catch (gatewayError) {
+          logger.error({
+            message: 'Provider refund failed, marking as refunded in system',
+            error: gatewayError instanceof Error ? gatewayError.message : String(gatewayError),
+            paymentId: id,
           });
         }
       }
 
-      // Fallback to original behavior for non-Stripe payments or if Stripe refund failed
+      // Fallback: mark as refunded in our system
       payment.status = PaymentStatus.REFUNDED;
       payment.metadata = { ...payment.metadata, refundReason: reason, refundedAt: new Date().toISOString() };
       payment.updatedAt = new Date();
@@ -332,7 +276,7 @@ class PaymentService {
       span.addEvent('Payment refunded successfully');
 
       logger.info({
-        message: 'Payment refunded',
+        message: 'Payment refunded (fallback)',
         paymentId: id,
         reason,
       });
@@ -438,11 +382,13 @@ class PaymentService {
         const to = new Date(filters.dateTo);
         payments = payments.filter((p) => p.createdAt <= to);
       }
-      if (filters.minAmount !== undefined) {
-        payments = payments.filter((p) => p.amount >= filters.minAmount!);
+      const minAmount = filters.minAmount;
+      if (minAmount !== undefined) {
+        payments = payments.filter((p) => p.amount >= minAmount);
       }
-      if (filters.maxAmount !== undefined) {
-        payments = payments.filter((p) => p.amount <= filters.maxAmount!);
+      const maxAmount = filters.maxAmount;
+      if (maxAmount !== undefined) {
+        payments = payments.filter((p) => p.amount <= maxAmount);
       }
 
       const total = payments.length;
@@ -466,12 +412,6 @@ class PaymentService {
 
   generateTransactionId(): string {
     return 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
-
-  private simulateProcessing(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, Math.random() * 500 + 100);
-    });
   }
 
   getAllPayments(): Payment[] {

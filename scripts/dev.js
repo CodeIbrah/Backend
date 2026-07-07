@@ -49,6 +49,7 @@ const services = [
   { name: 'invoice-service', cwd: 'microservices/invoice-service', port: 3006, color: '\x1b[31m' },
   { name: 'mail-service', cwd: 'microservices/mail-service', port: 3007, color: '\x1b[37m' },
   { name: 'sms-service', cwd: 'microservices/sms-service', port: 3008, color: '\x1b[38m' },
+  { name: 'api-test-ui', cwd: 'apps/api-test-ui', port: 5173, color: '\x1b[35m' },
 ].map((s) => ({
   ...s,
   command: isWindows ? 'npm.cmd' : 'npm',

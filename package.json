@@ -11,7 +11,8 @@
     "microservices/invoice-service",
     "microservices/mail-service",
     "microservices/sms-service",
-    "packages/*"
+    "packages/*",
+    "apps/api-test-ui"
   ],
   "description": "Enterprise-ready backend template with hybrid monolith + microservices architecture",
   "scripts": {
@@ -26,6 +27,7 @@
     "dev:invoice": "npm run dev -w microservices/invoice-service",
     "dev:mail": "npm run dev -w microservices/mail-service",
     "dev:sms": "npm run dev -w microservices/sms-service",
+    "dev:api-test-ui": "npm run dev -w apps/api-test-ui",
     "build": "npm run build -w main && npm run build -w microservices/auth-service && npm run build -w microservices/users-service && npm run build -w microservices/notifications-service && npm run build -w microservices/payment-service && npm run build -w microservices/invoice-service && npm run build -w microservices/mail-service && npm run build -w microservices/sms-service",
     "health": "node scripts/check-health.js",
     "lint": "npm run lint -w main",
