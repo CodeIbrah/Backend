@@ -19,7 +19,7 @@ export async function sendMailHandler(req: Request, res: Response): Promise<void
       return;
     }
 
-    const record = await mailService.send(validation.data);
+    const record = await mailService.send(validation.data as Parameters<typeof mailService.send>[0]);
     logger.info({ message: 'Mail sent', mailId: record.id, to: validation.data.to });
     res.status(201).json(successResponse(record, 'Mail sent successfully'));
   } catch (error) {

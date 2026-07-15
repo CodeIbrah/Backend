@@ -7,6 +7,7 @@ import {
   validateInvoiceId,
   validateInvoiceNumber,
   validatePagination,
+  validateResend,
 } from '../validators/payment.validator';
 import { logger } from '../logging/logger';
 
@@ -28,7 +29,7 @@ export async function createInvoiceHandler(req: Request, res: Response): Promise
         .json(
           errorResponse(
             'VALIDATION_ERROR',
-            validation.error.errors.map((e) => e.message).join(', '),
+            validation.error.errors.map((e: any) => e.message).join(', '),
           ),
         );
       return;
@@ -226,5 +227,51 @@ export async function getInvoiceByNumberHandler(req: Request, res: Response): Pr
   } catch (error) {
     logger.error({ message: 'Failed to get invoice by number', error });
     res.status(500).json(errorResponse('GET_INVOICE_BY_NUMBER_FAILED', (error as Error).message));
+  }
+}
+
+export async function resendInvoiceHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const idValidation = validateInvoiceId(req.params.id);
+
+    if (!idValidation.success) {
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            idValidation.error.errors.map((e) => e.message).join(', '),
+          ),
+        );
+      return;
+    }
+
+    const resendValidation = validateResend(req.body);
+
+    if (!resendValidation.success) {
+      res
+        .status(400)
+        .json(
+          errorResponse(
+            'VALIDATION_ERROR',
+            resendValidation.error.errors.map((e: any) => e.message).join(', '),
+          ),
+        );
+      return;
+    }
+
+    const invoice = await invoiceService.resendInvoice(req.params.id, resendValidation.data.channel);
+
+    logger.info({
+      message: 'Invoice resent',
+      invoiceId: invoice.id,
+      channel: resendValidation.data.channel,
+    });
+
+    res.status(200).json(successResponse(invoice, 'Invoice resent successfully'));
+  } catch (error) {
+    logger.error({ message: 'Failed to resend invoice', error });
+    const err = error as Error;
+    res.status(500).json(errorResponse('RESEND_INVOICE_FAILED', err.message));
   }
 }

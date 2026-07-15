@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { paymentService } from '../services/payment.service';
 import { receiptService } from '../services/receipt.service';
+import { invoiceService } from '../services/invoice.service';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/response';
 import {
   validateCreatePayment,
@@ -10,7 +11,7 @@ import {
   validatePagination,
 } from '../validators/payment.validator';
 import { logger } from '../logging/logger';
-import { PaymentStatus } from '../types';
+import { PaymentStatus, InvoiceChannel } from '../types';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -147,13 +148,47 @@ export async function processPaymentHandler(req: Request, res: Response): Promis
     const payment = await paymentService.processPayment(req.params.id);
 
     if (payment.status === PaymentStatus.COMPLETED) {
-      await receiptService.create(payment.id, null, {
+      const userEmail = payment.metadata?.userEmail as string | undefined;
+      const userPhone = payment.metadata?.userPhone as string | undefined;
+
+      const receipt = await receiptService.create(payment.id, null, {
         userId: payment.userId,
         amount: payment.amount,
         currency: payment.currency,
         method: payment.method,
         description: payment.description,
+        userEmail,
+        userPhone,
       });
+
+      // Auto-create invoice from payment data
+      try {
+        const invoice = await invoiceService.create(payment.userId, {
+          items: [{ description: payment.description, quantity: 1, unitPrice: payment.amount }],
+          tax: 0,
+          discount: 0,
+          currency: payment.currency,
+          userEmail: payment.metadata?.userEmail as string | undefined,
+          userPhone: payment.metadata?.userPhone as string | undefined,
+          channel: InvoiceChannel.BOTH,
+        });
+
+        // Mark invoice as paid with the payment ID
+        await invoiceService.payInvoice(invoice.id, payment.id);
+
+        logger.info({
+          message: 'Auto-created invoice and receipt from payment',
+          paymentId: payment.id,
+          invoiceId: invoice.id,
+          receiptId: receipt.id,
+        });
+      } catch (invoiceError) {
+        logger.error({
+          message: 'Failed to auto-create invoice from payment',
+          error: invoiceError,
+          paymentId: payment.id,
+        });
+      }
     }
 
     logger.info({ message: 'Payment processed', paymentId: payment.id, status: payment.status });

@@ -1,20 +1,25 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
   Invoice,
+  Receipt,
   InvoiceStatus,
   Currency,
   InvoiceItem,
+  InvoiceChannel,
   CreateInvoiceInput,
   PaginatedResult,
   InvoiceFilters,
 } from '../types';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
-import { generateInvoicePDF } from '../utils/pdf-generator';
+import { generateInvoicePDF, generateReceiptPDF } from '../utils/pdf-generator';
+import { deliveryService } from './delivery.service';
 
 class InvoiceService {
   private store = new Map<string, Invoice>();
-  private invoiceCounter = 1000;
+  private receiptStore = new Map<string, Receipt>();
+  private invoiceCounter = 2000;
+  private receiptCounter = 8000;
 
   async create(userId: string, data: CreateInvoiceInput): Promise<Invoice> {
     const span = tracer.startSpan('invoice.create');
@@ -41,6 +46,8 @@ class InvoiceService {
         id: uuidv4(),
         invoiceNumber: this.generateInvoiceNumber(),
         userId,
+        userEmail: data.userEmail,
+        userPhone: data.userPhone,
         paymentId: null,
         items,
         subtotal,
@@ -49,10 +56,12 @@ class InvoiceService {
         total,
         currency: data.currency || Currency.USD,
         status: InvoiceStatus.ISSUED,
+        channel: data.channel || InvoiceChannel.EMAIL,
         notes: data.notes || null,
         issuedAt: now,
         dueDate,
         paidAt: null,
+        sentAt: null,
         createdAt: now,
         updatedAt: now,
       };
@@ -197,11 +206,138 @@ class InvoiceService {
         paymentId,
       });
 
+      // Auto-create receipt and send via delivery service
+      try {
+        const receipt = await this.createReceipt({
+          userId: invoice.userId,
+          userEmail: invoice.userEmail,
+          userPhone: invoice.userPhone,
+          paymentId,
+          invoiceId: invoice.id,
+          amount: invoice.total,
+          currency: invoice.currency,
+          description: `Payment for invoice ${invoice.invoiceNumber}`,
+        });
+        await deliveryService.sendInvoice(invoice);
+        await deliveryService.sendReceipt(receipt);
+      } catch (deliveryError) {
+        logger.error({
+          message: 'Failed to send invoice/receipt after payment',
+          error: deliveryError,
+          invoiceId: id,
+          paymentId,
+        });
+      }
+
       return invoice;
     } catch (error) {
       span.recordException(error as Error);
       span.setStatus({ code: 2, message: (error as Error).message });
       logger.error({ message: 'Failed to pay invoice', error, invoiceId: id });
+      throw error;
+    } finally {
+      span.end();
+    }
+  }
+
+  async createReceipt(data: {
+    userId: string;
+    userEmail?: string;
+    userPhone?: string;
+    paymentId: string;
+    invoiceId: string;
+    amount: number;
+    currency: Currency;
+    description: string;
+  }): Promise<Receipt> {
+    const span = tracer.startSpan('invoice.createReceipt');
+    try {
+      span.setAttribute('paymentId', data.paymentId);
+      span.setAttribute('userId', data.userId);
+
+      const receipt: Receipt = {
+        id: uuidv4(),
+        receiptNumber: this.generateReceiptNumber(),
+        invoiceId: data.invoiceId,
+        paymentId: data.paymentId,
+        userId: data.userId,
+        userEmail: data.userEmail,
+        userPhone: data.userPhone,
+        amount: data.amount,
+        currency: data.currency,
+        method: undefined as any,
+        status: undefined as any,
+        description: data.description,
+        issuedAt: new Date(),
+        pdfUrl: null,
+        sentAt: null,
+      };
+
+      this.receiptStore.set(receipt.id, receipt);
+      span.setAttribute('receiptId', receipt.id);
+      span.setAttribute('receiptNumber', receipt.receiptNumber);
+      span.addEvent('Receipt created');
+
+      logger.info({
+        message: 'Receipt created',
+        receiptId: receipt.id,
+        receiptNumber: receipt.receiptNumber,
+        paymentId: data.paymentId,
+        userId: data.userId,
+      });
+
+      return receipt;
+    } catch (error) {
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: (error as Error).message });
+      logger.error({ message: 'Failed to create receipt', error, paymentId: data.paymentId });
+      throw error;
+    } finally {
+      span.end();
+    }
+  }
+
+  async findReceiptByPayment(paymentId: string): Promise<Receipt | null> {
+    for (const receipt of this.receiptStore.values()) {
+      if (receipt.paymentId === paymentId) return receipt;
+    }
+    return null;
+  }
+
+  async findReceipt(id: string): Promise<Receipt | null> {
+    return this.receiptStore.get(id) || null;
+  }
+
+  async resendInvoice(id: string, channel: InvoiceChannel): Promise<Invoice> {
+    const span = tracer.startSpan('invoice.resend');
+
+    try {
+      span.setAttribute('invoiceId', id);
+      span.setAttribute('channel', channel);
+
+      const invoice = this.store.get(id);
+      if (!invoice) {
+        throw new Error('Invoice not found');
+      }
+
+      const originalChannel = invoice.channel;
+      invoice.channel = channel;
+      await deliveryService.sendInvoice(invoice);
+      invoice.channel = originalChannel;
+      this.store.set(id, invoice);
+
+      span.addEvent('Invoice resent');
+      logger.info({
+        message: 'Invoice resent',
+        invoiceId: id,
+        channel,
+      });
+
+      return invoice;
+    } catch (error) {
+      span.recordException(error as Error);
+      span.setStatus({ code: 2, message: (error as Error).message });
+      logger.error({ message: 'Failed to resend invoice', error, invoiceId: id });
       throw error;
     } finally {
       span.end();
@@ -287,8 +423,18 @@ class InvoiceService {
     return `INV-${year}-${String(this.invoiceCounter).padStart(6, '0')}`;
   }
 
+  generateReceiptNumber(): string {
+    this.receiptCounter++;
+    const year = new Date().getFullYear();
+    return `RCP-${year}-${String(this.receiptCounter).padStart(6, '0')}`;
+  }
+
   getAllInvoices(): Invoice[] {
     return Array.from(this.store.values());
+  }
+
+  getAllReceipts(): Receipt[] {
+    return Array.from(this.receiptStore.values());
   }
 }
 

@@ -24,20 +24,6 @@ scrape_configs:
         labels:
           service: 'main'
 
-  - job_name: 'auth-service'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['auth-service:3001']
-        labels:
-          service: 'auth-service'
-
-  - job_name: 'users-service'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['users-service:3002']
-        labels:
-          service: 'users-service'
-
   - job_name: 'notifications-service'
     metrics_path: '/metrics'
     static_configs:

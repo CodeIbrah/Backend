@@ -10,6 +10,8 @@ interface CreateReceiptInput {
   currency: Currency;
   method: PaymentMethod;
   description: string;
+  userEmail?: string;
+  userPhone?: string;
 }
 
 class ReceiptService {
@@ -34,6 +36,8 @@ class ReceiptService {
         paymentId,
         invoiceId,
         userId: data.userId,
+        userEmail: data.userEmail,
+        userPhone: data.userPhone,
         receiptNumber: this.generateReceiptNumber(),
         amount: data.amount,
         currency: data.currency,
@@ -42,6 +46,7 @@ class ReceiptService {
         description: data.description,
         issuedAt: now,
         pdfUrl: null,
+        sentAt: null,
       };
 
       this.store.set(receipt.id, receipt);

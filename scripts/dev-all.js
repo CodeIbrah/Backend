@@ -38,8 +38,6 @@ loadEnvFile(path.join(__dirname, '..', '.env'));
 
 const services = [
   { name: 'main', cwd: 'main', port: 3000, color: '\x1b[36m' },
-  { name: 'auth-service', cwd: 'microservices/auth-service', port: 3001, color: '\x1b[32m' },
-  { name: 'users-service', cwd: 'microservices/users-service', port: 3002, color: '\x1b[33m' },
   { name: 'payment-service', cwd: 'microservices/payment-service', port: 3003, color: '\x1b[35m' },
   {
     name: 'notifications-service',
@@ -47,7 +45,6 @@ const services = [
     port: 3004,
     color: '\x1b[34m',
   },
-  { name: 'invoice-service', cwd: 'microservices/invoice-service', port: 3006, color: '\x1b[31m' },
   { name: 'mail-service', cwd: 'microservices/mail-service', port: 3007, color: '\x1b[37m' },
   { name: 'sms-service', cwd: 'microservices/sms-service', port: 3008, color: '\x1b[38m' },
 ];

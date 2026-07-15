@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Arial, sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; padding: 24px; }
+    .card { background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .logo { text-align: center; margin-bottom: 24px; }
+    .logo h1 { color: #1a73e8; font-size: 24px; margin: 0; }
+    h2 { color: #202124; font-size: 20px; margin: 0 0 16px 0; }
+    p { color: #5f6368; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0; }
+    .notice { background-color: #e8f0fe; border-left: 4px solid #1a73e8; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 14px; color: #202124; }
+    .btn { display: inline-block; background-color: #1a73e8; color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; margin: 8px 0; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e8eaed; font-size: 13px; color: #9aa0a6; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo"><h1>Backend Platform</h1></div>
+      <h2>Policy Update Notice</h2>
+      <p>Hello {{userName}},</p>
+      <p>We are writing to inform you that our <strong>{{policyName}}</strong> has been updated. These changes will take effect on <strong>{{effectiveDate}}</strong>.</p>
+      <div class="notice">
+        <strong>Summary of Changes:</strong><br />
+        {{summary}}
+      </div>
+      <p>We encourage you to review the updated policy to understand how these changes may affect you.</p>
+      <p style="text-align: center;"><a href="{{fullPolicyLink}}" class="btn">View Full Policy</a></p>
+      <p>If you have any questions or concerns regarding these changes, please do not hesitate to contact our support team.</p>
+      <div class="footer">
+        <p>&copy; 2026 Backend Platform. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

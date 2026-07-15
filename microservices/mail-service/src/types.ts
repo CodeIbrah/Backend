@@ -1,7 +1,9 @@
 export interface MailPayload {
   to: string;
   subject: string;
-  body: string;
+  body?: string;
+  templateId?: string;
+  templateData?: Record<string, unknown>;
   attachments?: Array<{ filename: string; content: string }>;
 }
 

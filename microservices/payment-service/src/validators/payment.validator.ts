@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { PaymentStatus, PaymentMethod, Currency, InvoiceStatus } from '../types';
+import { PaymentStatus, PaymentMethod, Currency, InvoiceStatus, InvoiceChannel } from '../types';
 
 const paymentStatusSchema = z.nativeEnum(PaymentStatus);
 const paymentMethodSchema = z.nativeEnum(PaymentMethod);
 const currencySchema = z.nativeEnum(Currency);
 const invoiceStatusSchema = z.nativeEnum(InvoiceStatus);
+const channelSchema = z.nativeEnum(InvoiceChannel);
 
 export const createPaymentSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
@@ -39,6 +40,9 @@ export const createInvoiceSchema = z.object({
   currency: currencySchema.default(Currency.USD),
   notes: z.string().max(1000).optional().nullable(),
   dueDate: z.string().datetime().optional(),
+  userEmail: z.string().email().optional(),
+  userPhone: z.string().optional(),
+  channel: channelSchema.optional(),
 });
 
 export const payInvoiceSchema = z.object({
@@ -71,6 +75,10 @@ export const invoiceFiltersSchema = z.object({
   userId: z.string().uuid().optional(),
   dateFrom: z.string().datetime().optional(),
   dateTo: z.string().datetime().optional(),
+});
+
+export const resendSchema = z.object({
+  channel: channelSchema,
 });
 
 export const revenueReportSchema = z.object({
@@ -124,6 +132,10 @@ export function validatePaymentFilters(query: unknown) {
 
 export function validateInvoiceFilters(query: unknown) {
   return invoiceFiltersSchema.safeParse(query);
+}
+
+export function validateResend(body: unknown) {
+  return resendSchema.safeParse(body);
 }
 
 export function validateRevenueReport(query: unknown) {

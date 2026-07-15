@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Arial, sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; padding: 24px; }
+    .card { background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .logo { text-align: center; margin-bottom: 24px; }
+    .logo h1 { color: #1a73e8; font-size: 24px; margin: 0; }
+    h2 { color: #202124; font-size: 20px; margin: 0 0 16px 0; }
+    p { color: #5f6368; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0; }
+    .receipt-details { background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 16px 0; }
+    .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8eaed; }
+    .receipt-row:last-child { border-bottom: none; }
+    .receipt-label { color: #5f6368; font-size: 14px; }
+    .receipt-value { color: #202124; font-size: 14px; font-weight: 600; }
+    .receipt-total { display: flex; justify-content: space-between; padding: 12px 0 0 0; margin-top: 8px; border-top: 2px solid #202124; }
+    .receipt-total .receipt-label { font-size: 16px; font-weight: 700; color: #202124; }
+    .receipt-total .receipt-value { font-size: 18px; color: #1a73e8; }
+    .badge { display: inline-block; background-color: #e6f4ea; color: #137333; font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
+    .btn { display: inline-block; background-color: #1a73e8; color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; margin: 8px 0; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e8eaed; font-size: 13px; color: #9aa0a6; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo"><h1>Backend Platform</h1></div>
+      <h2>Payment Receipt</h2>
+      <p>Hello {{userName}},</p>
+      <p>Thank you for your payment. Your transaction has been completed successfully. A PDF copy of your receipt is attached to this email.</p>
+      <div class="receipt-details">
+        <div class="receipt-row">
+          <span class="receipt-label">Invoice Number</span>
+          <span class="receipt-value">{{invoiceNumber}}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Receipt Number</span>
+          <span class="receipt-value">{{receiptNumber}}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Date</span>
+          <span class="receipt-value">{{date}}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Payment Method</span>
+          <span class="receipt-value"><span class="badge">{{paymentMethod}}</span></span>
+        </div>
+        <div class="receipt-total">
+          <span class="receipt-label">Total Charged</span>
+          <span class="receipt-value">{{currency}} {{amount}}</span>
+        </div>
+      </div>
+      <p style="text-align: center;"><a href="{{downloadLink}}" class="btn">Download Receipt PDF</a></p>
+      <p>If you have any questions about this charge, please contact our support team. Your receipt PDF is also available for download from your account dashboard.</p>
+      <div class="footer">
+        <p>&copy; 2026 Backend Platform. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

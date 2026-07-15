@@ -129,7 +129,7 @@ export class UsersService {
 
   async create(data: {
     email: string;
-    password: string;
+    password?: string;
     name?: string;
     role?: Role;
   }): Promise<User> {
@@ -141,7 +141,7 @@ export class UsersService {
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
-        password: data.password,
+        password: data.password ?? null,
         name: data.name,
         role: data.role || Role.USER,
       },

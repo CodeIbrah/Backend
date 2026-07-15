@@ -10,16 +10,6 @@
       "param": 0.5
     },
     {
-      "service": "auth-service",
-      "type": "probabilistic",
-      "param": 0.5
-    },
-    {
-      "service": "users-service",
-      "type": "probabilistic",
-      "param": 0.3
-    },
-    {
       "service": "notifications-service",
       "type": "probabilistic",
       "param": 0.2

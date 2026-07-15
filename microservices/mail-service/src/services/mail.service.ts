@@ -1,10 +1,39 @@
 import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
 import { MailPayload, MailRecord, MailStatus, PaginatedResult } from '../types';
 import { logger } from '../logging/logger';
 import { tracer } from '../telemetry/tracer';
+import { templateService } from './template.service';
+import { TemplateId } from '../templates';
+import { PrismaService } from './prisma.service';
 
 class MailService {
-  private store = new Map<string, MailRecord>();
+  private prisma: PrismaService;
+  private transporter: nodemailer.Transporter | null = null;
+
+  constructor() {
+    this.prisma = PrismaService.getInstance();
+  }
+
+  private getTransporter(): nodemailer.Transporter {
+    if (this.transporter) {
+      return this.transporter;
+    }
+
+    const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+    const smtpUser = process.env.SMTP_USER || '';
+    const smtpPass = process.env.SMTP_PASS || '';
+
+    this.transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: smtpUser ? { user: smtpUser, pass: smtpPass } : undefined,
+    });
+
+    return this.transporter;
+  }
 
   async send(payload: MailPayload): Promise<MailRecord> {
     const span = tracer.startSpan('mail.send');
@@ -12,20 +41,56 @@ class MailService {
       span.setAttribute('to', payload.to);
       span.setAttribute('subject', payload.subject);
 
+      let body = payload.body || '';
+      let subject = payload.subject;
+      let attachments = payload.attachments;
+
+      if (payload.templateId) {
+        const rendered = templateService.render(payload.templateId as TemplateId, payload.templateData || {});
+        body = rendered.html;
+        subject = rendered.subject;
+
+        if (payload.templateId === 'payment-receipt' && payload.templateData) {
+          const pdfAttachment = this.buildPdfAttachment(payload.templateData);
+          if (pdfAttachment) {
+            attachments = [...(attachments || []), pdfAttachment];
+          }
+        }
+      }
+
       const record: MailRecord = {
         id: uuidv4(),
         to: payload.to,
-        subject: payload.subject,
-        body: payload.body,
+        subject,
+        body,
         status: MailStatus.PENDING,
         sentAt: null,
         error: null,
         createdAt: new Date(),
       };
 
-      await this.deliver(record);
+      await this.prisma.client.email.create({
+        data: {
+          id: record.id,
+          to: record.to,
+          subject: record.subject,
+          body: record.body,
+          status: record.status,
+          sentAt: record.sentAt,
+          error: record.error,
+        },
+      });
 
-      this.store.set(record.id, record);
+      await this.deliver(record, attachments);
+
+      await this.prisma.client.email.update({
+        where: { id: record.id },
+        data: {
+          status: record.status,
+          sentAt: record.sentAt,
+          error: record.error,
+        },
+      });
 
       span.setAttribute('mailId', record.id);
       span.setAttribute('status', record.status);
@@ -35,8 +100,9 @@ class MailService {
         message: 'Mail processed',
         mailId: record.id,
         to: payload.to,
-        subject: payload.subject,
+        subject,
         status: record.status,
+        templateUsed: payload.templateId || null,
       });
 
       return record;
@@ -51,24 +117,52 @@ class MailService {
   }
 
   async findAll(page = 1, limit = 10): Promise<PaginatedResult<MailRecord>> {
-    const items = Array.from(this.store.values());
-    const total = items.length;
-    const start = (page - 1) * limit;
-    return { items: items.slice(start, start + limit), total, page, limit };
+    const skip = (page - 1) * limit;
+    const [emails, total] = await Promise.all([
+      this.prisma.client.email.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.client.email.count(),
+    ]);
+
+    const items: MailRecord[] = emails.map((e) => ({
+      id: e.id,
+      to: e.to,
+      subject: e.subject,
+      body: e.body,
+      status: e.status as MailStatus,
+      sentAt: e.sentAt,
+      error: e.error,
+      createdAt: e.createdAt,
+    }));
+
+    return { items, total, page, limit };
   }
 
   async findOne(id: string): Promise<MailRecord | null> {
-    return this.store.get(id) || null;
+    const email = await this.prisma.client.email.findUnique({ where: { id } });
+    if (!email) return null;
+    return {
+      id: email.id,
+      to: email.to,
+      subject: email.subject,
+      body: email.body,
+      status: email.status as MailStatus,
+      sentAt: email.sentAt,
+      error: email.error,
+      createdAt: email.createdAt,
+    };
   }
 
-  private async deliver(record: MailRecord): Promise<void> {
+  private async deliver(
+    record: MailRecord,
+    attachments?: MailPayload['attachments'],
+  ): Promise<void> {
     const span = tracer.startSpan('mail.deliver');
     try {
       const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
-      const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
-      const smtpUser = process.env.SMTP_USER || '';
-      const smtpPass = process.env.SMTP_PASS || '';
-      const fromEmail = process.env.FROM_EMAIL || 'noreply@example.com';
 
       if (!smtpHost || smtpHost === 'smtp.example.com') {
         logger.warn({
@@ -83,20 +177,24 @@ class MailService {
         return;
       }
 
-      const nodemailer = require('nodemailer');
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: smtpUser ? { user: smtpUser, pass: smtpPass } : undefined,
-      });
+      const transporter = this.getTransporter();
 
-      await transporter.sendMail({
-        from: fromEmail,
+      const mailOptions: nodemailer.SendMailOptions = {
+        from: process.env.FROM_EMAIL || 'noreply@example.com',
         to: record.to,
         subject: record.subject,
         html: record.body,
-      });
+      };
+
+      if (attachments && attachments.length > 0) {
+        mailOptions.attachments = attachments.map((att) => ({
+          filename: att.filename,
+          content: Buffer.from(att.content, 'base64'),
+          encoding: 'base64',
+        }));
+      }
+
+      await transporter.sendMail(mailOptions);
 
       record.status = MailStatus.SENT;
       record.sentAt = new Date();
@@ -110,6 +208,20 @@ class MailService {
     } finally {
       span.end();
     }
+  }
+
+  private buildPdfAttachment(
+    templateData: Record<string, unknown>,
+  ): { filename: string; content: string } | null {
+    const invoiceNumber = templateData.invoiceNumber;
+    if (!invoiceNumber) {
+      return null;
+    }
+
+    return {
+      filename: `receipt-${String(invoiceNumber)}.pdf`,
+      content: '',
+    };
   }
 }
 

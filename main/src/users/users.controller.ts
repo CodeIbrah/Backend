@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Delete,
   Param,
@@ -11,8 +12,9 @@ import {
   HttpStatus,
   ForbiddenException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiCreatedResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -25,6 +27,15 @@ import { CurrentUser } from '../common/decorators/user.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @Roles('ADMIN')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create a new user (ADMIN only)' })
+  @ApiCreatedResponse({ description: 'User created successfully' })
+  async create(@Body() createUserDto: CreateUserDto): Promise<unknown> {
+    return this.usersService.create(createUserDto);
+  }
 
   @Get()
   @Roles('ADMIN')

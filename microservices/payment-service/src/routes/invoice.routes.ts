@@ -6,6 +6,7 @@ import {
   getInvoicePDFHandler,
   payInvoiceHandler,
   getInvoiceByNumberHandler,
+  resendInvoiceHandler,
 } from '../controllers/invoice.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
@@ -17,5 +18,6 @@ router.get('/api/v1/invoices/:number', authMiddleware, getInvoiceByNumberHandler
 router.get('/api/v1/invoices/:id', authMiddleware, getInvoiceHandler);
 router.get('/api/v1/invoices/:id/pdf', authMiddleware, getInvoicePDFHandler);
 router.post('/api/v1/invoices/:id/pay', authMiddleware, payInvoiceHandler);
+router.post('/api/v1/invoices/:id/resend', authMiddleware, resendInvoiceHandler);
 
 export default router;

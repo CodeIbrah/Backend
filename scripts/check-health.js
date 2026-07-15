@@ -2,8 +2,6 @@ const http = require('http');
 
 const services = [
   { name: 'Main API', port: 3000, path: '/api/v1/health' },
-  { name: 'Auth Service', port: 3001, path: '/health' },
-  { name: 'Users Service', port: 3002, path: '/health' },
   { name: 'Payment Service', port: 3003, path: '/health' },
   { name: 'Notifications Service', port: 3004, path: '/health' },
 ];

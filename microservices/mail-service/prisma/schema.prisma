@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Email {
+  id        String    @id @default(uuid())
+  to        String
+  subject   String
+  body      String
+  status    String    @default("PENDING")
+  sentAt    DateTime?
+  error     String?
+  createdAt DateTime  @default(now())
+}

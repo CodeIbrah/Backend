@@ -11,6 +11,8 @@ import './telemetry/tracer';
 import routes from './routes';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { successResponse } from './utils/response';
+import { templateService } from './services/template.service';
+import { PrismaService } from './services/prisma.service';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3007', 10);
@@ -65,33 +67,45 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use(routes);
 app.use(errorMiddleware);
 
-const server = app.listen(PORT, () => {
-  logger.info(`Mail service listening on port ${PORT}`);
-});
+async function startServer(): Promise<void> {
+  const prismaService = PrismaService.getInstance();
+  await prismaService.onModuleInit();
+  await templateService.init();
 
-function gracefulShutdown(signal: string): void {
-  logger.info({ message: `Received ${signal}. Starting graceful shutdown...` });
-  server.close(() => {
-    logger.info('HTTP server closed');
-    process.exit(0);
+  const server = app.listen(PORT, () => {
+    logger.info(`Mail service listening on port ${PORT}`);
   });
-  setTimeout(() => {
-    logger.error('Forced shutdown after timeout');
-    process.exit(1);
-  }, 10000);
+
+  function gracefulShutdown(signal: string): void {
+    logger.info({ message: `Received ${signal}. Starting graceful shutdown...` });
+    server.close(async () => {
+      await prismaService.onModuleDestroy();
+      logger.info('HTTP server closed');
+      process.exit(0);
+    });
+    setTimeout(() => {
+      logger.error('Forced shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  }
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  process.on('uncaughtException', (error: Error) => {
+    logger.error({ message: 'Uncaught exception', error: error.message, stack: error.stack });
+    gracefulShutdown('uncaughtException');
+  });
+
+  process.on('unhandledRejection', (reason: unknown) => {
+    logger.error({ message: 'Unhandled rejection', reason: String(reason) });
+    gracefulShutdown('unhandledRejection');
+  });
 }
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-process.on('uncaughtException', (error: Error) => {
-  logger.error({ message: 'Uncaught exception', error: error.message, stack: error.stack });
-  gracefulShutdown('uncaughtException');
-});
-
-process.on('unhandledRejection', (reason: unknown) => {
-  logger.error({ message: 'Unhandled rejection', reason: String(reason) });
-  gracefulShutdown('unhandledRejection');
+startServer().catch((err) => {
+  logger.error({ message: 'Failed to start server', error: err });
+  process.exit(1);
 });
 
 export default app;

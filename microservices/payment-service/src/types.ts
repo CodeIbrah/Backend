@@ -29,6 +29,12 @@ export enum InvoiceStatus {
   CANCELLED = 'CANCELLED',
 }
 
+export enum InvoiceChannel {
+  EMAIL = 'EMAIL',
+  SMS = 'SMS',
+  BOTH = 'BOTH',
+}
+
 export enum Currency {
   USD = 'USD',
   EUR = 'EUR',
@@ -65,6 +71,8 @@ export interface Invoice {
   id: string;
   invoiceNumber: string;
   userId: string;
+  userEmail?: string;
+  userPhone?: string;
   paymentId: string | null;
   items: InvoiceItem[];
   subtotal: number;
@@ -73,10 +81,12 @@ export interface Invoice {
   total: number;
   currency: Currency;
   status: InvoiceStatus;
+  channel?: InvoiceChannel;
   notes: string | null;
   issuedAt: Date;
   dueDate: Date;
   paidAt: Date | null;
+  sentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -86,6 +96,8 @@ export interface Receipt {
   paymentId: string;
   invoiceId: string | null;
   userId: string;
+  userEmail?: string;
+  userPhone?: string;
   receiptNumber: string;
   amount: number;
   currency: Currency;
@@ -94,6 +106,7 @@ export interface Receipt {
   description: string;
   issuedAt: Date;
   pdfUrl: string | null;
+  sentAt: Date | null;
 }
 
 export interface AdminPaymentStats {
@@ -131,6 +144,9 @@ export interface CreateInvoiceInput {
   currency?: Currency;
   notes?: string | null;
   dueDate?: string;
+  userEmail?: string;
+  userPhone?: string;
+  channel?: InvoiceChannel;
 }
 
 export interface PaymentFilters {
