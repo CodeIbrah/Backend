@@ -84,14 +84,11 @@ export class AdyenProvider implements PaymentProvider {
         ...this.buildPaymentMethod(request),
       };
 
-      const response = await fetch(
-        `${this.getBaseUrl()}/v71/payments`,
-        {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify(payload),
-        },
-      );
+      const response = await fetch(`${this.getBaseUrl()}/v71/payments`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -154,17 +151,14 @@ export class AdyenProvider implements PaymentProvider {
         },
       };
 
-      const response = await fetch(
-        `${this.getEndpoint('Payment')}/v71/capture`,
-        {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify({
-            ...payload,
-            originalReference: transactionId,
-          }),
-        },
-      );
+      const response = await fetch(`${this.getEndpoint('Payment')}/v71/capture`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          ...payload,
+          originalReference: transactionId,
+        }),
+      });
 
       if (!response.ok) throw new Error(`Adyen capture failed: ${response.statusText}`);
 
@@ -205,17 +199,14 @@ export class AdyenProvider implements PaymentProvider {
         },
       };
 
-      const response = await fetch(
-        `${this.getEndpoint('Payment')}/v71/refund`,
-        {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify({
-            ...payload,
-            originalReference: transactionId,
-          }),
-        },
-      );
+      const response = await fetch(`${this.getEndpoint('Payment')}/v71/refund`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          ...payload,
+          originalReference: transactionId,
+        }),
+      });
 
       if (!response.ok) throw new Error(`Adyen refund failed: ${response.statusText}`);
 
@@ -247,24 +238,25 @@ export class AdyenProvider implements PaymentProvider {
     }
   }
 
-  async partialRefund(transactionId: string, amount: number, reason?: string): Promise<PaymentResult> {
+  async partialRefund(
+    transactionId: string,
+    amount: number,
+    reason?: string,
+  ): Promise<PaymentResult> {
     return this.refund(transactionId, amount, reason);
   }
 
   async cancel(transactionId: string): Promise<PaymentResult> {
     const span = tracer.startSpan('adyen.cancel');
     try {
-      const response = await fetch(
-        `${this.getEndpoint('Payment')}/v71/cancel`,
-        {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify({
-            merchantAccount: this.getMerchantAccount(),
-            originalReference: transactionId,
-          }),
-        },
-      );
+      const response = await fetch(`${this.getEndpoint('Payment')}/v71/cancel`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          merchantAccount: this.getMerchantAccount(),
+          originalReference: transactionId,
+        }),
+      });
 
       if (!response.ok) throw new Error(`Adyen cancel failed: ${response.statusText}`);
 
@@ -372,6 +364,17 @@ export class AdyenProvider implements PaymentProvider {
               ownerName: request.paymentData.ownerName as string,
             },
           },
+        };
+      case PaymentMethod.APPLE_PAY:
+        return {
+          paymentMethod: { type: 'applepay' },
+          /** Apple Pay requires the domain registered in Adyen's Apple Pay configuration */
+          applePayToken: request.paymentData.applePayToken as string | undefined,
+        };
+      case PaymentMethod.GOOGLE_PAY:
+        return {
+          paymentMethod: { type: 'googlepay' },
+          googlePayToken: request.paymentData.googlePayToken as string | undefined,
         };
       case PaymentMethod.BIZUM:
         return {
