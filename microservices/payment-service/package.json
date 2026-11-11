@@ -32,7 +32,7 @@
     "morgan": "^1.10.0",
     "pdfkit": "^0.15.0",
     "prom-client": "^15.1.0",
-    "redsys-easy": "^3.0.0",
+    "redsys-easy": "^6.0.1",
     "stripe": "^17.0.0",
     "uuid": "^9.0.0",
     "winston": "^3.13.0",
