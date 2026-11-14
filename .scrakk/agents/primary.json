@@ -1,0 +1,18 @@
+{
+  "agents": [
+    {
+      "id": "asistente",
+      "label": "Asistente",
+      "description": "Agente general. Pregunta antes de acciones riesgosas.",
+      "icon": "chat",
+      "color": "#6366f1",
+      "mode": "primary",
+      "base": "default",
+      "prompt": "",
+      "model": "inherit",
+      "subagents": [
+        "explorador"
+      ]
+    }
+  ]
+}

@@ -85,3 +85,6 @@ temp/
 # Sentry
 .sentryclirc
 PROMP.md
+
+# CodeGraph local index (regenerable with: codegraph init)
+.codegraph/
